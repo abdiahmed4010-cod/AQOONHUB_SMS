@@ -100,7 +100,7 @@ namespace AQOONHUB.BusinessLogic
 
             // Log
             auditLogger.LogCreate(createdBy, "Staff", "Staff Member", staff.EmployeeID,
-                $"Added {staff.FullName} as {staff.Position} in {staff.Department}");
+                string.Format("Added {0} as {1} in {2}", staff.FullName, staff.Position, staff.Department));
 
             return staff;
         }
@@ -180,13 +180,13 @@ namespace AQOONHUB.BusinessLogic
                 throw new Exception("Staff not found");
 
             if (leaveType == "Annual" && days > staff.LeaveBalance)
-                throw new ValidationException($"Insufficient leave balance. Available: {staff.LeaveBalance} days, Requested: {days} days");
+                throw new ValidationException(string.Format("Insufficient leave balance. Available: {0} days, Requested: {1} days", staff.LeaveBalance, days));
 
             // Create request
             int leaveId = staffDAL.RequestLeave(staffId, leaveType, startDate, endDate, reason);
 
             auditLogger.LogAction(requestedBy, "LEAVE_REQUEST", "HR",
-                $"{staff.FullName} requested {leaveType} leave: {startDate:yyyy-MM-dd} to {endDate:yyyy-MM-dd} ({days} days)");
+                string.Format("{0} requested {1} leave: {2:yyyy-MM-dd} to {3:yyyy-MM-dd} ({4} days)", staff.FullName, leaveType, startDate, endDate, days));
 
             return leaveId;
         }
@@ -219,8 +219,8 @@ namespace AQOONHUB.BusinessLogic
             if (result)
             {
                 string action = approve ? "APPROVED" : "REJECTED";
-                auditLogger.LogAction(approvedBy, $"LEAVE_{action}", "HR",
-                    $"{action} {leaveType} leave for {staffName}. Notes: {notes}");
+                auditLogger.LogAction(approvedBy, string.Format("LEAVE_{0}", action), "HR",
+                    string.Format("{0} {1} leave for {2}. Notes: {3}", action, leaveType, staffName, notes));
             }
 
             return result;
@@ -260,7 +260,7 @@ namespace AQOONHUB.BusinessLogic
             }
 
             auditLogger.LogAction(processedBy, "PAYROLL_RUN", "HR",
-                $"Processed payroll for {month}/{year}. {payroll.Rows.Count} staff members.");
+                string.Format("Processed payroll for {0}/{1}. {2} staff members.", month, year, payroll.Rows.Count));
 
             return true;
         }

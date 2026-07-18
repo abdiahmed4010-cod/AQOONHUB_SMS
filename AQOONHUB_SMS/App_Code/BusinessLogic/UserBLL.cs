@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using AQOONHUB.DataAccess;
 using AQOONHUB.Models;
 using AQOONHUB.Utilities;
@@ -282,7 +284,7 @@ namespace AQOONHUB.BusinessLogic
             int newId = Convert.ToInt32(db.ExecuteScalar(query, parameters));
 
             auditLogger.LogCreate(createdBy, "Users", "User", newId.ToString(),
-                $"Created user account for {user.FullName} ({user.Role})");
+                string.Format("Created user account for {0} ({1})", user.FullName, user.Role));
 
             return newId;
         }
@@ -313,7 +315,7 @@ namespace AQOONHUB.BusinessLogic
             if (result)
             {
                 auditLogger.LogUpdate(updatedBy, "Users", "User", user.UserID.ToString(),
-                    "Profile", "Previous", $"Name: {user.FullName}, Role: {user.Role}");
+                    "Profile", "Previous", string.Format("Name: {0}, Role: {1}", user.FullName, user.Role));
             }
 
             return result;
@@ -332,7 +334,7 @@ namespace AQOONHUB.BusinessLogic
             if (result)
             {
                 auditLogger.LogAction(disabledBy, "DISABLE", "Users",
-                    $"Disabled user ID {userId}. Reason: {reason}");
+                    string.Format("Disabled user ID {0}. Reason: {1}", userId, reason));
             }
 
             return result;

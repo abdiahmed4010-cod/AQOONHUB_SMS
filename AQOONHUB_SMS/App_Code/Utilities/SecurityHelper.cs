@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
 using System.Web;
@@ -19,7 +20,7 @@ namespace AQOONHUB.Utilities
         public static string HashPassword(string password)
         {
             if (string.IsNullOrEmpty(password))
-                throw new ArgumentException("Password cannot be null or empty", nameof(password));
+                throw new ArgumentException("Password cannot be null or empty", "password");
 
             using (SHA256 sha256 = SHA256.Create())
             {
@@ -271,7 +272,8 @@ namespace AQOONHUB.Utilities
         /// </summary>
         public static PasswordValidationResult ValidatePasswordPolicy(string password)
         {
-            var result = new PasswordValidationResult { IsValid = true };
+            var result = new PasswordValidationResult();
+            result.IsValid = true;
 
             if (string.IsNullOrEmpty(password) || password.Length < 8)
             {
@@ -315,6 +317,11 @@ namespace AQOONHUB.Utilities
     public class PasswordValidationResult
     {
         public bool IsValid { get; set; }
-        public List<string> Errors { get; set; } = new List<string>();
+        public List<string> Errors { get; set; }
+
+        public PasswordValidationResult()
+        {
+            Errors = new List<string>();
+        }
     }
 }

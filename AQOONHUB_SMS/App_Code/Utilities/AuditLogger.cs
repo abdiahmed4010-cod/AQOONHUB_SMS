@@ -58,7 +58,7 @@ namespace AQOONHUB.Utilities
             {
                 // Write to Windows Event Log if database logging fails
                 System.Diagnostics.EventLog.WriteEntry("AQOONHUB",
-                    $"Audit logging failed: {ex.Message}. Original action: {action} - {detail}",
+                    string.Format("Audit logging failed: {0}. Original action: {1} - {2}", ex.Message, action, detail),
                     System.Diagnostics.EventLogEntryType.Error);
             }
         }
@@ -68,7 +68,7 @@ namespace AQOONHUB.Utilities
         /// </summary>
         public void LogCreate(int userId, string module, string entityType, string entityId, string description)
         {
-            string detail = $"Created {entityType} [{entityId}]: {description}";
+            string detail = string.Format("Created {0} [{1}]: {2}", entityType, entityId, description);
             LogAction(userId, "CREATE", module, detail);
         }
 
@@ -78,7 +78,7 @@ namespace AQOONHUB.Utilities
         public void LogUpdate(int userId, string module, string entityType, string entityId,
             string fieldName, string oldValue, string newValue)
         {
-            string detail = $"Updated {entityType} [{entityId}] - Field '{fieldName}': '{oldValue}' → '{newValue}'";
+            string detail = string.Format("Updated {0} [{1}] - Field '{2}': '{3}' → '{4}'", entityType, entityId, fieldName, oldValue, newValue);
             LogAction(userId, "UPDATE", module, detail);
         }
 
@@ -87,7 +87,7 @@ namespace AQOONHUB.Utilities
         /// </summary>
         public void LogDelete(int userId, string module, string entityType, string entityId, string description)
         {
-            string detail = $"Deleted {entityType} [{entityId}]: {description}";
+            string detail = string.Format("Deleted {0} [{1}]: {2}", entityType, entityId, description);
             LogAction(userId, "DELETE", module, detail);
         }
 
@@ -96,7 +96,7 @@ namespace AQOONHUB.Utilities
         /// </summary>
         public void LogRestore(int userId, string module, string entityType, string entityId)
         {
-            string detail = $"Restored {entityType} [{entityId}] from archive";
+            string detail = string.Format("Restored {0} [{1}] from archive", entityType, entityId);
             LogAction(userId, "RESTORE", module, detail);
         }
 
@@ -105,7 +105,7 @@ namespace AQOONHUB.Utilities
         /// </summary>
         public void LogExport(int userId, string module, string exportType, string fileName, int recordCount)
         {
-            string detail = $"Exported {exportType} to '{fileName}' ({recordCount} records)";
+            string detail = string.Format("Exported {0} to '{1}' ({2} records)", exportType, fileName, recordCount);
             LogAction(userId, "EXPORT", module, detail);
         }
 
@@ -115,9 +115,15 @@ namespace AQOONHUB.Utilities
         public void LogLogin(int? userId, string username, bool success, string failureReason = null)
         {
             string action = success ? "LOGIN" : "LOGIN_FAILED";
-            string detail = success
-                ? $"Successful login: {username}"
-                : $"Failed login attempt: {username}. Reason: {failureReason ?? "Invalid credentials"}";
+            string detail;
+            if (success)
+            {
+                detail = string.Format("Successful login: {0}", username);
+            }
+            else
+            {
+                detail = string.Format("Failed login attempt: {0}. Reason: {1}", username, failureReason ?? "Invalid credentials");
+            }
 
             LogAction(userId, action, "Auth", detail);
         }
@@ -127,7 +133,7 @@ namespace AQOONHUB.Utilities
         /// </summary>
         public void LogLogout(int userId, string username)
         {
-            string detail = $"User logged out: {username}";
+            string detail = string.Format("User logged out: {0}", username);
             LogAction(userId, "LOGOUT", "Auth", detail);
         }
 
@@ -137,7 +143,7 @@ namespace AQOONHUB.Utilities
         public void LogPermissionChange(int userId, string module, string targetUser,
             string permission, string oldValue, string newValue)
         {
-            string detail = $"Changed permission for {targetUser}: {permission} '{oldValue}' → '{newValue}'";
+            string detail = string.Format("Changed permission for {0}: {1} '{2}' → '{3}'", targetUser, permission, oldValue, newValue);
             LogAction(userId, "PERMISSION_CHANGE", module, detail);
         }
 
@@ -146,7 +152,7 @@ namespace AQOONHUB.Utilities
         /// </summary>
         public void LogBulkOperation(int userId, string module, string operation, int affectedCount, string description)
         {
-            string detail = $"Bulk {operation}: {affectedCount} records affected. {description}";
+            string detail = string.Format("Bulk {0}: {1} records affected. {2}", operation, affectedCount, description);
             LogAction(userId, "BULK", module, detail);
         }
 
@@ -185,7 +191,7 @@ namespace AQOONHUB.Utilities
             catch (Exception ex)
             {
                 System.Diagnostics.EventLog.WriteEntry("AQOONHUB",
-                    $"Login activity logging failed: {ex.Message}",
+                    string.Format("Login activity logging failed: {0}", ex.Message),
                     System.Diagnostics.EventLogEntryType.Error);
             }
         }
@@ -200,8 +206,8 @@ namespace AQOONHUB.Utilities
         public DataTable GetAuditLog(string module = null, string action = null,
             DateTime? fromDate = null, DateTime? toDate = null, int? userId = null, int top = 100)
         {
-            string query = $@"
-                SELECT TOP ({top})
+            string query = string.Format(@"
+                SELECT TOP ({0})
                     al.AuditID,
                     al.Action,
                     al.Module,
@@ -212,7 +218,7 @@ namespace AQOONHUB.Utilities
                     u.Email as UserEmail
                 FROM AuditLog al
                 LEFT JOIN Users u ON al.UserID = u.UserID
-                WHERE 1=1";
+                WHERE 1=1", top);
 
             var parameters = new System.Collections.Generic.List<SqlParameter>();
 
@@ -256,8 +262,8 @@ namespace AQOONHUB.Utilities
         /// </summary>
         public DataTable GetLoginActivity(int? userId = null, string status = null, int top = 100)
         {
-            string query = $@"
-                SELECT TOP ({top})
+            string query = string.Format(@"
+                SELECT TOP ({0})
                     la.LoginID,
                     ISNULL(u.FullName, 'Unknown') as UserName,
                     ISNULL(u.Role, '—') as Role,
@@ -268,7 +274,7 @@ namespace AQOONHUB.Utilities
                     la.FailureReason
                 FROM LoginActivity la
                 LEFT JOIN Users u ON la.UserID = u.UserID
-                WHERE 1=1";
+                WHERE 1=1", top);
 
             var parameters = new System.Collections.Generic.List<SqlParameter>();
 
@@ -360,7 +366,7 @@ namespace AQOONHUB.Utilities
                 string version = context.Request.Browser.Version;
                 string platform = context.Request.Browser.Platform;
 
-                return $"{browser} {version} — {platform}";
+                return string.Format("{0} {1} — {2}", browser, version, platform);
             }
             catch
             {

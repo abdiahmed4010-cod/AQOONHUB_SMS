@@ -103,7 +103,7 @@ namespace AQOONHUB.BusinessLogic
 
             // Log audit
             auditLogger.LogCreate(createdBy, "Students", "Student", student.StudentCode,
-                $"Registered {student.FullName} in {student.ClassName}");
+                string.Format("Registered {0} in {1}", student.FullName, student.ClassName));
 
             return student;
         }
@@ -195,7 +195,7 @@ namespace AQOONHUB.BusinessLogic
             if (result)
             {
                 auditLogger.LogAction(promotedBy, "PROMOTE", "Students",
-                    $"Promoted {student.FullName} ({student.StudentCode}) to new class");
+                    string.Format("Promoted {0} ({1}) to new class", student.FullName, student.StudentCode));
             }
 
             return result;
@@ -216,7 +216,7 @@ namespace AQOONHUB.BusinessLogic
 
             // Log
             auditLogger.LogAction(transferredBy, "TRANSFER", "Students",
-                $"Transferred {student.FullName} to {transferTo}. Reason: {reason}");
+                string.Format("Transferred {0} to {1}. Reason: {2}", student.FullName, transferTo, reason));
 
             return true;
         }
@@ -234,7 +234,7 @@ namespace AQOONHUB.BusinessLogic
             studentDAL.UpdateStudent(student);
 
             auditLogger.LogAction(suspendedBy, "SUSPEND", "Students",
-                $"Suspended {student.FullName}. Reason: {reason}. Until: {until?.ToString("yyyy-MM-dd") ?? "Indefinite"}");
+                string.Format("Suspended {0}. Reason: {1}. Until: {2}", student.FullName, reason, until != null ? until.Value.ToString("yyyy-MM-dd") : "Indefinite"));
 
             return true;
         }
@@ -257,7 +257,7 @@ namespace AQOONHUB.BusinessLogic
             if (result)
             {
                 auditLogger.LogAction(reactivatedBy, "REACTIVATE", "Students",
-                    $"Reactivated {student.FullName}");
+                    string.Format("Reactivated {0}", student.FullName));
             }
 
             return result;
@@ -272,7 +272,7 @@ namespace AQOONHUB.BusinessLogic
         /// </summary>
         public List<Student> GetStudentsWithOutstandingFees(decimal minBalance = 0)
         {
-            var students = studentDAL.GetAllStudents("Active");
+            var students = studentDAL.GetAllStudents("Active", null);
             return students.FindAll(s => s.Balance > minBalance);
         }
 
@@ -282,7 +282,7 @@ namespace AQOONHUB.BusinessLogic
         public List<Student> GetStudentsWithLowAttendance(int threshold = 75)
         {
             AttendanceDAL attendanceDAL = new AttendanceDAL();
-            var students = studentDAL.GetAllStudents("Active");
+            var students = studentDAL.GetAllStudents("Active", null);
 
             List<Student> lowAttendance = new List<Student>();
             foreach (var student in students)

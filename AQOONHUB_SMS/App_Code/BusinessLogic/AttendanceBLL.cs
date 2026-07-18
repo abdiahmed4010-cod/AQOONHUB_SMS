@@ -77,7 +77,7 @@ namespace AQOONHUB.BusinessLogic
             int count = attendanceDAL.BulkMarkAttendance(sectionId, date, period, markedBy);
 
             auditLogger.LogAction(markedBy, "BULK_ATTENDANCE", "Attendance",
-                $"Marked all {count} students present for section {sectionId} on {date:yyyy-MM-dd}");
+                string.Format("Marked all {0} students present for section {1} on {2:yyyy-MM-dd}", count, sectionId, date));
 
             return count;
         }
@@ -96,7 +96,7 @@ namespace AQOONHUB.BusinessLogic
             }
 
             auditLogger.LogAction(markedBy, "ATTENDANCE_REGISTER", "Attendance",
-                $"Saved attendance register for section {sectionId} on {date:yyyy-MM-dd}. {savedCount} students marked.");
+                string.Format("Saved attendance register for section {0} on {1:yyyy-MM-dd}. {2} students marked.", sectionId, date, savedCount));
 
             return savedCount > 0;
         }
@@ -196,7 +196,7 @@ namespace AQOONHUB.BusinessLogic
 
             // Send SMS/Email to parent
             // Implementation depends on notification service
-            string message = $"Your child {student.FullName} was marked absent on {date:yyyy-MM-dd}. Please contact the school if this is incorrect.";
+            string message = string.Format("Your child {0} was marked absent on {1:yyyy-MM-dd}. Please contact the school if this is incorrect.", student.FullName, date);
 
             // NotificationService.SendSMS(student.GuardianPhone, message);
         }

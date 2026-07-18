@@ -13,7 +13,7 @@ namespace AQOONHUB.Models
         public string LastName { get; set; }
         public string FullName
         {
-            get { return $"{FirstName} {LastName}"; }
+            get { return string.Format("{0} {1}", FirstName, LastName); }
         }
         public string Gender { get; set; }
         public DateTime DateOfBirth { get; set; }

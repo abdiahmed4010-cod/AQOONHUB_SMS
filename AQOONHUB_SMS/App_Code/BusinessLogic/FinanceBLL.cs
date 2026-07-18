@@ -40,7 +40,7 @@ namespace AQOONHUB.BusinessLogic
         /// </summary>
         public List<string> GenerateTermInvoices(int termId, int classId, int generatedBy)
         {
-            var students = studentDAL.GetAllStudents("Active");
+            var students = studentDAL.GetAllStudents("Active", null);
             List<string> generatedInvoices = new List<string>();
 
             foreach (var student in students)
@@ -57,7 +57,7 @@ namespace AQOONHUB.BusinessLogic
             if (generatedInvoices.Count > 0)
             {
                 auditLogger.LogBulkOperation(generatedBy, "Finance", "INVOICE_GENERATION",
-                    generatedInvoices.Count, $"Generated invoices for term {termId}");
+                    generatedInvoices.Count, string.Format("Generated invoices for term {0}", termId));
             }
 
             return generatedInvoices;
@@ -83,7 +83,7 @@ namespace AQOONHUB.BusinessLogic
             if (result)
             {
                 auditLogger.LogAction(voidedBy, "VOID", "Finance",
-                    $"Voided invoice {invoice.InvoiceNo}. Reason: {reason}");
+                    string.Format("Voided invoice {0}. Reason: {1}", invoice.InvoiceNo, reason));
             }
 
             return result;
@@ -114,7 +114,7 @@ namespace AQOONHUB.BusinessLogic
                 throw new ValidationException("Payment amount must be greater than 0");
 
             if (amount > invoice.Balance)
-                throw new ValidationException($"Payment amount (${amount:N2}) exceeds balance (${invoice.Balance:N2})");
+                throw new ValidationException(string.Format("Payment amount (${0:N2}) exceeds balance (${1:N2})", amount, invoice.Balance));
 
             // Validate payment method
             string[] validMethods = { "Zaad", "eDahab", "Cash", "Bank Transfer" };
@@ -127,7 +127,7 @@ namespace AQOONHUB.BusinessLogic
             if (receiptNo != null)
             {
                 auditLogger.LogAction(receivedBy, "PAYMENT", "Finance",
-                    $"Recorded payment {receiptNo} for invoice {invoice.InvoiceNo}. Amount: ${amount:N2} via {paymentMethod}");
+                    string.Format("Recorded payment {0} for invoice {1}. Amount: ${2:N2} via {3}", receiptNo, invoice.InvoiceNo, amount, paymentMethod));
 
                 // Check if fully paid and send notification
                 var updatedInvoice = financeDAL.GetInvoiceById(invoiceId);
@@ -158,7 +158,7 @@ namespace AQOONHUB.BusinessLogic
             decimal newTotal = invoice.TotalAmount - discountAmount;
 
             auditLogger.LogAction(appliedBy, "DISCOUNT", "Finance",
-                $"Applied {discountType} discount of ${discountAmount:N2} to invoice {invoice.InvoiceNo}. Reason: {reason}");
+                string.Format("Applied {0} discount of ${1:N2} to invoice {2}. Reason: {3}", discountType, discountAmount, invoice.InvoiceNo, reason));
 
             return true;
         }
@@ -208,7 +208,7 @@ namespace AQOONHUB.BusinessLogic
 
         public DataTable GetFeeStructures(int? academicYearId = null)
         {
-            return financeDAL.GetFeeStructures(academicYearId);
+            return financeDAL.GetFeeStructures(academicYearId, null);
         }
 
         public int AddFeeStructure(string feeName, string category, int? classId,
@@ -224,7 +224,7 @@ namespace AQOONHUB.BusinessLogic
             int feeId = financeDAL.AddFeeStructure(feeName, category, classId, amount, billingTerm, academicYearId);
 
             auditLogger.LogCreate(createdBy, "Finance", "Fee Structure", feeId.ToString(),
-                $"Added {feeName}: ${amount:N2} ({billingTerm})");
+                string.Format("Added {0}: ${1:N2} ({2})", feeName, amount, billingTerm));
 
             return feeId;
         }
@@ -235,7 +235,7 @@ namespace AQOONHUB.BusinessLogic
 
         private bool InvoiceExistsForTerm(int studentId, int termId)
         {
-            var invoices = financeDAL.GetInvoices(null, studentId);
+            var invoices = financeDAL.GetInvoices(null, studentId, null);
             foreach (var inv in invoices)
             {
                 if (inv.TermID == termId && inv.Status != "Void")

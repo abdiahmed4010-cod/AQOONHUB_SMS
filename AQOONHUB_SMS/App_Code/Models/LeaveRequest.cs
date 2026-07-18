@@ -44,7 +44,7 @@ namespace AQOONHUB.Models
 
         public string DurationDisplay
         {
-            get { return $"{StartDate:MMM dd} → {EndDate:MMM dd} ({Days} days)"; }
+            get { return string.Format("{0:MMM dd} → {1:MMM dd} ({2} days)", StartDate, EndDate, Days); }
         }
     }
 }

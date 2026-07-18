@@ -58,7 +58,7 @@ namespace AQOONHUB.BusinessLogic
             if (result)
             {
                 auditLogger.LogAction(setBy, "YEAR_CHANGE", "Academics",
-                    $"Changed active academic year to {targetYear["YearName"]}");
+                    string.Format("Changed active academic year to {0}", targetYear["YearName"]));
             }
 
             return result;
@@ -94,7 +94,7 @@ namespace AQOONHUB.BusinessLogic
             if (result)
             {
                 auditLogger.LogAction(setBy, "TERM_CHANGE", "Academics",
-                    $"Changed current term to {targetTerm["TermName"]} ({targetTerm["YearName"]})");
+                    string.Format("Changed current term to {0} ({1})", targetTerm["TermName"], targetTerm["YearName"]));
 
                 // Trigger term change processes
                 OnTermChange(termId);
@@ -129,7 +129,7 @@ namespace AQOONHUB.BusinessLogic
             int classId = academicDAL.AddClass(className, capacity, roomNumber);
 
             auditLogger.LogCreate(createdBy, "Academics", "Class", classId.ToString(),
-                $"Added {className} with capacity {capacity}");
+                string.Format("Added {0} with capacity {1}", className, capacity));
 
             return classId;
         }
@@ -145,13 +145,13 @@ namespace AQOONHUB.BusinessLogic
             foreach (DataRow row in existing.Rows)
             {
                 if (row["SectionName"].ToString() == sectionName)
-                    throw new ValidationException($"Section {sectionName} already exists for this class");
+                    throw new ValidationException(string.Format("Section {0} already exists for this class", sectionName));
             }
 
             int sectionId = academicDAL.AddSection(classId, sectionName, capacity);
 
             auditLogger.LogCreate(createdBy, "Academics", "Section", sectionId.ToString(),
-                $"Added Section {sectionName} to class");
+                string.Format("Added Section {0} to class", sectionName));
 
             return sectionId;
         }
@@ -185,7 +185,7 @@ namespace AQOONHUB.BusinessLogic
             int subjectId = academicDAL.AddSubject(subjectName, subjectCode, description);
 
             auditLogger.LogCreate(createdBy, "Academics", "Subject", subjectCode,
-                $"Added subject: {subjectName}");
+                string.Format("Added subject: {0}", subjectName));
 
             return subjectId;
         }
@@ -220,7 +220,7 @@ namespace AQOONHUB.BusinessLogic
                 string conflictMsg = "Teacher has conflicting classes:\n";
                 foreach (DataRow row in conflicts.Rows)
                 {
-                    conflictMsg += $"- {row["ClassName"]} {row["SectionName"]}: {row["SubjectName"]}\n";
+                    conflictMsg += string.Format("- {0} {1}: {2}\n", row["ClassName"], row["SectionName"], row["SubjectName"]);
                 }
                 throw new ValidationException(conflictMsg);
             }
@@ -231,7 +231,7 @@ namespace AQOONHUB.BusinessLogic
                 periodNo, startTime, endTime, roomNumber, academicYearId);
 
             auditLogger.LogCreate(createdBy, "Academics", "Timetable Slot", slotId.ToString(),
-                $"Added {startTime:hh\\:mm}-{endTime:hh\\:mm} slot for section {sectionId}");
+                string.Format("Added {0:hh\\:mm}-{1:hh\\:mm} slot for section {2}", startTime, endTime, sectionId));
 
             return slotId;
         }
@@ -289,18 +289,18 @@ namespace AQOONHUB.BusinessLogic
                     else
                     {
                         failed++;
-                        failures.Add($"{row["StudentName"]}: Promotion failed");
+                        failures.Add(string.Format("{0}: Promotion failed", row["StudentName"]));
                     }
                 }
                 else
                 {
                     failed++;
-                    failures.Add($"{row["StudentName"]}: Did not meet requirements");
+                    failures.Add(string.Format("{0}: Did not meet requirements", row["StudentName"]));
                 }
             }
 
             auditLogger.LogBulkOperation(executedBy, "Academics", "PROMOTION",
-                promoted, $"Promoted {promoted} students from class {fromClassId} to {toClassId}");
+                promoted, string.Format("Promoted {0} students from class {1} to {2}", promoted, fromClassId, toClassId));
 
             return new PromotionResult
             {

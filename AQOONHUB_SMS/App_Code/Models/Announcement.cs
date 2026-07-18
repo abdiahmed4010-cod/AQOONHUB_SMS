@@ -24,9 +24,9 @@ namespace AQOONHUB.Models
             get
             {
                 TimeSpan diff = DateTime.Now - CreatedAt;
-                if (diff.TotalMinutes < 60) return $"{(int)diff.TotalMinutes}m ago";
-                if (diff.TotalHours < 24) return $"{(int)diff.TotalHours}h ago";
-                if (diff.TotalDays < 7) return $"{(int)diff.TotalDays}d ago";
+                if (diff.TotalMinutes < 60) return string.Format("{0}m ago", (int)diff.TotalMinutes);
+                if (diff.TotalHours < 24) return string.Format("{0}h ago", (int)diff.TotalHours);
+                if (diff.TotalDays < 7) return string.Format("{0}d ago", (int)diff.TotalDays);
                 return CreatedAt.ToString("MMM dd");
             }
         }
