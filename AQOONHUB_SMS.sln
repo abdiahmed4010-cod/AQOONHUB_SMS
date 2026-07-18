@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.37301.9
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AQOONHUB_SMS", "AQOONHUB_SMS\AQOONHUB_SMS.csproj", "{331BF695-007E-45BE-9000-DDD0D6FA7D81}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{331BF695-007E-45BE-9000-DDD0D6FA7D81}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{331BF695-007E-45BE-9000-DDD0D6FA7D81}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{331BF695-007E-45BE-9000-DDD0D6FA7D81}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{331BF695-007E-45BE-9000-DDD0D6FA7D81}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B2A0E045-105B-423E-BFFE-205044E40788}
+	EndGlobalSection
+EndGlobal
