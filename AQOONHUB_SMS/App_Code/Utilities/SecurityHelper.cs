@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Web;
 
-namespace AQOONHUB.Utilities
+namespace AQOONHUB_SMS.App_Code.Utilities
 {
     /// <summary>
     /// Provides security utilities for password hashing, encryption, and token generation

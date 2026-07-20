@@ -479,7 +479,7 @@ namespace AQOONHUB_SMS.App_Code.BusinessLogic
                         timetable[i].StartTime < timetable[j].EndTime &&
                         timetable[i].EndTime > timetable[j].StartTime)
                     {
-                        issues.Add(string.Format("Room '{0}' double-booked on day {1} between {2:hh\\:mm} and {3:hh\\:mm}",
+                        issues.Add(string.Format("Room \'{0}\' double-booked on day {1} between {2:hh\\:mm} and {3:hh\\:mm}",
                             timetable[i].RoomNumber, timetable[i].DayOfWeek, timetable[i].StartTime, timetable[j].EndTime));
                     }
                 }
@@ -550,4 +550,30 @@ namespace AQOONHUB_SMS.App_Code.BusinessLogic
             if (slot.PeriodNo <= 0)
                 errors.Add("Period number is required");
 
-            if (slot.StartTime
+            if (slot.StartTime == TimeSpan.Zero)
+                errors.Add("Start time is required");
+
+            if (slot.EndTime == TimeSpan.Zero)
+                errors.Add("End time is required");
+
+            if (slot.StartTime != TimeSpan.Zero && slot.EndTime != TimeSpan.Zero)
+            {
+                if (slot.StartTime >= slot.EndTime)
+                    errors.Add("Start time must be before end time");
+
+                if ((slot.EndTime - slot.StartTime).TotalMinutes < 30)
+                    errors.Add("Class duration must be at least 30 minutes");
+            }
+
+            if (string.IsNullOrWhiteSpace(slot.RoomNumber))
+                errors.Add("Room number is required");
+
+            if (slot.AcademicYearID <= 0)
+                errors.Add("Academic year is required");
+
+            return errors;
+        }
+
+        #endregion
+    }
+}

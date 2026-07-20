@@ -1,4 +1,6 @@
-﻿namespace AQOONHUB.Models
+﻿using System;
+
+namespace AQOONHUB_SMS.App_Code.Models
 {
     /// <summary>
     /// Represents school configuration settings

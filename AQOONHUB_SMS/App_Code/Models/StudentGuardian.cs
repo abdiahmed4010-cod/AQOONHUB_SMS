@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AQOONHUB.Models
+namespace AQOONHUB_SMS.App_Code.Models
 {
     /// <summary>
     /// Represents the relationship between a student and their guardian

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using AQOONHUB.DataAccess;
-using AQOONHUB.Models;
-using AQOONHUB.Utilities;
+using AQOONHUB_SMS.App_Code.DataAccess;
+using AQOONHUB_SMS.App_Code.Models;
+using AQOONHUB_SMS.App_Code.Utilities;
 
-namespace AQOONHUB.BusinessLogic
+namespace AQOONHUB_SMS.App_Code.BusinessLogic
 {
     /// <summary>
     /// Business logic layer for academic year management

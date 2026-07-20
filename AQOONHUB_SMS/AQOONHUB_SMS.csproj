@@ -227,6 +227,21 @@
     <Content Include="App_Code\DataAccess\SectionDAL.cs" />
     <Content Include="App_Code\DataAccess\SubjectDAL.cs" />
     <Content Include="App_Code\DataAccess\TimetableDAL.cs" />
+    <Content Include="App_Code\BusinessLogic\AcademicYearBLL.cs" />
+    <Content Include="App_Code\BusinessLogic\TermBLL.cs" />
+    <Content Include="App_Code\BusinessLogic\ClassBLL.cs" />
+    <Content Include="App_Code\BusinessLogic\SectionBLL.cs" />
+    <Content Include="App_Code\BusinessLogic\SubjectBLL.cs" />
+    <Content Include="App_Code\BusinessLogic\TimetableBLL.cs" />
+    <Content Include="App_Code\BusinessLogic\RoleBLL.cs" />
+    <Content Include="App_Code\BusinessLogic\PermissionBLL.cs" />
+    <Content Include="App_Code\BusinessLogic\UserRoleBLL.cs" />
+    <Content Include="App_Code\BusinessLogic\RolePermissionBLL.cs" />
+    <Content Include="App_Code\DataAccess\RoleDAL.cs" />
+    <Content Include="App_Code\DataAccess\UserDAL.cs" />
+    <Content Include="App_Code\DataAccess\PermissionDAL.cs" />
+    <Content Include="App_Code\DataAccess\UserRoleDAL.cs" />
+    <Content Include="App_Code\DataAccess\RolePermissionDAL.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="About.aspx.cs">
       <DependentUpon>About.aspx</DependentUpon>

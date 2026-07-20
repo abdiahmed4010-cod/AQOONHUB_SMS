@@ -1,10 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using AQOONHUB_SMS.App_Code.Models;
+using AQOONHUB_SMS.App_Code.Utilities;
+using System;
 using System.Data;
 using System.Data.SqlClient;
-using AQOONHUB.Models;
+using System.Collections.Generic;
 
-namespace AQOONHUB.DataAccess
+
+namespace AQOONHUB_SMS.App_Code.DataAccess
 {
     public class StudentDAL
     {

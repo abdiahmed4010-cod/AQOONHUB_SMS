@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using AQOONHUB.DataAccess;
-using AQOONHUB.Models;
-using AQOONHUB.Utilities;
+using AQOONHUB_SMS.App_Code.DataAccess;
+using AQOONHUB_SMS.App_Code.Models;
+using AQOONHUB_SMS.App_Code.Utilities;
 
-namespace AQOONHUB.BusinessLogic
+namespace AQOONHUB_SMS.App_Code.BusinessLogic
 {
     public class UserBLL
     {

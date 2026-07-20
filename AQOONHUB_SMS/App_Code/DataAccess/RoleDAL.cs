@@ -1,95 +1,67 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using AQOONHUB_SMS.App_Code.Models;
+using AQOONHUB_SMS.App_Code.Utilities;
+using System;
 using System.Data;
 using System.Data.SqlClient;
-using AQOONHUB_SMS.App_Code.Models;
+using System.Collections.Generic;
+
 
 namespace AQOONHUB_SMS.App_Code.DataAccess
 {
-    /// <summary>
-    /// Data access layer for role management
-    /// </summary>
     public class RoleDAL
     {
         private DatabaseHelper db;
 
-        /// <summary>
-        /// Initializes a new instance of the RoleDAL class
-        /// </summary>
         public RoleDAL()
         {
             db = new DatabaseHelper();
         }
 
-        #region Retrieval Operations
+        #region Roles
 
         /// <summary>
         /// Gets all roles
         /// </summary>
-        public List<Role> GetAllRoles()
+        public DataTable GetAllRoles()
         {
-            List<Role> roles = new List<Role>();
-
             string query = "SELECT * FROM Roles ORDER BY RoleName";
-
-            DataTable dt = db.ExecuteQuery(query);
-
-            foreach (DataRow row in dt.Rows)
-            {
-                roles.Add(MapToRole(row));
-            }
-
-            return roles;
+            return db.ExecuteQuery(query);
         }
 
         /// <summary>
         /// Gets role by ID
         /// </summary>
-        public Role GetRoleById(int roleId)
+        public DataRow GetRoleById(int roleId)
         {
             string query = "SELECT * FROM Roles WHERE RoleID = @RoleID";
-
             SqlParameter[] parameters = new SqlParameter[]
             {
                 new SqlParameter("@RoleID", roleId)
             };
 
             DataTable dt = db.ExecuteQuery(query, parameters);
-
-            if (dt.Rows.Count > 0)
-                return MapToRole(dt.Rows[0]);
-
-            return null;
+            return dt.Rows.Count > 0 ? dt.Rows[0] : null;
         }
 
         /// <summary>
         /// Gets role by name
         /// </summary>
-        public Role GetRoleByName(string roleName)
+        public DataRow GetRoleByName(string roleName)
         {
             string query = "SELECT * FROM Roles WHERE RoleName = @RoleName";
-
             SqlParameter[] parameters = new SqlParameter[]
             {
                 new SqlParameter("@RoleName", roleName)
             };
 
             DataTable dt = db.ExecuteQuery(query, parameters);
-
-            if (dt.Rows.Count > 0)
-                return MapToRole(dt.Rows[0]);
-
-            return null;
+            return dt.Rows.Count > 0 ? dt.Rows[0] : null;
         }
 
-        #endregion
-
-        #region Create Operations
-
         /// <summary>
-        /// Adds a new role
+        /// Adds role
         /// </summary>
-        public int AddRole(Role role)
+        public int AddRole(string roleName, string description, bool isActive)
         {
             string query = @"
                 INSERT INTO Roles (RoleName, Description, IsActive, CreatedAt, UpdatedAt)
@@ -98,22 +70,18 @@ namespace AQOONHUB_SMS.App_Code.DataAccess
 
             SqlParameter[] parameters = new SqlParameter[]
             {
-                new SqlParameter("@RoleName", role.RoleName),
-                new SqlParameter("@Description", string.IsNullOrEmpty(role.Description) ? (object)DBNull.Value : role.Description),
-                new SqlParameter("@IsActive", role.IsActive)
+                new SqlParameter("@RoleName", roleName),
+                new SqlParameter("@Description", (object)description ?? DBNull.Value),
+                new SqlParameter("@IsActive", isActive)
             };
 
             return Convert.ToInt32(db.ExecuteScalar(query, parameters));
         }
 
-        #endregion
-
-        #region Update Operations
-
         /// <summary>
-        /// Updates an existing role
+        /// Updates role
         /// </summary>
-        public bool UpdateRole(Role role)
+        public bool UpdateRole(int roleId, string roleName, string description, bool isActive)
         {
             string query = @"
                 UPDATE Roles SET
@@ -125,51 +93,27 @@ namespace AQOONHUB_SMS.App_Code.DataAccess
 
             SqlParameter[] parameters = new SqlParameter[]
             {
-                new SqlParameter("@RoleID", role.RoleID),
-                new SqlParameter("@RoleName", role.RoleName),
-                new SqlParameter("@Description", string.IsNullOrEmpty(role.Description) ? (object)DBNull.Value : role.Description),
-                new SqlParameter("@IsActive", role.IsActive)
+                new SqlParameter("@RoleID", roleId),
+                new SqlParameter("@RoleName", roleName),
+                new SqlParameter("@Description", (object)description ?? DBNull.Value),
+                new SqlParameter("@IsActive", isActive)
             };
 
             return db.ExecuteNonQuery(query, parameters) > 0;
         }
 
-        #endregion
-
-        #region Delete Operations
-
         /// <summary>
-        /// Deletes a role
+        /// Deletes role
         /// </summary>
         public bool DeleteRole(int roleId)
         {
             string query = "DELETE FROM Roles WHERE RoleID = @RoleID";
-
             SqlParameter[] parameters = new SqlParameter[]
             {
                 new SqlParameter("@RoleID", roleId)
             };
 
             return db.ExecuteNonQuery(query, parameters) > 0;
-        }
-
-        #endregion
-
-        #region Mapping
-
-        /// <summary>
-        /// Maps a DataRow to a Role object
-        /// </summary>
-        private Role MapToRole(DataRow row)
-        {
-            Role role = new Role();
-            role.RoleID = Convert.ToInt32(row["RoleID"]);
-            role.RoleName = row["RoleName"].ToString();
-            role.Description = row["Description"] == DBNull.Value ? null : row["Description"].ToString();
-            role.IsActive = Convert.ToBoolean(row["IsActive"]);
-            role.CreatedAt = Convert.ToDateTime(row["CreatedAt"]);
-            role.UpdatedAt = Convert.ToDateTime(row["UpdatedAt"]);
-            return role;
         }
 
         #endregion

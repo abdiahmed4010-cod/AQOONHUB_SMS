@@ -2,9 +2,9 @@
 using System.Data;
 using System.Data.SqlClient;
 using System.Web;
-using AQOONHUB.DataAccess;
+using AQOONHUB_SMS.App_Code.DataAccess;
 
-namespace AQOONHUB.Utilities
+namespace AQOONHUB_SMS.App_Code.Utilities
 {
     /// <summary>
     /// Provides comprehensive audit logging for all system activities

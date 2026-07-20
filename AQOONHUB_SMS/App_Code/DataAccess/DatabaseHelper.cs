@@ -3,7 +3,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Configuration;
 
-namespace AQOONHUB.DataAccess
+namespace AQOONHUB_SMS.App_Code.DataAccess
 {
     public class DatabaseHelper
     {

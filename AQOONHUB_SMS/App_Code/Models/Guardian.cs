@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace AQOONHUB.Models
+namespace AQOONHUB_SMS.App_Code.Models
 {
     public class Guardian
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AQOONHUB.Models
+namespace AQOONHUB_SMS.App_Code.Models
 {
     /// <summary>
     /// Represents a grading scale for academic evaluation
