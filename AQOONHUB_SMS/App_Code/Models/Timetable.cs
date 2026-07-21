@@ -14,15 +14,18 @@ namespace AQOONHUB_SMS.App_Code.Models
         private string _subjectName;
         private int _teacherID;
         private string _teacherName;
-        private string _dayOfWeek;
+        private int _dayOfWeek;
         private TimeSpan _startTime;
         private TimeSpan _endTime;
         private string _roomNumber;
         private int _academicYearID;
         private int _termID;
+        private string _academicYearName;
+        private string _termName;
         private string _status;
         private DateTime _createdAt;
         private DateTime _updatedAt;
+        private int _periodNo;
 
         public int TimetableID
         {
@@ -60,13 +63,22 @@ namespace AQOONHUB_SMS.App_Code.Models
             set { _teacherID = value; }
         }
 
+        /// <summary>
+        /// Alias for TeacherID used by BLL
+        /// </summary>
+        public int StaffID
+        {
+            get { return _teacherID; }
+            set { _teacherID = value; }
+        }
+
         public string TeacherName
         {
             get { return _teacherName; }
             set { _teacherName = value; }
         }
 
-        public string DayOfWeek
+        public int DayOfWeek
         {
             get { return _dayOfWeek; }
             set { _dayOfWeek = value; }
@@ -102,6 +114,18 @@ namespace AQOONHUB_SMS.App_Code.Models
             set { _termID = value; }
         }
 
+        public string AcademicYearName
+        {
+            get { return _academicYearName; }
+            set { _academicYearName = value; }
+        }
+
+        public string TermName
+        {
+            get { return _termName; }
+            set { _termName = value; }
+        }
+
         public string Status
         {
             get { return _status; }
@@ -118,6 +142,15 @@ namespace AQOONHUB_SMS.App_Code.Models
         {
             get { return _updatedAt; }
             set { _updatedAt = value; }
+        }
+
+        /// <summary>
+        /// Period number for the timetable slot
+        /// </summary>
+        public int PeriodNo
+        {
+            get { return _periodNo; }
+            set { _periodNo = value; }
         }
 
         public string DisplayTime

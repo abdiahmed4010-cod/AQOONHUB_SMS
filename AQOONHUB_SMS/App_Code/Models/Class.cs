@@ -15,6 +15,8 @@ namespace AQOONHUB_SMS.App_Code.Models
         private string _status;
         private DateTime _createdAt;
         private DateTime _updatedAt;
+        private int _capacity;
+        private string _roomNumber;
 
         public int ClassID
         {
@@ -62,6 +64,18 @@ namespace AQOONHUB_SMS.App_Code.Models
         {
             get { return _updatedAt; }
             set { _updatedAt = value; }
+        }
+
+        public int Capacity
+        {
+            get { return _capacity; }
+            set { _capacity = value; }
+        }
+
+        public string RoomNumber
+        {
+            get { return _roomNumber; }
+            set { _roomNumber = value; }
         }
 
         public string DisplayName

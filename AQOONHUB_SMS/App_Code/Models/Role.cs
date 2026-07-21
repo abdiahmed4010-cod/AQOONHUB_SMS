@@ -1,177 +1,53 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
-using AQOONHUB_SMS.App_Code.Models;
 
-namespace AQOONHUB_SMS.App_Code.DataAccess
+namespace AQOONHUB_SMS.App_Code.Models
 {
     /// <summary>
-    /// Data access layer for role management
+    /// Represents a user role in the system
     /// </summary>
-    public class RoleDAL
+    public class Role
     {
-        private DatabaseHelper db;
+        private int _roleID;
+        private string _roleName;
+        private string _description;
+        private bool _isActive;
+        private DateTime _createdAt;
+        private DateTime _updatedAt;
 
-        /// <summary>
-        /// Initializes a new instance of the RoleDAL class
-        /// </summary>
-        public RoleDAL()
+        public int RoleID
         {
-            db = new DatabaseHelper();
+            get { return _roleID; }
+            set { _roleID = value; }
         }
 
-        #region Retrieval Operations
-
-        /// <summary>
-        /// Gets all roles
-        /// </summary>
-        public List<Role> GetAllRoles()
+        public string RoleName
         {
-            List<Role> roles = new List<Role>();
-
-            string query = "SELECT * FROM Roles ORDER BY RoleName";
-
-            DataTable dt = db.ExecuteQuery(query);
-
-            foreach (DataRow row in dt.Rows)
-            {
-                roles.Add(MapToRole(row));
-            }
-
-            return roles;
+            get { return _roleName; }
+            set { _roleName = value; }
         }
 
-        /// <summary>
-        /// Gets role by ID
-        /// </summary>
-        public Role GetRoleById(int roleId)
+        public string Description
         {
-            string query = "SELECT * FROM Roles WHERE RoleID = @RoleID";
-
-            SqlParameter[] parameters = new SqlParameter[]
-            {
-                new SqlParameter("@RoleID", roleId)
-            };
-
-            DataTable dt = db.ExecuteQuery(query, parameters);
-
-            if (dt.Rows.Count > 0)
-                return MapToRole(dt.Rows[0]);
-
-            return null;
+            get { return _description; }
+            set { _description = value; }
         }
 
-        /// <summary>
-        /// Gets role by name
-        /// </summary>
-        public Role GetRoleByName(string roleName)
+        public bool IsActive
         {
-            string query = "SELECT * FROM Roles WHERE RoleName = @RoleName";
-
-            SqlParameter[] parameters = new SqlParameter[]
-            {
-                new SqlParameter("@RoleName", roleName)
-            };
-
-            DataTable dt = db.ExecuteQuery(query, parameters);
-
-            if (dt.Rows.Count > 0)
-                return MapToRole(dt.Rows[0]);
-
-            return null;
+            get { return _isActive; }
+            set { _isActive = value; }
         }
 
-        #endregion
-
-        #region Create Operations
-
-        /// <summary>
-        /// Adds a new role
-        /// </summary>
-        public int AddRole(Role role)
+        public DateTime CreatedAt
         {
-            string query = @"
-                INSERT INTO Roles (RoleName, Description, IsActive, CreatedAt, UpdatedAt)
-                VALUES (@RoleName, @Description, @IsActive, GETDATE(), GETDATE());
-                SELECT SCOPE_IDENTITY();";
-
-            SqlParameter[] parameters = new SqlParameter[]
-            {
-                new SqlParameter("@RoleName", role.RoleName),
-                new SqlParameter("@Description", string.IsNullOrEmpty(role.Description) ? (object)DBNull.Value : role.Description),
-                new SqlParameter("@IsActive", role.IsActive)
-            };
-
-            return Convert.ToInt32(db.ExecuteScalar(query, parameters));
+            get { return _createdAt; }
+            set { _createdAt = value; }
         }
 
-        #endregion
-
-        #region Update Operations
-
-        /// <summary>
-        /// Updates an existing role
-        /// </summary>
-        public bool UpdateRole(Role role)
+        public DateTime UpdatedAt
         {
-            string query = @"
-                UPDATE Roles SET
-                    RoleName = @RoleName,
-                    Description = @Description,
-                    IsActive = @IsActive,
-                    UpdatedAt = GETDATE()
-                WHERE RoleID = @RoleID";
-
-            SqlParameter[] parameters = new SqlParameter[]
-            {
-                new SqlParameter("@RoleID", role.RoleID),
-                new SqlParameter("@RoleName", role.RoleName),
-                new SqlParameter("@Description", string.IsNullOrEmpty(role.Description) ? (object)DBNull.Value : role.Description),
-                new SqlParameter("@IsActive", role.IsActive)
-            };
-
-            return db.ExecuteNonQuery(query, parameters) > 0;
+            get { return _updatedAt; }
+            set { _updatedAt = value; }
         }
-
-        #endregion
-
-        #region Delete Operations
-
-        /// <summary>
-        /// Deletes a role
-        /// </summary>
-        public bool DeleteRole(int roleId)
-        {
-            string query = "DELETE FROM Roles WHERE RoleID = @RoleID";
-
-            SqlParameter[] parameters = new SqlParameter[]
-            {
-                new SqlParameter("@RoleID", roleId)
-            };
-
-            return db.ExecuteNonQuery(query, parameters) > 0;
-        }
-
-        #endregion
-
-        #region Mapping
-
-        /// <summary>
-        /// Maps a DataRow to a Role object
-        /// </summary>
-        private Role MapToRole(DataRow row)
-        {
-            Role role = new Role();
-            role.RoleID = Convert.ToInt32(row["RoleID"]);
-            role.RoleName = row["RoleName"].ToString();
-            role.Description = row["Description"] == DBNull.Value ? null : row["Description"].ToString();
-            role.IsActive = Convert.ToBoolean(row["IsActive"]);
-            role.CreatedAt = Convert.ToDateTime(row["CreatedAt"]);
-            role.UpdatedAt = Convert.ToDateTime(row["UpdatedAt"]);
-            return role;
-        }
-
-        #endregion
     }
 }

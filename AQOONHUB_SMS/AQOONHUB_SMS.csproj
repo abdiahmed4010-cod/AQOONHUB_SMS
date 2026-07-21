@@ -106,12 +106,47 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="About.aspx" />
+    <Content Include="Assets\js\modules\dashboard\dashboard.js" />
+    <Content Include="Assets\js\modules\attendance\attendance.js" />
+    <Content Include="Assets\js\core\app.js" />
+    <Content Include="Assets\js\core\dropdown.js" />
+    <Content Include="Assets\js\core\layout.js" />
+    <Content Include="Assets\js\core\modal.js" />
+    <Content Include="Assets\js\core\notification.js" />
+    <Content Include="Assets\js\core\sidebar.js" />
+    <Content Include="Assets\js\core\validation.js" />
+    <Content Include="Assets\js\modules\finance\finance.js" />
+    <Content Include="Assets\js\modules\parents\parents.js" />
+    <Content Include="Assets\js\modules\reports\reports.js" />
+    <Content Include="Assets\js\modules\settings\settings.js" />
+    <Content Include="Assets\js\modules\staff\staff.js" />
+    <Content Include="Assets\js\modules\teachers\teachers.js" />
+    <Content Include="Assets\js\modules\students\students.js" />
+    <Content Include="Assets\js\plugins\chart.js" />
+    <Content Include="Assets\js\plugins\datatable.js" />
+    <Content Include="Assets\js\plugins\flatpickr.js" />
+    <Content Include="Assets\js\plugins\sweetalert.js" />
     <Content Include="Contact.aspx" />
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\Site.css" />
+    <Content Include="Controls\Breadcrumb\Breadcrumb.ascx" />
+    <Content Include="Controls\DataTable\DataTable.ascx" />
+    <Content Include="Controls\EmptyState\EmptyState.ascx" />
+    <Content Include="Controls\Footer\Footer.ascx" />
+    <Content Include="Controls\Header\Header.ascx" />
+    <Content Include="Controls\Loading\Loading.ascx" />
+    <Content Include="Controls\MasterPages\MasterPages.ascx" />
+    <Content Include="Controls\Modal\Modal.ascx" />
+    <Content Include="Controls\Notification\Notification.ascx" />
+    <Content Include="Controls\PageHeader\PageHeader.ascx" />
+    <Content Include="Controls\ProfileMenu\ProfileMenu.ascx" />
+    <Content Include="Controls\SearchBox\SearchBox.ascx" />
+    <Content Include="Controls\Sidebar\Sidebar.ascx" />
+    <Content Include="Controls\StatsCard\StatsCard.ascx" />
+    <Content Include="Controls\Toast\Toast.ascx" />
     <Content Include="Default.aspx" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
@@ -124,7 +159,9 @@
     <Content Include="Content\bootstrap.css.map" />
     <Content Include="Content\bootstrap-theme.min.css.map" />
     <Content Include="Content\bootstrap-theme.css.map" />
+    <Content Include="MasterPages\MainMaster.Master" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
+    <Content Include="Modules\Authentication\Login.aspx" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\jquery-3.4.1.js" />
@@ -258,6 +295,111 @@
     <Compile Include="Contact.aspx.designer.cs">
       <DependentUpon>Contact.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Controls\Breadcrumb\Breadcrumb.ascx.cs">
+      <DependentUpon>Breadcrumb.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Controls\Breadcrumb\Breadcrumb.ascx.designer.cs">
+      <DependentUpon>Breadcrumb.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\DataTable\DataTable.ascx.cs">
+      <DependentUpon>DataTable.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Controls\DataTable\DataTable.ascx.designer.cs">
+      <DependentUpon>DataTable.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\EmptyState\EmptyState.ascx.cs">
+      <DependentUpon>EmptyState.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Controls\EmptyState\EmptyState.ascx.designer.cs">
+      <DependentUpon>EmptyState.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Footer\Footer.ascx.cs">
+      <DependentUpon>Footer.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Controls\Footer\Footer.ascx.designer.cs">
+      <DependentUpon>Footer.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Header\Header.ascx.cs">
+      <DependentUpon>Header.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Controls\Header\Header.ascx.designer.cs">
+      <DependentUpon>Header.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Loading\Loading.ascx.cs">
+      <DependentUpon>Loading.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Controls\Loading\Loading.ascx.designer.cs">
+      <DependentUpon>Loading.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\MasterPages\MasterPages.ascx.cs">
+      <DependentUpon>MasterPages.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Controls\MasterPages\MasterPages.ascx.designer.cs">
+      <DependentUpon>MasterPages.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Modal\Modal.ascx.cs">
+      <DependentUpon>Modal.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Controls\Modal\Modal.ascx.designer.cs">
+      <DependentUpon>Modal.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Notification\Notification.ascx.cs">
+      <DependentUpon>Notification.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Controls\Notification\Notification.ascx.designer.cs">
+      <DependentUpon>Notification.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\PageHeader\PageHeader.ascx.cs">
+      <DependentUpon>PageHeader.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Controls\PageHeader\PageHeader.ascx.designer.cs">
+      <DependentUpon>PageHeader.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ProfileMenu\ProfileMenu.ascx.cs">
+      <DependentUpon>ProfileMenu.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Controls\ProfileMenu\ProfileMenu.ascx.designer.cs">
+      <DependentUpon>ProfileMenu.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SearchBox\SearchBox.ascx.cs">
+      <DependentUpon>SearchBox.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Controls\SearchBox\SearchBox.ascx.designer.cs">
+      <DependentUpon>SearchBox.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Sidebar\Sidebar.ascx.cs">
+      <DependentUpon>Sidebar.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Controls\Sidebar\Sidebar.ascx.designer.cs">
+      <DependentUpon>Sidebar.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\StatsCard\StatsCard.ascx.cs">
+      <DependentUpon>StatsCard.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Controls\StatsCard\StatsCard.ascx.designer.cs">
+      <DependentUpon>StatsCard.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Toast\Toast.ascx.cs">
+      <DependentUpon>Toast.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Controls\Toast\Toast.ascx.designer.cs">
+      <DependentUpon>Toast.ascx</DependentUpon>
+    </Compile>
     <Compile Include="Default.aspx.cs">
       <DependentUpon>Default.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -267,6 +409,20 @@
     </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="MasterPages\MainMaster.Master.cs">
+      <DependentUpon>MainMaster.Master</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="MasterPages\MainMaster.Master.designer.cs">
+      <DependentUpon>MainMaster.Master</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Authentication\Login.aspx.cs">
+      <DependentUpon>Login.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Authentication\Login.aspx.designer.cs">
+      <DependentUpon>Login.aspx</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Site.Master.cs">
@@ -293,6 +449,22 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Assets\fonts\" />
+    <Folder Include="Assets\icons\" />
+    <Folder Include="Assets\images\" />
+    <Folder Include="Assets\uploads\" />
+    <Folder Include="Modules\Academic\" />
+    <Folder Include="Modules\Administration\" />
+    <Folder Include="Modules\Attendance\" />
+    <Folder Include="Modules\Dashboard\" />
+    <Folder Include="Modules\Examination\" />
+    <Folder Include="Modules\Finance\" />
+    <Folder Include="Modules\Parents\" />
+    <Folder Include="Modules\Reports\" />
+    <Folder Include="Modules\Settings\" />
+    <Folder Include="Modules\Staff\" />
+    <Folder Include="Modules\Students\" />
+    <Folder Include="Modules\Teachers\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

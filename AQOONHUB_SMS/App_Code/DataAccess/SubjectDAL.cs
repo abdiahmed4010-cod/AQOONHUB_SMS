@@ -63,6 +63,21 @@ namespace AQOONHUB_SMS.App_Code.DataAccess
         }
 
         /// <summary>
+        /// Gets all subjects filtered by active status
+        /// </summary>
+        public List<Subject> GetAllSubjects(bool activeOnly)
+        {
+            if (activeOnly)
+            {
+                return GetAllSubjects(null, "Active");
+            }
+            else
+            {
+                return GetAllSubjects(null, null);
+            }
+        }
+
+        /// <summary>
         /// Gets subject by ID
         /// </summary>
         public Subject GetSubjectById(int subjectId)

@@ -1,0 +1,754 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true"
+    CodeBehind="MainMaster.master.cs"
+    Inherits="AQOONHUB_SMS.MasterPages.MainMaster" %>
+<!DOCTYPE html>
+<html lang="en">
+<head runat="server">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="AQOONHUB School Management System - Admissions, academics, attendance, exams, finance, HR and reporting" />
+    <title>AQOONHUB — School Management System</title>
+    
+    <link rel="icon" type="image/png" href="<%= ResolveUrl("~/Assets/images/logo.png") %>" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin="anonymous" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    
+    <!-- Tailwind CSS v3.4.1 (fixed version for production stability) -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+    
+    <!-- Lucide Icons v0.400.0 (fixed version) -->
+    <script src="https://unpkg.com/lucide@0.400.0/dist/umd/lucide.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { 50: '#EFF6FF', 100: '#DBEAFE', 200: '#BFDBFE', 300: '#93C5FD', 400: '#60A5FA', 500: '#3B82F6', 600: '#2563EB', 700: '#1D4ED8', 800: '#1E3A8A', 900: '#1E3A8A' },
+                        violet2: { 500: '#8B5CF6', 600: '#7C3AED' },
+                        sidebar: '#1E3A8A',
+                        surface: '#F8FAFC'
+                    },
+                    fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui'] },
+                    boxShadow: {
+                        card: '0 1px 2px 0 rgb(0 0 0 / 0.04), 0 1px 3px 0 rgb(0 0 0 / 0.06)',
+                        pop: '0 12px 32px -8px rgb(15 23 42 / 0.18)'
+                    }
+                }
+            }
+        };
+    </script>
+    
+    <style>
+        /* ============================================================
+           AQOONHUB — School Management System · Custom Styles
+           ============================================================ */
+        html { -webkit-font-smoothing: antialiased; }
+        body { font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif; }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 8px; }
+        .dark ::-webkit-scrollbar-thumb { background: #334155; }
+        
+        /* Navigation */
+        .nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.55rem 0.75rem; border-radius: 0.6rem; font-size: 0.85rem; font-weight: 500; color: #C7D2FE; transition: all 0.15s; cursor: pointer; text-decoration: none; }
+        .nav-item:hover { background: rgba(255,255,255,0.08); color: #fff; }
+        .nav-item.active { background: linear-gradient(90deg,#2563EB,#7C3AED); color: #fff; box-shadow: 0 4px 14px -4px rgba(37,99,235,0.5); }
+        .nav-section { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #818CF8; padding: 1rem 0.75rem 0.35rem; margin: 0; }
+        
+        /* Buttons */
+        .btn { display: inline-flex; align-items: center; gap: 0.45rem; font-weight: 600; font-size: 0.82rem; border-radius: 0.6rem; padding: 0.55rem 1rem; transition: all 0.15s; cursor: pointer; border: 1px solid transparent; line-height: 1.25; }
+        .btn-primary { background: #2563EB; color: #fff; } 
+        .btn-primary:hover { background: #1D4ED8; }
+        .btn-secondary { background: #fff; color: #374151; border-color: #E5E7EB; } 
+        .btn-secondary:hover { background: #F9FAFB; }
+        .dark .btn-secondary { background: #1E293B; color: #E2E8F0; border-color: #334155; } 
+        .dark .btn-secondary:hover { background: #273549; }
+        .btn-danger { background: #EF4444; color: #fff; } 
+        .btn-danger:hover { background: #DC2626; }
+        .btn-ghost { color: #4B5563; background: transparent; border-color: transparent; } 
+        .btn-ghost:hover { background: #F3F4F6; }
+        .dark .btn-ghost { color: #94A3B8; } 
+        .dark .btn-ghost:hover { background: #1E293B; }
+        
+        /* Form Inputs */
+        .input { width: 100%; border: 1px solid #E5E7EB; border-radius: 0.6rem; padding: 0.55rem 0.8rem; font-size: 0.85rem; background: #fff; color: #111827; outline: none; transition: border 0.15s, box-shadow 0.15s; line-height: 1.25; }
+        .input:focus { border-color: #2563EB; box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
+        .dark .input { background: #0F172A; border-color: #334155; color: #E2E8F0; }
+        
+        /* Cards */
+        .card { background: #fff; border: 1px solid #E5E7EB; border-radius: 0.9rem; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.04); }
+        .dark .card { background: #1E293B; border-color: #334155; }
+        
+        /* Tables */
+        .th { text-align: left; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #6B7280; padding: 0.7rem 1rem; border-bottom: 1px solid #E5E7EB; white-space: nowrap; }
+        .dark .th { color: #94A3B8; border-color: #334155; }
+        .td { padding: 0.75rem 1rem; font-size: 0.83rem; color: #374151; border-bottom: 1px solid #F1F5F9; white-space: nowrap; }
+        .dark .td { color: #CBD5E1; border-color: #263449; }
+        tr.rowlink { cursor: pointer; transition: background 0.12s; } 
+        tr.rowlink:hover { background: #F8FAFC; } 
+        .dark tr.rowlink:hover { background: #273549; }
+        
+        /* Badges */
+        .badge { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.7rem; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 999px; line-height: 1; }
+        
+        /* Animations */
+        .fadein { animation: fadein 0.25s ease; } 
+        @keyframes fadein { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+        
+        .skeleton { background: linear-gradient(90deg,#EEF2F7 25%,#E2E8F0 37%,#EEF2F7 63%); background-size: 400% 100%; animation: sk 1.2s infinite; border-radius: 0.5rem; }
+        .dark .skeleton { background: linear-gradient(90deg,#1E293B 25%,#273549 37%,#1E293B 63%); background-size: 400% 100%; }
+        @keyframes sk { 0% { background-position: 100% 50%; } 100% { background-position: 0 50%; } }
+        
+        .toast-in { animation: toastin 0.3s cubic-bezier(0.21,1.02,0.73,1); } 
+        @keyframes toastin { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: none; } }
+        
+        .modal-in { animation: modalin 0.22s cubic-bezier(0.21,1.02,0.73,1); } 
+        @keyframes modalin { from { opacity: 0; transform: scale(0.96) translateY(8px); } to { opacity: 1; transform: none; } }
+        
+        /* Tabs */
+        .tab-btn { padding: 0.55rem 1rem; font-size: 0.83rem; font-weight: 600; color: #6B7280; border-bottom: 2px solid transparent; cursor: pointer; white-space: nowrap; background: none; }
+        .tab-btn.active { color: #2563EB; border-color: #2563EB; } 
+        .dark .tab-btn { color: #94A3B8; } 
+        .dark .tab-btn.active { color: #60A5FA; border-color: #60A5FA; }
+        
+        /* Avatars */
+        .avatar { display: inline-flex; align-items: center; justify-content: center; border-radius: 999px; font-weight: 700; color: #fff; flex-shrink: 0; line-height: 1; }
+        
+        /* Lucide Icons */
+        .lucide { stroke-width: 2; }
+        
+        /* Switch Toggle */
+        .switch { position: relative; width: 40px; height: 22px; background: #D1D5DB; border-radius: 999px; cursor: pointer; transition: background 0.2s; flex-shrink: 0; }
+        .switch.on { background: #2563EB; }
+        .switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; background: #fff; border-radius: 999px; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.25); }
+        .switch.on::after { transform: translateX(18px); }
+        
+        /* Print */
+        @media print { .no-print { display: none !important; } }
+        
+        /* Focus visible for accessibility */
+        *:focus-visible { outline: 2px solid #2563EB; outline-offset: 2px; }
+        
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+        }
+    </style>
+    
+    <asp:ContentPlaceHolder ID="head" runat="server"></asp:ContentPlaceHolder>
+</head>
+<body class="bg-surface dark:bg-slate-900 text-slate-900 dark:text-slate-100">
+    
+    <!-- Dark mode anti-flash: runs before any render -->
+    <script>
+        (function () {
+            var theme = localStorage.getItem('aqh_theme') || 'light';
+            if (theme === 'dark') { document.documentElement.classList.add('dark'); }
+        })();
+    </script>
+    
+    <form id="frmMain" runat="server" autocomplete="off">
+        <asp:ScriptManager ID="smMain" runat="server" EnablePartialRendering="true" />
+        
+        <!-- Skip to main content link for accessibility -->
+        <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:bg-brand-600 focus:text-white focus:px-4 focus:py-2 focus:rounded-lg">Skip to main content</a>
+        
+        <!-- ============================================ -->
+        <!-- SIDEBAR                                      -->
+        <!-- ============================================ -->
+        <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-sidebar text-white flex flex-col transition-transform duration-200 -translate-x-full lg:translate-x-0" role="navigation" aria-label="Main navigation">
+            <a href="<%= ResolveUrl("~/Modules/Dashboard/Dashboard.aspx") %>" class="flex items-center gap-3 px-5 h-16 border-b border-white/10 shrink-0" aria-label="AQOONHUB Home">
+                <img src="<%= ResolveUrl("~/Assets/images/logo.png") %>" alt="AQOONHUB Logo" class="w-9 h-9 rounded-lg bg-white p-0.5 object-contain" width="36" height="36" />
+                <div>
+                    <p class="font-extrabold tracking-tight leading-none">AQOON<span class="text-violet-300">HUB</span></p>
+                    <p class="text-[10px] text-indigo-300 mt-0.5">School Management System</p>
+                </div>
+            </a>
+            
+            <nav class="flex-1 overflow-y-auto px-3 pb-6 pt-2" aria-label="Sidebar navigation">
+                <p class="nav-section">Main</p>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Dashboard/Dashboard.aspx") %>" data-nav="dashboard">
+                    <i data-lucide="layout-dashboard" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Dashboard</span>
+                </a>
+                
+                <p class="nav-section">People</p>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Students/Admissions.aspx") %>" data-nav="admissions">
+                    <i data-lucide="clipboard-list" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Admissions</span>
+                </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Students/Students.aspx") %>" data-nav="students">
+                    <i data-lucide="graduation-cap" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Students</span>
+                </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Parents/Parents.aspx") %>" data-nav="parents">
+                    <i data-lucide="users" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Parents</span>
+                </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Staff/Staff.aspx") %>" data-nav="staff">
+                    <i data-lucide="briefcase" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Staff &amp; HR</span>
+                </a>
+                
+                <p class="nav-section">Academics</p>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Academic/AcademicYears.aspx") %>" data-nav="academicyears">
+                    <i data-lucide="calendar-range" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Academic Years &amp; Terms</span>
+                </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Academic/Classes.aspx") %>" data-nav="classes">
+                    <i data-lucide="school" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Classes &amp; Sections</span>
+                </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Academic/Subjects.aspx") %>" data-nav="subjects">
+                    <i data-lucide="book-open" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Subjects</span>
+                </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Academic/Timetable.aspx") %>" data-nav="timetable">
+                    <i data-lucide="calendar-days" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Timetable Builder</span>
+                </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Academic/Promotion.aspx") %>" data-nav="promotion">
+                    <i data-lucide="trending-up" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Promotion Wizard</span>
+                </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Attendance/Attendance.aspx") %>" data-nav="attendance">
+                    <i data-lucide="user-check" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Attendance</span>
+                </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Examination/Exams.aspx") %>" data-nav="exams">
+                    <i data-lucide="file-edit" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Examinations</span>
+                </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Examination/Transcripts.aspx") %>" data-nav="transcripts">
+                    <i data-lucide="scroll" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Transcript Center</span>
+                </a>
+                
+                <p class="nav-section">Finance</p>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Finance/FeeStructure.aspx") %>" data-nav="feestructure">
+                    <i data-lucide="wallet" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Fee Structure</span>
+                </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Finance/Invoices.aspx") %>" data-nav="invoices">
+                    <i data-lucide="file-text" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Invoices</span>
+                </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Finance/Payments.aspx") %>" data-nav="payments">
+                    <i data-lucide="credit-card" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Payments</span>
+                </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Finance/Outstanding.aspx") %>" data-nav="outstanding">
+                    <i data-lucide="alert-circle" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Outstanding Balances</span>
+                </a>
+                
+                <p class="nav-section">Communication</p>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Administration/Announcements.aspx") %>" data-nav="announcements">
+                    <i data-lucide="megaphone" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Announcements</span>
+                </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Administration/Events.aspx") %>" data-nav="events">
+                    <i data-lucide="calendar" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Events Calendar</span>
+                </a>
+                
+                <p class="nav-section">Reports &amp; Tools</p>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Reports/Reports.aspx") %>" data-nav="reports">
+                    <i data-lucide="bar-chart-3" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Reports Center</span>
+                </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Reports/Print.aspx") %>" data-nav="print">
+                    <i data-lucide="printer" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Print Center</span>
+                </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Reports/Export.aspx") %>" data-nav="export">
+                    <i data-lucide="download" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Export Center</span>
+                </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Reports/Import.aspx") %>" data-nav="import">
+                    <i data-lucide="upload" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Import Center</span>
+                </a>
+                
+                <p class="nav-section">System</p>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Administration/Users.aspx") %>" data-nav="users">
+                    <i data-lucide="shield" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Users &amp; Roles</span>
+                </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Administration/AuditLog.aspx") %>" data-nav="auditlog">
+                    <i data-lucide="history" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Audit Log</span>
+                </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Administration/LoginActivity.aspx") %>" data-nav="loginactivity">
+                    <i data-lucide="key-round" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Login Activity</span>
+                </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Settings/Settings.aspx") %>" data-nav="settings">
+                    <i data-lucide="settings" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Settings</span>
+                </a>
+            </nav>
+            
+            <div class="p-4 border-t border-white/10 shrink-0">
+                <div class="rounded-xl bg-white/5 p-3 flex items-center gap-3">
+                    <span class="avatar" style="width:36px;height:36px;font-size:13.5px;background:#7C3AED" aria-hidden="true">AY</span>
+                    <div class="min-w-0">
+                        <p class="text-xs font-bold truncate" id="sidebar-user-name">Amina Yusuf</p>
+                        <p class="text-[10px] text-indigo-300">Super Admin</p>
+                    </div>
+                    <asp:LinkButton ID="lnkSidebarLogout" runat="server" CssClass="ml-auto text-indigo-300 hover:text-white p-1 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50" 
+                        ToolTip="Sign out" OnClientClick="return confirmLogout();" OnClick="lnkLogout_Click" aria-label="Sign out">
+                        <i data-lucide="log-out" class="w-4 h-4" aria-hidden="true"></i>
+                    </asp:LinkButton>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- Sidebar backdrop for mobile -->
+        <div id="sidebar-backdrop" class="fixed inset-0 bg-slate-900/50 z-30 hidden lg:hidden" onclick="toggleSidebar(false)" aria-hidden="true"></div>
+        
+        <!-- ============================================ -->
+        <!-- MAIN LAYOUT                                  -->
+        <!-- ============================================ -->
+        <div class="lg:pl-64 flex flex-col min-h-screen">
+            
+            <!-- Header -->
+            <header class="sticky top-0 z-20 h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-gray-200 dark:border-slate-700 flex items-center gap-3 px-4 md:px-6" role="banner">
+                <button type="button" class="lg:hidden btn-ghost btn !p-2" onclick="toggleSidebar()" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="sidebar">
+                    <i data-lucide="menu" class="w-5 h-5" aria-hidden="true"></i>
+                </button>
+                
+                <button type="button" class="hidden md:flex items-center gap-2 input !w-72 !py-2 text-gray-400 text-xs whitespace-nowrap" onclick="openSearch()" aria-label="Open search">
+                    <i data-lucide="search" class="w-4 h-4" aria-hidden="true"></i>
+                    <span class="truncate">Search students, staff, invoices…</span>
+                    <kbd class="ml-auto text-[10px] bg-gray-100 dark:bg-slate-700 rounded px-1.5 py-0.5 font-sans shrink-0">Ctrl K</kbd>
+                </button>
+                
+                <button type="button" class="md:hidden btn-ghost btn !p-2" onclick="openSearch()" aria-label="Open search">
+                    <i data-lucide="search" class="w-5 h-5" aria-hidden="true"></i>
+                </button>
+                
+                <div class="ml-auto flex items-center gap-1.5">
+                    <span class="hidden md:inline-flex badge mr-1" style="background:#7C3AED18;color:#7C3AED">Super Admin view</span>
+                    
+                    <!-- Notifications Dropdown -->
+                    <div class="relative">
+                        <button type="button" class="btn-ghost btn !p-2 relative" onclick="toggleDropdown('dd-notif')" title="Notifications" aria-label="Notifications" aria-haspopup="true" aria-expanded="false">
+                            <i data-lucide="bell" class="w-5 h-5" aria-hidden="true"></i>
+                            <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500" aria-hidden="true"></span>
+                        </button>
+                        <div id="dd-notif" class="hidden absolute right-0 mt-2 w-80 card shadow-pop p-2 z-50" role="menu" aria-label="Notifications menu">
+                            <div class="flex items-center justify-between px-2 py-1.5">
+                                <p class="text-sm font-bold">Notifications</p>
+                                <button type="button" class="text-xs text-brand-600 font-semibold hover:underline" onclick="markAllRead()">Mark all read</button>
+                            </div>
+                            <a href="#" class="flex gap-3 p-2.5 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700/50" role="menuitem">
+                                <span class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style="background:#F59E0B18;color:#F59E0B" aria-hidden="true">
+                                    <i data-lucide="alert-circle" class="w-4 h-4"></i>
+                                </span>
+                                <div class="min-w-0">
+                                    <p class="text-xs font-semibold leading-snug">2 invoices are overdue</p>
+                                    <p class="text-[11px] text-gray-500 dark:text-slate-400 truncate">INV-2026-0004 · INV-2026-0008</p>
+                                    <p class="text-[10px] text-gray-400 mt-0.5">2h ago</p>
+                                </div>
+                            </a>
+                            <a href="#" class="flex gap-3 p-2.5 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700/50" role="menuitem">
+                                <span class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style="background:#2563EB18;color:#2563EB" aria-hidden="true">
+                                    <i data-lucide="clipboard-list" class="w-4 h-4"></i>
+                                </span>
+                                <div class="min-w-0">
+                                    <p class="text-xs font-semibold leading-snug">2 admission applications awaiting review</p>
+                                    <p class="text-[11px] text-gray-500 dark:text-slate-400 truncate">APP-0101 · APP-0104</p>
+                                    <p class="text-[10px] text-gray-400 mt-0.5">5h ago</p>
+                                </div>
+                            </a>
+                            <a href="#" class="flex gap-3 p-2.5 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700/50 opacity-60" role="menuitem">
+                                <span class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style="background:#22C55E18;color:#22C55E" aria-hidden="true">
+                                    <i data-lucide="user-check" class="w-4 h-4"></i>
+                                </span>
+                                <div class="min-w-0">
+                                    <p class="text-xs font-semibold leading-snug">Leave request from Asha Ali</p>
+                                    <p class="text-[11px] text-gray-500 dark:text-slate-400 truncate">Sick leave · Jul 20–21</p>
+                                    <p class="text-[10px] text-gray-400 mt-0.5">1d ago</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Theme Toggle -->
+                    <button type="button" class="btn-ghost btn !p-2" onclick="toggleTheme()" title="Toggle dark mode" aria-label="Toggle dark mode">
+                        <i data-lucide="moon" id="theme-icon" class="w-5 h-5" aria-hidden="true"></i>
+                    </button>
+                    
+                    <!-- User Dropdown -->
+                    <div class="relative">
+                        <button type="button" class="flex items-center gap-2 pl-1 pr-2 py-1 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors" onclick="toggleDropdown('dd-user')" aria-label="User menu" aria-haspopup="true" aria-expanded="false">
+                            <span class="avatar" style="width:32px;height:32px;font-size:12px;background:#7C3AED" aria-hidden="true">AY</span>
+                            <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400" aria-hidden="true"></i>
+                        </button>
+                        <div id="dd-user" class="hidden absolute right-0 mt-2 w-64 card shadow-pop p-2 z-50" role="menu" aria-label="User menu">
+                            <div class="px-3 py-2.5 border-b border-gray-100 dark:border-slate-700 mb-1">
+                                <p class="text-sm font-bold">Amina Yusuf</p>
+                                <p class="text-xs text-gray-500 dark:text-slate-400">amina.yusuf@aqoonhub.edu</p>
+                            </div>
+                            <a href="<%= ResolveUrl("~/Modules/Settings/Profile.aspx") %>" class="nav-item !text-gray-600 dark:!text-slate-300 hover:!bg-gray-100 dark:hover:!bg-slate-700" role="menuitem">
+                                <i data-lucide="user" class="w-4 h-4" aria-hidden="true"></i> Profile Settings
+                            </a>
+                            <p class="nav-section !text-gray-400 !pt-2">Switch role (demo)</p>
+                            <div class="grid grid-cols-2 gap-1 px-1 pb-1">
+                                <button type="button" class="text-[11px] font-semibold rounded-lg px-2 py-1.5 text-left bg-brand-600 text-white">Super Admin</button>
+                                <button type="button" class="text-[11px] font-semibold rounded-lg px-2 py-1.5 text-left bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 hover:opacity-80">Admin / Registrar</button>
+                                <button type="button" class="text-[11px] font-semibold rounded-lg px-2 py-1.5 text-left bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 hover:opacity-80">Teacher</button>
+                                <button type="button" class="text-[11px] font-semibold rounded-lg px-2 py-1.5 text-left bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 hover:opacity-80">Accountant</button>
+                                <button type="button" class="text-[11px] font-semibold rounded-lg px-2 py-1.5 text-left bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 hover:opacity-80">HR / Staff Manager</button>
+                                <button type="button" class="text-[11px] font-semibold rounded-lg px-2 py-1.5 text-left bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 hover:opacity-80">Parent</button>
+                            </div>
+                            <asp:LinkButton ID="lnkHeaderLogout" runat="server" CssClass="nav-item w-full !text-red-500 hover:!bg-red-50 dark:hover:!bg-red-500/10" 
+                                OnClientClick="return confirmLogout();" OnClick="lnkLogout_Click" role="menuitem">
+                                <i data-lucide="log-out" class="w-4 h-4" aria-hidden="true"></i> Sign out
+                            </asp:LinkButton>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Main Content Area -->
+            <main id="main-content" class="flex-1" role="main" tabindex="-1">
+                <asp:ContentPlaceHolder ID="MainContent" runat="server"></asp:ContentPlaceHolder>
+            </main>
+            
+            <!-- Footer -->
+            <footer class="border-t border-gray-200 dark:border-slate-700 py-4 px-6 flex flex-wrap items-center justify-between gap-2 text-xs text-gray-400 dark:text-slate-500" role="contentinfo">
+                <p>&copy; <%: DateTime.Now.Year %> AQOONHUB International School &middot; All rights reserved</p>
+                <p>AQOONHUB SMS v1.0 &middot; <a class="hover:text-brand-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 rounded" href="<%= ResolveUrl("~/Modules/Settings/Settings.aspx") %>">Settings</a> &middot; <a class="hover:text-brand-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 rounded" href="<%= ResolveUrl("~/Modules/Administration/AuditLog.aspx") %>">Audit Log</a></p>
+            </footer>
+        </div>
+        
+        <!-- Toast Container -->
+        <div id="toast-root" class="fixed top-4 right-4 z-[100] flex flex-col gap-2 w-80" role="region" aria-live="polite" aria-label="Notifications"></div>
+        
+        <!-- Overlay Root for Dynamic Modals -->
+        <div id="overlay-root" aria-hidden="true"></div>
+        
+    </form>
+    
+    <!-- ============================================ -->
+    <!-- JAVASCRIPT                                   -->
+    <!-- ============================================ -->
+    <script>
+        /* ============================================================
+           AQOONHUB — School Management System · Client-Side Scripts
+           ============================================================ */
+
+        (function (window, document) {
+            'use strict';
+
+            /* ---------------- DOM Utilities ---------------- */
+            var $ = function (s, el) { return (el || document).querySelector(s); };
+            var $$ = function (s, el) { return Array.prototype.slice.call((el || document).querySelectorAll(s)); };
+
+            var esc = function (s) {
+                return String(s || '').replace(/[&<>"']/g, function (c) {
+                    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+                });
+            };
+
+            var fmtMoney = function (n) {
+                return '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            };
+
+            var getInitials = function (name) {
+                var parts = name.split(' ');
+                var result = '';
+                for (var i = 0; i < Math.min(2, parts.length); i++) {
+                    if (parts[i]) result += parts[i][0];
+                }
+                return result.toUpperCase();
+            };
+
+            var AV_COLORS = ['#2563EB', '#7C3AED', '#0EA5E9', '#22C55E', '#F59E0B', '#EF4444', '#EC4899', '#14B8A6'];
+            var getAvColor = function (name) {
+                var sum = 0;
+                for (var i = 0; i < (name || '').length; i++) sum += name.charCodeAt(i);
+                return AV_COLORS[sum % AV_COLORS.length];
+            };
+
+            var renderAvatar = function (name, size) {
+                size = size || 8;
+                return '<span class="avatar" style="width:' + (size * 4) + 'px;height:' + (size * 4) + 'px;font-size:' + (size * 1.5) + 'px;background:' + getAvColor(name) + '">' + getInitials(name) + '</span>';
+            };
+
+            var todayStr = function () { return new Date().toISOString().slice(0, 10); };
+
+            var renderIcon = function (name, cls) {
+                cls = cls || 'w-4 h-4';
+                return '<i data-lucide="' + name + '" class="' + cls + '" aria-hidden="true"></i>';
+            };
+
+            var refreshIcons = function () {
+                if (window.lucide && typeof lucide.createIcons === 'function') {
+                    try { lucide.createIcons(); } catch (e) { console.warn('Lucide icons refresh failed:', e); }
+                }
+            };
+
+            /* ---------------- Global State ---------------- */
+            var State = {
+                role: localStorage.getItem('aqh_role') || 'superadmin',
+                theme: localStorage.getItem('aqh_theme') || 'light',
+                user: null,
+                authed: sessionStorage.getItem('aqh_authed') === '1',
+                collapsed: localStorage.getItem('aqh_collapsed') === '1'
+            };
+
+            var ROLES = {
+                superadmin: { label: 'Super Admin', name: 'Amina Yusuf', email: 'amina.yusuf@aqoonhub.edu', color: '#7C3AED' },
+                admin: { label: 'Admin / Registrar', name: 'Khalid Warsame', email: 'k.warsame@aqoonhub.edu', color: '#2563EB' },
+                teacher: { label: 'Teacher', name: 'Farah Abdi', email: 'f.abdi@aqoonhub.edu', color: '#0EA5E9' },
+                accountant: { label: 'Accountant', name: 'Hodan Ali', email: 'h.ali@aqoonhub.edu', color: '#22C55E' },
+                hr: { label: 'HR / Staff Manager', name: 'Yusuf Osman', email: 'y.osman@aqoonhub.edu', color: '#F59E0B' },
+                parent: { label: 'Parent', name: 'Sahra Mohamed', email: 'sahra.m@gmail.com', color: '#EC4899' }
+            };
+
+            /* ---------------- Theme Management ---------------- */
+            function applyTheme() {
+                var isDark = State.theme === 'dark';
+                document.documentElement.classList.toggle('dark', isDark);
+                var themeIcon = $('#theme-icon');
+                if (themeIcon) {
+                    themeIcon.setAttribute('data-lucide', isDark ? 'sun' : 'moon');
+                    refreshIcons();
+                }
+            }
+
+            window.toggleTheme = function () {
+                State.theme = State.theme === 'dark' ? 'light' : 'dark';
+                localStorage.setItem('aqh_theme', State.theme);
+                applyTheme();
+                showToast(State.theme === 'dark' ? 'Dark mode enabled' : 'Light mode enabled', 'info', 'Theme');
+            };
+
+            /* ---------------- Toast Notifications ---------------- */
+            window.showToast = function (msg, type, title) {
+                var configs = {
+                    success: { icon: 'check-circle-2', color: '#22C55E' },
+                    error: { icon: 'x-circle', color: '#EF4444' },
+                    info: { icon: 'info', color: '#0EA5E9' },
+                    warning: { icon: 'alert-triangle', color: '#F59E0B' }
+                };
+                var conf = configs[type] || configs.info;
+                var defaultTitles = { success: 'Success', error: 'Error', warning: 'Warning', info: 'Info' };
+                var titleText = title || defaultTitles[type] || 'Info';
+
+                var el = document.createElement('div');
+                el.className = 'toast-in card flex items-start gap-3 p-3.5 shadow-pop';
+                el.setAttribute('role', 'alert');
+                el.innerHTML = '<span style="color:' + conf.color + '">' + renderIcon(conf.icon, 'w-5 h-5') + '</span>' +
+                    '<div class="flex-1 min-w-0"><p class="text-sm font-semibold">' + esc(titleText) + '</p>' +
+                    '<p class="text-xs text-gray-500 dark:text-slate-400 mt-0.5">' + esc(msg) + '</p></div>' +
+                    '<button type="button" class="text-gray-400 hover:text-gray-600" onclick="this.parentElement.remove()" aria-label="Dismiss notification">' + renderIcon('x', 'w-4 h-4') + '</button>';
+
+                var container = $('#toast-root');
+                if (container) {
+                    container.appendChild(el);
+                    refreshIcons();
+                    setTimeout(function () {
+                        el.style.transition = 'all .3s';
+                        el.style.opacity = '0';
+                        el.style.transform = 'translateX(24px)';
+                        setTimeout(function () { if (el.parentNode) el.remove(); }, 300);
+                    }, 3600);
+                }
+            };
+
+            /* ---------------- Modal System ---------------- */
+            window.openModal = function (html, widthClass) {
+                widthClass = widthClass || 'max-w-lg';
+                var wrap = document.createElement('div');
+                wrap.className = 'fixed inset-0 z-[90] flex items-center justify-center p-4';
+                wrap.setAttribute('role', 'dialog');
+                wrap.setAttribute('aria-modal', 'true');
+                wrap.innerHTML = '<div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onclick="closeModal()"></div>' +
+                    '<div class="modal-in relative card w-full ' + widthClass + ' max-h-[88vh] overflow-y-auto p-6 shadow-pop">' + html + '</div>';
+                var overlay = $('#overlay-root');
+                if (overlay) overlay.appendChild(wrap);
+                refreshIcons();
+                var focusable = wrap.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+                if (focusable.length) focusable[0].focus();
+            };
+
+            window.closeModal = function () {
+                var overlay = $('#overlay-root');
+                if (overlay && overlay.lastChild) overlay.lastChild.remove();
+            };
+
+            window.modalHeader = function (title, sub) {
+                return '<div class="flex items-start justify-between mb-5">' +
+                    '<div><h3 class="text-lg font-bold">' + esc(title) + '</h3>' + (sub ? '<p class="text-xs text-gray-500 dark:text-slate-400 mt-1">' + esc(sub) + '</p>' : '') + '</div>' +
+                    '<button type="button" class="btn-ghost btn !p-1.5" onclick="closeModal()" aria-label="Close dialog">' + renderIcon('x', 'w-5 h-5') + '</button></div>';
+            };
+
+            window.confirmDialog = function (title, msg, onYes, danger) {
+                danger = danger !== false;
+                window._confirmCb = onYes;
+                var iconName = danger ? 'trash-2' : 'help-circle';
+                var bgColor = danger ? '#FEF2F2' : '#EFF6FF';
+                var iconColor = danger ? '#EF4444' : '#2563EB';
+                var btnClass = danger ? 'btn-danger' : 'btn-primary';
+                var actionText = danger ? 'Delete' : 'Confirm';
+
+                openModal('<div class="text-center py-2">' +
+                    '<span class="inline-flex items-center justify-center w-14 h-14 rounded-full mb-4" style="background:' + bgColor + ';color:' + iconColor + '">' + renderIcon(iconName, 'w-7 h-7') + '</span>' +
+                    '<h3 class="text-lg font-bold">' + esc(title) + '</h3>' +
+                    '<p class="text-sm text-gray-500 dark:text-slate-400 mt-2 mb-6">' + esc(msg) + '</p>' +
+                    '<div class="flex gap-3 justify-center">' +
+                    '<button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>' +
+                    '<button type="button" class="btn ' + btnClass + '" onclick="closeModal();if(window._confirmCb)window._confirmCb();">' + actionText + '</button>' +
+                    '</div></div>', 'max-w-sm');
+            };
+
+            /* ---------------- Dropdown Management ---------------- */
+            window.toggleDropdown = function (id) {
+                var el = document.getElementById(id);
+                if (!el) return;
+                var wasHidden = el.classList.contains('hidden');
+                $$('#dd-notif, #dd-user').forEach(function (d) { d.classList.add('hidden'); d.setAttribute('aria-expanded', 'false'); });
+                if (wasHidden) {
+                    el.classList.remove('hidden');
+                    el.setAttribute('aria-expanded', 'true');
+                }
+            };
+
+            document.addEventListener('click', function (e) {
+                if (!e.target.closest('#dd-notif') && !e.target.closest('#dd-user') && !e.target.closest('button[onclick^="toggleDropdown"]')) {
+                    $$('#dd-notif, #dd-user').forEach(function (d) { d.classList.add('hidden'); d.setAttribute('aria-expanded', 'false'); });
+                }
+            });
+
+            /* ---------------- Sidebar Toggle ---------------- */
+            window.toggleSidebar = function (force) {
+                var sb = $('#sidebar');
+                var bd = $('#sidebar-backdrop');
+                if (!sb) return;
+                var open = force !== undefined ? force : sb.classList.contains('-translate-x-full');
+                sb.classList.toggle('-translate-x-full', !open);
+                if (bd) bd.classList.toggle('hidden', !open);
+                var toggleBtn = document.querySelector('button[aria-controls="sidebar"]');
+                if (toggleBtn) toggleBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+            };
+
+            /* ---------------- Search ---------------- */
+            window.openSearch = function () {
+                openModal('<div class="flex items-center gap-3 border-b border-gray-100 dark:border-slate-700 pb-3 mb-3">' +
+                    renderIcon('search', 'w-5 h-5 text-gray-400') +
+                    '<input id="gs-input" class="flex-1 outline-none bg-transparent text-sm" placeholder="Search students, teachers, parents, classes, invoices, payments, users…" oninput="renderSearchResults(this.value)">' +
+                    '<button type="button" class="text-xs text-gray-400 border border-gray-200 dark:border-slate-600 rounded px-1.5 py-0.5" onclick="closeModal()">ESC</button></div>' +
+                    '<div id="gs-results" class="max-h-80 overflow-y-auto"></div>', 'max-w-xl');
+                renderSearchResults('');
+                setTimeout(function () { var inp = $('#gs-input'); if (inp) inp.focus(); }, 50);
+            };
+
+            window.renderSearchResults = function (q) {
+                var results = $('#gs-results');
+                if (!results) return;
+                q = (q || '').trim().toLowerCase();
+                if (q) {
+                    results.innerHTML = '<div class="p-4 text-center text-sm text-gray-500">Search results for &quot;' + esc(q) + '&quot; would appear here.</div>';
+                } else {
+                    results.innerHTML = '<div class="p-4 text-center text-sm text-gray-500">Start typing to search across all modules...</div>';
+                }
+            };
+
+            /* ---------------- Logout ---------------- */
+            window.confirmLogout = function () {
+                return confirm('Are you sure you want to sign out?');
+            };
+
+            window.logout = function () {
+                sessionStorage.removeItem('aqh_authed');
+                State.authed = false;
+                showToast('You have been signed out securely.', 'info', 'Signed out');
+                setTimeout(function () {
+                    window.location.href = '<%= ResolveUrl("~/Modules/Authentication/Login.aspx") %>';
+                }, 800);
+            };
+
+            /* ---------------- Mark All Read ---------------- */
+            window.markAllRead = function () {
+                showToast('All notifications marked as read', 'success');
+            };
+
+            /* ---------------- Active Navigation Highlighting ---------------- */
+            function highlightActiveNav() {
+                var currentPath = window.location.pathname.toLowerCase();
+                var navItems = $$('.nav-item[data-nav]');
+                var bestMatch = null;
+                var bestMatchLength = 0;
+
+                navItems.forEach(function (item) {
+                    item.classList.remove('active');
+                    var navKey = item.getAttribute('data-nav');
+                    if (!navKey) return;
+                    if (currentPath.indexOf(navKey.toLowerCase()) !== -1) {
+                        if (navKey.length > bestMatchLength) {
+                            bestMatchLength = navKey.length;
+                            bestMatch = item;
+                        }
+                    }
+                });
+
+                if (bestMatch) {
+                    bestMatch.classList.add('active');
+                } else if (currentPath.indexOf('dashboard') !== -1 || currentPath === '/' || currentPath === '/default.aspx') {
+                    var dashboardNav = $('.nav-item[data-nav="dashboard"]');
+                    if (dashboardNav) dashboardNav.classList.add('active');
+                }
+            }
+
+            /* ---------------- Keyboard Shortcuts ---------------- */
+            document.addEventListener('keydown', function (e) {
+                if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+                    e.preventDefault();
+                    openSearch();
+                }
+                if (e.key === 'Escape') {
+                    closeModal();
+                    $$('#dd-notif, #dd-user').forEach(function (d) { d.classList.add('hidden'); });
+                }
+            });
+
+            /* ---------------- Initialization ---------------- */
+            document.addEventListener('DOMContentLoaded', function () {
+                applyTheme();
+                highlightActiveNav();
+                refreshIcons();
+
+                if (typeof Sys !== 'undefined' && Sys.WebForms && Sys.WebForms.PageRequestManager) {
+                    Sys.WebForms.PageRequestManager.getInstance().add_endRequest(function () {
+                        refreshIcons();
+                        highlightActiveNav();
+                    });
+                }
+            });
+
+            // Expose utilities globally for page scripts
+            window.AQOONHUB = {
+                $: $, $$: $$, esc: esc, fmtMoney: fmtMoney,
+                getInitials: getInitials, getAvColor: getAvColor,
+                renderAvatar: renderAvatar, todayStr: todayStr,
+                renderIcon: renderIcon, refreshIcons: refreshIcons,
+                State: State, ROLES: ROLES
+            };
+
+        })(window, document);
+    </script>
+    
+    <asp:ContentPlaceHolder ID="scripts" runat="server"></asp:ContentPlaceHolder>
+</body>
+</html>

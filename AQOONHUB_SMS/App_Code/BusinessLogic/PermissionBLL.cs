@@ -132,7 +132,7 @@ namespace AQOONHUB_SMS.App_Code.BusinessLogic
             if (permission.PermissionName.Length > 100)
                 throw new ValidationException("Permission name cannot exceed 100 characters");
 
-            if (string.IsNullOrWhiteSpace(permission.ModuleName))
+            if (string.IsNullOrWhiteSpace(permission.Module))
                 throw new ValidationException("Module name is required");
 
             // Check for duplicate permission name
@@ -145,7 +145,7 @@ namespace AQOONHUB_SMS.App_Code.BusinessLogic
                 int permissionID = permissionDAL.AddPermission(permission);
 
                 auditLogger.LogCreate(createdBy, "Permission", "Permission", permissionID.ToString(),
-                    string.Format("Added permission '{0}' in module '{1}'", permission.PermissionName, permission.ModuleName));
+                    string.Format("Added permission '{0}' in module '{1}'", permission.PermissionName, permission.Module));
 
                 return permissionID;
             }
@@ -182,7 +182,7 @@ namespace AQOONHUB_SMS.App_Code.BusinessLogic
             if (permission.PermissionName.Length > 100)
                 throw new ValidationException("Permission name cannot exceed 100 characters");
 
-            if (string.IsNullOrWhiteSpace(permission.ModuleName))
+            if (string.IsNullOrWhiteSpace(permission.Module))
                 throw new ValidationException("Module name is required");
 
             // Verify the permission exists
@@ -210,11 +210,11 @@ namespace AQOONHUB_SMS.App_Code.BusinessLogic
                             permission.PermissionID.ToString(), "PermissionName",
                             existing.PermissionName, permission.PermissionName);
                     }
-                    if (!string.Equals(existing.ModuleName, permission.ModuleName, StringComparison.OrdinalIgnoreCase))
+                    if (!string.Equals(existing.Module, permission.Module, StringComparison.OrdinalIgnoreCase))
                     {
                         auditLogger.LogUpdate(updatedBy, "Permission", "Permission",
-                            permission.PermissionID.ToString(), "ModuleName",
-                            existing.ModuleName, permission.ModuleName);
+                            permission.PermissionID.ToString(), "Module",
+                            existing.Module, permission.Module);
                     }
                 }
 

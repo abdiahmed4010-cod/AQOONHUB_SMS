@@ -65,6 +65,14 @@ namespace AQOONHUB_SMS.App_Code.DataAccess
         }
 
         /// <summary>
+        /// Gets all terms filtered by academic year ID
+        /// </summary>
+        public List<Term> GetAllTerms(int academicYearId)
+        {
+            return GetAllTerms(academicYearId, null);
+        }
+
+        /// <summary>
         /// Gets term by ID
         /// </summary>
         public Term GetTermById(int termId)
@@ -159,6 +167,20 @@ namespace AQOONHUB_SMS.App_Code.DataAccess
             };
 
             return db.ExecuteNonQuery(query, parameters) > 0;
+        }
+
+        /// <summary>
+        /// Clears the IsCurrent flag from all terms
+        /// </summary>
+        public bool ClearCurrentFlag()
+        {
+            string query = @"
+                UPDATE Terms
+                SET IsCurrent = 0,
+                    UpdatedAt = GETDATE()
+                WHERE IsCurrent = 1";
+
+            return db.ExecuteNonQuery(query) > 0;
         }
 
         /// <summary>

@@ -5,9 +5,11 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Collections.Generic;
 
-
 namespace AQOONHUB_SMS.App_Code.DataAccess
 {
+    /// <summary>
+    /// Data access layer for role management
+    /// </summary>
     public class RoleDAL
     {
         private DatabaseHelper db;
@@ -17,21 +19,28 @@ namespace AQOONHUB_SMS.App_Code.DataAccess
             db = new DatabaseHelper();
         }
 
-        #region Roles
+        #region Retrieval Operations
 
         /// <summary>
         /// Gets all roles
         /// </summary>
-        public DataTable GetAllRoles()
+        public List<Role> GetAllRoles()
         {
             string query = "SELECT * FROM Roles ORDER BY RoleName";
-            return db.ExecuteQuery(query);
+            DataTable dt = db.ExecuteQuery(query);
+
+            List<Role> roles = new List<Role>();
+            foreach (DataRow row in dt.Rows)
+            {
+                roles.Add(MapToRole(row));
+            }
+            return roles;
         }
 
         /// <summary>
-        /// Gets role by ID
+        /// Gets a role by ID
         /// </summary>
-        public DataRow GetRoleById(int roleId)
+        public Role GetRoleById(int roleId)
         {
             string query = "SELECT * FROM Roles WHERE RoleID = @RoleID";
             SqlParameter[] parameters = new SqlParameter[]
@@ -40,13 +49,13 @@ namespace AQOONHUB_SMS.App_Code.DataAccess
             };
 
             DataTable dt = db.ExecuteQuery(query, parameters);
-            return dt.Rows.Count > 0 ? dt.Rows[0] : null;
+            return dt.Rows.Count > 0 ? MapToRole(dt.Rows[0]) : null;
         }
 
         /// <summary>
-        /// Gets role by name
+        /// Gets a role by name
         /// </summary>
-        public DataRow GetRoleByName(string roleName)
+        public Role GetRoleByName(string roleName)
         {
             string query = "SELECT * FROM Roles WHERE RoleName = @RoleName";
             SqlParameter[] parameters = new SqlParameter[]
@@ -55,13 +64,17 @@ namespace AQOONHUB_SMS.App_Code.DataAccess
             };
 
             DataTable dt = db.ExecuteQuery(query, parameters);
-            return dt.Rows.Count > 0 ? dt.Rows[0] : null;
+            return dt.Rows.Count > 0 ? MapToRole(dt.Rows[0]) : null;
         }
 
+        #endregion
+
+        #region Create Operations
+
         /// <summary>
-        /// Adds role
+        /// Adds a new role
         /// </summary>
-        public int AddRole(string roleName, string description, bool isActive)
+        public int AddRole(Role role)
         {
             string query = @"
                 INSERT INTO Roles (RoleName, Description, IsActive, CreatedAt, UpdatedAt)
@@ -70,18 +83,22 @@ namespace AQOONHUB_SMS.App_Code.DataAccess
 
             SqlParameter[] parameters = new SqlParameter[]
             {
-                new SqlParameter("@RoleName", roleName),
-                new SqlParameter("@Description", (object)description ?? DBNull.Value),
-                new SqlParameter("@IsActive", isActive)
+                new SqlParameter("@RoleName", role.RoleName),
+                new SqlParameter("@Description", (object)role.Description ?? DBNull.Value),
+                new SqlParameter("@IsActive", role.IsActive)
             };
 
             return Convert.ToInt32(db.ExecuteScalar(query, parameters));
         }
 
+        #endregion
+
+        #region Update Operations
+
         /// <summary>
-        /// Updates role
+        /// Updates an existing role
         /// </summary>
-        public bool UpdateRole(int roleId, string roleName, string description, bool isActive)
+        public bool UpdateRole(Role role)
         {
             string query = @"
                 UPDATE Roles SET
@@ -93,17 +110,21 @@ namespace AQOONHUB_SMS.App_Code.DataAccess
 
             SqlParameter[] parameters = new SqlParameter[]
             {
-                new SqlParameter("@RoleID", roleId),
-                new SqlParameter("@RoleName", roleName),
-                new SqlParameter("@Description", (object)description ?? DBNull.Value),
-                new SqlParameter("@IsActive", isActive)
+                new SqlParameter("@RoleID", role.RoleID),
+                new SqlParameter("@RoleName", role.RoleName),
+                new SqlParameter("@Description", (object)role.Description ?? DBNull.Value),
+                new SqlParameter("@IsActive", role.IsActive)
             };
 
             return db.ExecuteNonQuery(query, parameters) > 0;
         }
 
+        #endregion
+
+        #region Delete Operations
+
         /// <summary>
-        /// Deletes role
+        /// Deletes a role
         /// </summary>
         public bool DeleteRole(int roleId)
         {
@@ -114,6 +135,26 @@ namespace AQOONHUB_SMS.App_Code.DataAccess
             };
 
             return db.ExecuteNonQuery(query, parameters) > 0;
+        }
+
+        #endregion
+
+        #region Mapping
+
+        /// <summary>
+        /// Maps a DataRow to a Role object
+        /// </summary>
+        private Role MapToRole(DataRow row)
+        {
+            return new Role
+            {
+                RoleID = Convert.ToInt32(row["RoleID"]),
+                RoleName = row["RoleName"].ToString(),
+                Description = row["Description"] != DBNull.Value ? row["Description"].ToString() : null,
+                IsActive = Convert.ToBoolean(row["IsActive"]),
+                CreatedAt = Convert.ToDateTime(row["CreatedAt"]),
+                UpdatedAt = Convert.ToDateTime(row["UpdatedAt"])
+            };
         }
 
         #endregion

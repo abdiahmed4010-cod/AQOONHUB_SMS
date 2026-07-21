@@ -5,7 +5,6 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Collections.Generic;
 
-
 namespace AQOONHUB_SMS.App_Code.DataAccess
 {
     public class SectionDAL
@@ -70,6 +69,57 @@ namespace AQOONHUB_SMS.App_Code.DataAccess
         public List<Section> GetAllSections()
         {
             return GetAllSections(0, 0, null);
+        }
+
+        /// <summary>
+        /// Gets sections by class ID
+        /// </summary>
+        public List<Section> GetSectionsByClass(int classId)
+        {
+            List<Section> sections = new List<Section>();
+
+            string query = @"
+                SELECT s.*, c.ClassName, t.FullName as TeacherName,
+                       (SELECT COUNT(*) FROM Students st WHERE st.SectionID = s.SectionID AND st.Status = 'Active') as CurrentEnrollment
+                FROM Sections s
+                INNER JOIN Classes c ON s.ClassID = c.ClassID
+                LEFT JOIN Teachers t ON s.TeacherID = t.TeacherID
+                WHERE s.ClassID = @ClassID
+                ORDER BY s.SectionName";
+
+            SqlParameter[] parameters = new SqlParameter[]
+            {
+                new SqlParameter("@ClassID", classId)
+            };
+
+            DataTable dt = db.ExecuteQuery(query, parameters);
+
+            foreach (DataRow row in dt.Rows)
+            {
+                sections.Add(MapToSection(row));
+            }
+
+            return sections;
+        }
+
+        /// <summary>
+        /// Gets section enrollment count
+        /// </summary>
+        public int GetSectionEnrollment(int sectionId)
+        {
+            string query = @"
+                SELECT COUNT(*)
+                FROM Students
+                WHERE SectionID = @SectionID
+                AND Status = 'Active'";
+
+            SqlParameter[] parameters = new SqlParameter[]
+            {
+                new SqlParameter("@SectionID", sectionId)
+            };
+
+            object result = db.ExecuteScalar(query, parameters);
+            return result != null ? Convert.ToInt32(result) : 0;
         }
 
         /// <summary>

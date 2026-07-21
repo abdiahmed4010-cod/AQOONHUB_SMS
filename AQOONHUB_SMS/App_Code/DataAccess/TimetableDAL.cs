@@ -20,7 +20,7 @@ namespace AQOONHUB_SMS.App_Code.DataAccess
         /// <summary>
         /// Gets all timetable entries with optional filters
         /// </summary>
-        public List<Timetable> GetAllTimetables(int sectionId, int teacherId, string dayOfWeek, int academicYearId, int termId)
+        public List<Timetable> GetAllTimetables(int sectionId, int teacherId, int dayOfWeek, int academicYearId, int termId)
         {
             List<Timetable> timetables = new List<Timetable>();
 
@@ -50,7 +50,7 @@ namespace AQOONHUB_SMS.App_Code.DataAccess
                 parameters.Add(new SqlParameter("@TeacherID", teacherId));
             }
 
-            if (!string.IsNullOrEmpty(dayOfWeek))
+            if (dayOfWeek > 0)
             {
                 query += " AND t.DayOfWeek = @DayOfWeek";
                 parameters.Add(new SqlParameter("@DayOfWeek", dayOfWeek));
@@ -85,7 +85,15 @@ namespace AQOONHUB_SMS.App_Code.DataAccess
         /// </summary>
         public List<Timetable> GetAllTimetables()
         {
-            return GetAllTimetables(0, 0, null, 0, 0);
+            return GetAllTimetables(0, 0, 0, 0, 0);
+        }
+
+        /// <summary>
+        /// Gets timetable entries for a section and academic year (BLL compatibility)
+        /// </summary>
+        public List<Timetable> GetTimetable(int sectionID, int academicYearID)
+        {
+            return GetAllTimetables(sectionID, 0, 0, academicYearID, 0);
         }
 
         /// <summary>
@@ -125,9 +133,9 @@ namespace AQOONHUB_SMS.App_Code.DataAccess
         {
             string query = @"
                 INSERT INTO Timetables (SectionID, SubjectID, TeacherID, DayOfWeek, StartTime, EndTime,
-                    RoomNumber, AcademicYearID, TermID, Status, CreatedAt, UpdatedAt)
+                    RoomNumber, AcademicYearID, TermID, PeriodNo, Status, CreatedAt, UpdatedAt)
                 VALUES (@SectionID, @SubjectID, @TeacherID, @DayOfWeek, @StartTime, @EndTime,
-                    @RoomNumber, @AcademicYearID, @TermID, @Status, GETDATE(), GETDATE());
+                    @RoomNumber, @AcademicYearID, @TermID, @PeriodNo, @Status, GETDATE(), GETDATE());
                 SELECT SCOPE_IDENTITY();";
 
             SqlParameter[] parameters = new SqlParameter[]
@@ -141,10 +149,19 @@ namespace AQOONHUB_SMS.App_Code.DataAccess
                 new SqlParameter("@RoomNumber", string.IsNullOrEmpty(timetable.RoomNumber) ? (object)DBNull.Value : timetable.RoomNumber),
                 new SqlParameter("@AcademicYearID", timetable.AcademicYearID),
                 new SqlParameter("@TermID", timetable.TermID),
+                new SqlParameter("@PeriodNo", timetable.PeriodNo),
                 new SqlParameter("@Status", timetable.Status)
             };
 
             return Convert.ToInt32(db.ExecuteScalar(query, parameters));
+        }
+
+        /// <summary>
+        /// Adds a new timetable slot (BLL compatibility wrapper)
+        /// </summary>
+        public int AddTimetableSlot(Timetable slot)
+        {
+            return AddTimetable(slot);
         }
 
         /// <summary>
@@ -163,6 +180,7 @@ namespace AQOONHUB_SMS.App_Code.DataAccess
                     RoomNumber = @RoomNumber,
                     AcademicYearID = @AcademicYearID,
                     TermID = @TermID,
+                    PeriodNo = @PeriodNo,
                     Status = @Status,
                     UpdatedAt = GETDATE()
                 WHERE TimetableID = @TimetableID";
@@ -179,10 +197,19 @@ namespace AQOONHUB_SMS.App_Code.DataAccess
                 new SqlParameter("@RoomNumber", string.IsNullOrEmpty(timetable.RoomNumber) ? (object)DBNull.Value : timetable.RoomNumber),
                 new SqlParameter("@AcademicYearID", timetable.AcademicYearID),
                 new SqlParameter("@TermID", timetable.TermID),
+                new SqlParameter("@PeriodNo", timetable.PeriodNo),
                 new SqlParameter("@Status", timetable.Status)
             };
 
             return db.ExecuteNonQuery(query, parameters) > 0;
+        }
+
+        /// <summary>
+        /// Updates an existing timetable slot (BLL compatibility wrapper)
+        /// </summary>
+        public bool UpdateTimetableSlot(Timetable slot)
+        {
+            return UpdateTimetable(slot);
         }
 
         /// <summary>
@@ -201,9 +228,149 @@ namespace AQOONHUB_SMS.App_Code.DataAccess
         }
 
         /// <summary>
+        /// Deletes a timetable slot (BLL compatibility wrapper)
+        /// </summary>
+        public bool DeleteTimetableSlot(int timetableID)
+        {
+            return SoftDeleteTimetable(timetableID);
+        }
+
+        /// <summary>
+        /// Checks for teacher scheduling conflicts
+        /// </summary>
+        public DataTable CheckTeacherConflicts(int staffID, int dayOfWeek, TimeSpan startTime, TimeSpan endTime)
+        {
+            string query = @"
+                SELECT t.TimetableID, c.ClassName, sec.SectionName, sub.SubjectName,
+                       t.StartTime, t.EndTime
+                FROM Timetables t
+                INNER JOIN Sections sec ON t.SectionID = sec.SectionID
+                INNER JOIN Classes c ON sec.ClassID = c.ClassID
+                INNER JOIN Subjects sub ON t.SubjectID = sub.SubjectID
+                WHERE t.TeacherID = @TeacherID
+                AND t.DayOfWeek = @DayOfWeek
+                AND t.Status = 'Active'
+                AND (
+                    (t.StartTime <= @StartTime AND t.EndTime > @StartTime)
+                    OR (t.StartTime < @EndTime AND t.EndTime >= @EndTime)
+                    OR (t.StartTime >= @StartTime AND t.EndTime <= @EndTime)
+                )";
+
+            SqlParameter[] parameters = new SqlParameter[]
+            {
+                new SqlParameter("@TeacherID", staffID),
+                new SqlParameter("@DayOfWeek", dayOfWeek),
+                new SqlParameter("@StartTime", startTime),
+                new SqlParameter("@EndTime", endTime)
+            };
+
+            return db.ExecuteQuery(query, parameters);
+        }
+
+        /// <summary>
+        /// Checks for teacher scheduling conflicts excluding a specific timetable entry
+        /// </summary>
+        public DataTable CheckTeacherConflicts(int staffID, int dayOfWeek, TimeSpan startTime, TimeSpan endTime, int excludeTimetableID)
+        {
+            string query = @"
+                SELECT t.TimetableID, c.ClassName, sec.SectionName, sub.SubjectName,
+                       t.StartTime, t.EndTime
+                FROM Timetables t
+                INNER JOIN Sections sec ON t.SectionID = sec.SectionID
+                INNER JOIN Classes c ON sec.ClassID = c.ClassID
+                INNER JOIN Subjects sub ON t.SubjectID = sub.SubjectID
+                WHERE t.TeacherID = @TeacherID
+                AND t.DayOfWeek = @DayOfWeek
+                AND t.Status = 'Active'
+                AND t.TimetableID != @ExcludeTimetableID
+                AND (
+                    (t.StartTime <= @StartTime AND t.EndTime > @StartTime)
+                    OR (t.StartTime < @EndTime AND t.EndTime >= @EndTime)
+                    OR (t.StartTime >= @StartTime AND t.EndTime <= @EndTime)
+                )";
+
+            SqlParameter[] parameters = new SqlParameter[]
+            {
+                new SqlParameter("@TeacherID", staffID),
+                new SqlParameter("@DayOfWeek", dayOfWeek),
+                new SqlParameter("@StartTime", startTime),
+                new SqlParameter("@EndTime", endTime),
+                new SqlParameter("@ExcludeTimetableID", excludeTimetableID)
+            };
+
+            return db.ExecuteQuery(query, parameters);
+        }
+
+        /// <summary>
+        /// Checks for room scheduling conflicts
+        /// </summary>
+        public DataTable CheckRoomConflicts(string roomNumber, int dayOfWeek, TimeSpan startTime, TimeSpan endTime)
+        {
+            string query = @"
+                SELECT t.TimetableID, c.ClassName, sec.SectionName, sub.SubjectName,
+                       t.StartTime, t.EndTime
+                FROM Timetables t
+                INNER JOIN Sections sec ON t.SectionID = sec.SectionID
+                INNER JOIN Classes c ON sec.ClassID = c.ClassID
+                INNER JOIN Subjects sub ON t.SubjectID = sub.SubjectID
+                WHERE t.RoomNumber = @RoomNumber
+                AND t.DayOfWeek = @DayOfWeek
+                AND t.Status = 'Active'
+                AND (
+                    (t.StartTime <= @StartTime AND t.EndTime > @StartTime)
+                    OR (t.StartTime < @EndTime AND t.EndTime >= @EndTime)
+                    OR (t.StartTime >= @StartTime AND t.EndTime <= @EndTime)
+                )";
+
+            SqlParameter[] parameters = new SqlParameter[]
+            {
+                new SqlParameter("@RoomNumber", roomNumber),
+                new SqlParameter("@DayOfWeek", dayOfWeek),
+                new SqlParameter("@StartTime", startTime),
+                new SqlParameter("@EndTime", endTime)
+            };
+
+            return db.ExecuteQuery(query, parameters);
+        }
+
+        /// <summary>
+        /// Checks for room scheduling conflicts excluding a specific timetable entry
+        /// </summary>
+        public DataTable CheckRoomConflicts(string roomNumber, int dayOfWeek, TimeSpan startTime, TimeSpan endTime, int excludeTimetableID)
+        {
+            string query = @"
+                SELECT t.TimetableID, c.ClassName, sec.SectionName, sub.SubjectName,
+                       t.StartTime, t.EndTime
+                FROM Timetables t
+                INNER JOIN Sections sec ON t.SectionID = sec.SectionID
+                INNER JOIN Classes c ON sec.ClassID = c.ClassID
+                INNER JOIN Subjects sub ON t.SubjectID = sub.SubjectID
+                WHERE t.RoomNumber = @RoomNumber
+                AND t.DayOfWeek = @DayOfWeek
+                AND t.Status = 'Active'
+                AND t.TimetableID != @ExcludeTimetableID
+                AND (
+                    (t.StartTime <= @StartTime AND t.EndTime > @StartTime)
+                    OR (t.StartTime < @EndTime AND t.EndTime >= @EndTime)
+                    OR (t.StartTime >= @StartTime AND t.EndTime <= @EndTime)
+                )";
+
+            SqlParameter[] parameters = new SqlParameter[]
+            {
+                new SqlParameter("@RoomNumber", roomNumber),
+                new SqlParameter("@DayOfWeek", dayOfWeek),
+                new SqlParameter("@StartTime", startTime),
+                new SqlParameter("@EndTime", endTime),
+                new SqlParameter("@ExcludeTimetableID", excludeTimetableID)
+            };
+
+            return db.ExecuteQuery(query, parameters);
+        }
+
+        /// <summary>
         /// Checks for scheduling conflicts
         /// </summary>
-        public bool HasConflict(int sectionId, int teacherId, string dayOfWeek, TimeSpan startTime, TimeSpan endTime, int excludeTimetableId)
+        public bool HasConflict(int sectionId, int teacherId, int dayOfWeek, TimeSpan startTime, TimeSpan endTime, int excludeTimetableId)
         {
             string query = @"
                 SELECT COUNT(*) FROM Timetables
@@ -245,7 +412,7 @@ namespace AQOONHUB_SMS.App_Code.DataAccess
             timetable.SubjectName = row["SubjectName"].ToString();
             timetable.TeacherID = Convert.ToInt32(row["TeacherID"]);
             timetable.TeacherName = row["TeacherName"].ToString();
-            timetable.DayOfWeek = row["DayOfWeek"].ToString();
+            timetable.DayOfWeek = Convert.ToInt32(row["DayOfWeek"]);
             timetable.StartTime = (TimeSpan)row["StartTime"];
             timetable.EndTime = (TimeSpan)row["EndTime"];
             timetable.RoomNumber = row["RoomNumber"] == DBNull.Value ? null : row["RoomNumber"].ToString();
@@ -256,6 +423,12 @@ namespace AQOONHUB_SMS.App_Code.DataAccess
             timetable.Status = row["Status"].ToString();
             timetable.CreatedAt = Convert.ToDateTime(row["CreatedAt"]);
             timetable.UpdatedAt = Convert.ToDateTime(row["UpdatedAt"]);
+
+            if (row.Table.Columns.Contains("PeriodNo") && row["PeriodNo"] != DBNull.Value)
+            {
+                timetable.PeriodNo = Convert.ToInt32(row["PeriodNo"]);
+            }
+
             return timetable;
         }
     }
