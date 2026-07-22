@@ -1,7 +1,10 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Login.aspx.cs" Inherits="AQOONHUB_SMS.Modules.Authentication.Login" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Login.aspx.cs" 
+    Inherits="AQOONHUB_SMS.Modules.Authentication.Login" 
+    MasterPageFile="" %>
 
 <!DOCTYPE html>
 <html lang="en" class="">
+<!-- rest of your Login.aspx stays exactly the same -->
 <head runat="server">
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
