@@ -17,38 +17,38 @@
             --border-color: #E5E7EB;
             --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.04), 0 1px 3px 0 rgb(0 0 0 / 0.06);
             --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.06);
-            --radius: 0.9rem;
-            --radius-sm: 0.6rem;
+            --radius: 0.75rem;
+            --radius-sm: 0.5rem;
         }
 
         .dashboard-container {
-            padding: 1.5rem;
+            padding: 1.25rem;
             max-width: 1440px;
             margin: 0 auto;
         }
 
         .dash-header {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.25rem;
         }
         .dash-header h1 {
-            font-size: 1.5rem;
+            font-size: 1.35rem;
             font-weight: 800;
             color: var(--text-primary);
             letter-spacing: -0.025em;
             margin: 0;
         }
         .dash-header p {
-            font-size: 0.875rem;
+            font-size: 0.8rem;
             color: var(--text-secondary);
-            margin: 0.25rem 0 0 0;
+            margin: 0.2rem 0 0 0;
         }
         .dash-header .breadcrumb {
             display: flex;
             align-items: center;
             gap: 0.375rem;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: var(--text-secondary);
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.4rem;
         }
         .dash-header .breadcrumb a {
             color: var(--text-secondary);
@@ -63,8 +63,8 @@
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(1, 1fr);
-            gap: 1rem;
-            margin-bottom: 1.5rem;
+            gap: 0.875rem;
+            margin-bottom: 1.25rem;
         }
         @media (min-width: 640px) {
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
@@ -77,10 +77,10 @@
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: var(--radius);
-            padding: 1.25rem;
+            padding: 1rem;
             display: flex;
             align-items: flex-start;
-            gap: 1rem;
+            gap: 0.875rem;
             box-shadow: var(--shadow-sm);
             transition: all 0.2s ease;
         }
@@ -90,8 +90,8 @@
         }
 
         .stat-icon {
-            width: 3rem;
-            height: 3rem;
+            width: 2.5rem;
+            height: 2.5rem;
             border-radius: var(--radius-sm);
             display: flex;
             align-items: center;
@@ -99,8 +99,8 @@
             flex-shrink: 0;
         }
         .stat-icon svg {
-            width: 1.25rem;
-            height: 1.25rem;
+            width: 1.1rem;
+            height: 1.1rem;
         }
 
         .stat-icon.blue { background: #EFF6FF; color: #2563EB; }
@@ -113,31 +113,31 @@
 
         .stat-content { min-width: 0; flex: 1; }
         .stat-label {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 600;
             color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.2rem;
         }
         .stat-value {
-            font-size: 1.5rem;
+            font-size: 1.35rem;
             font-weight: 800;
             color: var(--text-primary);
             line-height: 1.2;
         }
         .stat-sub {
-            font-size: 0.6875rem;
+            font-size: 0.65rem;
             color: var(--text-secondary);
-            margin-top: 0.25rem;
+            margin-top: 0.2rem;
         }
 
-        /* Section Cards */
+        /* Section Cards - COMPACT SIZE */
         .section-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
+            gap: 0.875rem;
+            margin-bottom: 1.25rem;
         }
         @media (min-width: 1024px) {
             .section-grid.two-col { grid-template-columns: repeat(2, 1fr); }
@@ -155,17 +155,17 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 1rem 1.25rem;
+            padding: 0.875rem 1rem;
             border-bottom: 1px solid var(--border-color);
         }
         .dash-card-header h3 {
-            font-size: 0.875rem;
+            font-size: 0.8rem;
             font-weight: 700;
             color: var(--text-primary);
             margin: 0;
         }
         .dash-card-header .card-action {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 600;
             color: var(--brand-primary);
             text-decoration: none;
@@ -174,44 +174,44 @@
             opacity: 0.8;
         }
         .dash-card-body {
-            padding: 1.25rem;
+            padding: 1rem;
         }
 
-        /* Mini Stats */
+        /* Mini Stats - COMPACT */
         .mini-stats {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 0.75rem;
+            gap: 0.5rem;
         }
         @media (min-width: 640px) {
             .mini-stats { grid-template-columns: repeat(4, 1fr); }
         }
         .mini-stat {
             text-align: center;
-            padding: 0.75rem;
+            padding: 0.5rem;
             border-radius: var(--radius-sm);
             background: var(--bg-surface);
         }
         .mini-stat .value {
-            font-size: 1.25rem;
+            font-size: 1.1rem;
             font-weight: 800;
             line-height: 1;
         }
         .mini-stat .label {
-            font-size: 0.6875rem;
+            font-size: 0.6rem;
             font-weight: 600;
             color: var(--text-secondary);
-            margin-top: 0.375rem;
+            margin-top: 0.25rem;
             text-transform: uppercase;
         }
 
-        /* Progress Bar */
-        .progress-wrap { margin-top: 1rem; }
+        /* Progress Bar - COMPACT */
+        .progress-wrap { margin-top: 0.75rem; }
         .progress-label {
             display: flex;
             justify-content: space-between;
-            font-size: 0.75rem;
-            margin-bottom: 0.375rem;
+            font-size: 0.7rem;
+            margin-bottom: 0.3rem;
         }
         .progress-label span:first-child {
             font-weight: 600;
@@ -221,7 +221,7 @@
             color: var(--text-secondary);
         }
         .progress-track {
-            height: 0.5rem;
+            height: 0.4rem;
             background: #F3F4F6;
             border-radius: 999px;
             overflow: hidden;
@@ -241,21 +241,21 @@
         .dash-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.8125rem;
+            font-size: 0.75rem;
         }
         .dash-table thead th {
             text-align: left;
-            font-size: 0.6875rem;
+            font-size: 0.65rem;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.06em;
             color: var(--text-secondary);
-            padding: 0.75rem 1rem;
+            padding: 0.625rem 0.875rem;
             border-bottom: 1px solid var(--border-color);
             white-space: nowrap;
         }
         .dash-table tbody td {
-            padding: 0.875rem 1rem;
+            padding: 0.75rem 0.875rem;
             border-bottom: 1px solid #F1F5F9;
             color: var(--text-primary);
             vertical-align: middle;
@@ -272,9 +272,9 @@
             display: inline-flex;
             align-items: center;
             gap: 0.25rem;
-            font-size: 0.6875rem;
+            font-size: 0.65rem;
             font-weight: 600;
-            padding: 0.2rem 0.6rem;
+            padding: 0.15rem 0.5rem;
             border-radius: 999px;
             line-height: 1;
         }
@@ -285,12 +285,12 @@
         .badge-primary { background: #EFF6FF; color: #1D4ED8; }
         .badge-secondary { background: #F1F5F9; color: #64748B; }
 
-        /* Notifications */
+        /* Notifications - COMPACT */
         .notification-item {
             display: flex;
             align-items: flex-start;
-            gap: 0.75rem;
-            padding: 0.875rem;
+            gap: 0.625rem;
+            padding: 0.75rem;
             border-radius: var(--radius-sm);
             transition: background 0.15s;
         }
@@ -301,8 +301,8 @@
             border-bottom: 1px solid #F1F5F9;
         }
         .notif-icon {
-            width: 2rem;
-            height: 2rem;
+            width: 1.75rem;
+            height: 1.75rem;
             border-radius: var(--radius-sm);
             display: flex;
             align-items: center;
@@ -310,44 +310,44 @@
             flex-shrink: 0;
         }
         .notif-icon svg {
-            width: 0.875rem;
-            height: 0.875rem;
+            width: 0.8rem;
+            height: 0.8rem;
         }
         .notif-content {
             flex: 1;
             min-width: 0;
         }
         .notif-title {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 600;
             line-height: 1.4;
             color: var(--text-primary);
         }
         .notif-message {
-            font-size: 0.6875rem;
+            font-size: 0.65rem;
             color: var(--text-secondary);
             margin-top: 0.125rem;
             line-height: 1.4;
         }
         .notif-meta {
-            font-size: 0.625rem;
+            font-size: 0.6rem;
             color: #9CA3AF;
-            margin-top: 0.25rem;
+            margin-top: 0.2rem;
         }
 
-        /* Empty State */
+        /* Empty State - COMPACT */
         .empty-state {
             text-align: center;
-            padding: 2rem 1rem;
+            padding: 1.5rem 1rem;
         }
         .empty-state svg {
-            width: 2.5rem;
-            height: 2.5rem;
+            width: 2rem;
+            height: 2rem;
             color: #D1D5DB;
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.5rem;
         }
         .empty-state p {
-            font-size: 0.875rem;
+            font-size: 0.8rem;
             font-weight: 600;
             color: var(--text-secondary);
         }
@@ -360,7 +360,7 @@
         }
         .att-bar-track {
             flex: 1;
-            height: 0.5rem;
+            height: 0.4rem;
             background: #F3F4F6;
             border-radius: 999px;
             overflow: hidden;
@@ -370,16 +370,16 @@
             border-radius: 999px;
         }
         .att-bar-text {
-            font-size: 0.6875rem;
+            font-size: 0.65rem;
             font-weight: 600;
             white-space: nowrap;
         }
 
         /* Responsive */
         @media (max-width: 768px) {
-            .dashboard-container { padding: 1rem; }
-            .dash-header h1 { font-size: 1.25rem; }
-            .stat-value { font-size: 1.25rem; }
+            .dashboard-container { padding: 0.875rem; }
+            .dash-header h1 { font-size: 1.15rem; }
+            .stat-value { font-size: 1.15rem; }
         }
     </style>
 </asp:Content>
@@ -572,7 +572,7 @@
         <div class="section-grid two-col">
 
             <!-- Left Column: Recent Activities + Attendance by Class -->
-            <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <div style="display: flex; flex-direction: column; gap: 0.875rem;">
 
                 <!-- Recent Activities -->
                 <div class="dash-card">
@@ -631,7 +631,7 @@
                                                 <asp:Panel ID="pnlAttBar" runat="server" CssClass="att-bar-fill" Style="width: 0%;"></asp:Panel>
                                             </div>
                                             <span class="att-bar-text">
-                                                <asp:Label ID="lblAttRate" runat="server" Text='<%# Eval("AttendanceRate") + "%" %>'></asp:Label>
+                                                <asp:Label ID="lblAttRate" runat="server" Text='<%# Eval("AttendanceRate", "{0:0.0}") + "%" %>'></asp:Label>
                                             </span>
                                         </div>
                                     </ItemTemplate>

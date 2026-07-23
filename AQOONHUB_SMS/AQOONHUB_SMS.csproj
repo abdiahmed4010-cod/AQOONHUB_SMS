@@ -126,6 +126,7 @@
     <Content Include="Assets\js\plugins\datatable.js" />
     <Content Include="Assets\js\plugins\flatpickr.js" />
     <Content Include="Assets\js\plugins\sweetalert.js" />
+    <Content Include="Assets\images\logo.png" />
     <Content Include="Contact.aspx" />
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
@@ -163,6 +164,8 @@
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Modules\Authentication\Login.aspx" />
     <Content Include="Modules\Dashboard\Dashboard.aspx" />
+    <Content Include="Modules\Students\Addstudent.aspx" />
+    <Content Include="Modules\Students\Students.aspx" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\jquery-3.4.1.js" />
@@ -434,6 +437,20 @@
     <Compile Include="Modules\Dashboard\Dashboard.aspx.designer.cs">
       <DependentUpon>Dashboard.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Modules\Students\Addstudent.aspx.cs">
+      <DependentUpon>Addstudent.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Students\Addstudent.aspx.designer.cs">
+      <DependentUpon>Addstudent.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Students\Students.aspx.cs">
+      <DependentUpon>Students.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Students\Students.aspx.designer.cs">
+      <DependentUpon>Students.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Site.Master.cs">
       <DependentUpon>Site.Master</DependentUpon>
@@ -461,7 +478,6 @@
     <Folder Include="App_Data\" />
     <Folder Include="Assets\fonts\" />
     <Folder Include="Assets\icons\" />
-    <Folder Include="Assets\images\" />
     <Folder Include="Assets\uploads\" />
     <Folder Include="Modules\Academic\" />
     <Folder Include="Modules\Administration\" />
@@ -472,7 +488,6 @@
     <Folder Include="Modules\Reports\" />
     <Folder Include="Modules\Settings\" />
     <Folder Include="Modules\Staff\" />
-    <Folder Include="Modules\Students\" />
     <Folder Include="Modules\Teachers\" />
   </ItemGroup>
   <ItemGroup>

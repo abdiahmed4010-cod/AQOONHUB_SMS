@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Data;
+using System.Data.SqlClient;
+using System.Configuration;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
@@ -8,7 +10,10 @@ namespace AQOONHUB_SMS.Modules.Dashboard
     public partial class Dashboard : System.Web.UI.Page
     {
         #region Private Fields
-        private object _dashboardBLL;
+        private string ConnectionString
+        {
+            get { return ConfigurationManager.ConnectionStrings["AQOONHUB_DB"].ConnectionString; }
+        }
         #endregion
 
         #region Page Lifecycle
@@ -26,25 +31,6 @@ namespace AQOONHUB_SMS.Modules.Dashboard
         {
             try
             {
-                Type bllType = Type.GetType("AQOONHUB_SMS.App_Code.BusinessLogic.DashboardBLL, App_Code");
-                if (bllType == null)
-                {
-                    bllType = Type.GetType("AQOONHUB_SMS.App_Code.BusinessLogic.DashboardBLL");
-                }
-                if (bllType == null)
-                {
-                    bllType = Type.GetType("BusinessLogic.DashboardBLL");
-                }
-
-                if (bllType != null)
-                {
-                    _dashboardBLL = Activator.CreateInstance(bllType);
-                }
-                else
-                {
-                    return;
-                }
-
                 LoadStatistics();
                 LoadAttendanceData();
                 LoadFinanceData();
@@ -56,8 +42,6 @@ namespace AQOONHUB_SMS.Modules.Dashboard
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("[Dashboard] LoadDashboardData failed: " + ex.ToString());
-                ScriptManager.RegisterStartupScript(this, GetType(), "error",
-                    "alert('An error occurred while loading dashboard data. Please try again later.');", true);
             }
         }
 
@@ -65,13 +49,29 @@ namespace AQOONHUB_SMS.Modules.Dashboard
         {
             try
             {
-                object stats = CallBLLMethod("GetDashboardStats", null);
-                if (stats != null)
+                using (SqlConnection conn = new SqlConnection(ConnectionString))
                 {
-                    lblTotalStudents.Text = SafeFormatNumber(GetPropertyValue(stats, "TotalStudents"));
-                    lblActiveStudents.Text = SafeFormatNumber(GetPropertyValue(stats, "ActiveStudents"));
-                    lblTotalStaff.Text = SafeFormatNumber(GetPropertyValue(stats, "TotalStaff"));
-                    lblFeeCollection.Text = SafeFormatCurrency(GetPropertyValue(stats, "TotalCollected"));
+                    conn.Open();
+                    string query = @"
+                        SELECT 
+                            (SELECT COUNT(*) FROM Students WHERE IsActive = 1) AS TotalStudents,
+                            (SELECT COUNT(*) FROM Students WHERE Status = 'Active') AS ActiveStudents,
+                            (SELECT COUNT(*) FROM Staff) AS TotalStaff,
+                            (SELECT COALESCE(SUM(AmountPaid), 0) FROM FeePayments WHERE PaymentDate >= DATEADD(month, DATEDIFF(month, 0, GETDATE()), 0)) AS TotalCollected";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                lblTotalStudents.Text = SafeFormatNumber(reader["TotalStudents"]);
+                                lblActiveStudents.Text = SafeFormatNumber(reader["ActiveStudents"]);
+                                lblTotalStaff.Text = SafeFormatNumber(reader["TotalStaff"]);
+                                lblFeeCollection.Text = SafeFormatCurrency(reader["TotalCollected"]);
+                            }
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -84,17 +84,40 @@ namespace AQOONHUB_SMS.Modules.Dashboard
         {
             try
             {
-                object stats = CallBLLMethod("GetDashboardStats", null);
-                if (stats != null)
+                using (SqlConnection conn = new SqlConnection(ConnectionString))
                 {
-                    lblPresentToday.Text = SafeFormatNumber(GetPropertyValue(stats, "PresentToday"));
-                    lblAbsentToday.Text = SafeFormatNumber(GetPropertyValue(stats, "AbsentToday"));
-                    lblLateToday.Text = SafeFormatNumber(GetPropertyValue(stats, "LateToday"));
-                    lblAttendanceRate.Text = SafeFormatPercentage(GetPropertyValue(stats, "TodayAttendanceRate"));
-                    lblAttendanceRateBar.Text = SafeFormatPercentage(GetPropertyValue(stats, "TodayAttendanceRate"));
+                    conn.Open();
+                    string query = @"
+                        SELECT 
+                            COUNT(CASE WHEN Status = 'Present' THEN 1 END) AS PresentToday,
+                            COUNT(CASE WHEN Status = 'Absent' THEN 1 END) AS AbsentToday,
+                            COUNT(CASE WHEN Status = 'Late' THEN 1 END) AS LateToday,
+                            COUNT(*) AS TotalToday
+                        FROM Attendance
+                        WHERE CAST(AttendanceDate AS DATE) = CAST(GETDATE() AS DATE)";
 
-                    decimal rate = Convert.ToDecimal(GetPropertyValue(stats, "TodayAttendanceRate") ?? 0);
-                    attendanceProgress.Style["width"] = rate.ToString("0.0") + "%";
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                int present = Convert.ToInt32(reader["PresentToday"] ?? 0);
+                                int absent = Convert.ToInt32(reader["AbsentToday"] ?? 0);
+                                int late = Convert.ToInt32(reader["LateToday"] ?? 0);
+                                int total = Convert.ToInt32(reader["TotalToday"] ?? 0);
+
+                                lblPresentToday.Text = present.ToString();
+                                lblAbsentToday.Text = absent.ToString();
+                                lblLateToday.Text = late.ToString();
+
+                                decimal rate = total > 0 ? Math.Round((decimal)present / total * 100, 1) : 0;
+                                lblAttendanceRate.Text = rate.ToString("0.0") + "%";
+                                lblAttendanceRateBar.Text = rate.ToString("0.0") + "%";
+                                attendanceProgress.Style["width"] = rate.ToString("0.0") + "%";
+                            }
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -107,16 +130,37 @@ namespace AQOONHUB_SMS.Modules.Dashboard
         {
             try
             {
-                object stats = CallBLLMethod("GetDashboardStats", null);
-                if (stats != null)
+                using (SqlConnection conn = new SqlConnection(ConnectionString))
                 {
-                    lblTotalBilled.Text = SafeFormatCurrency(GetPropertyValue(stats, "TotalBilled"));
-                    lblTotalCollected.Text = SafeFormatCurrency(GetPropertyValue(stats, "TotalCollected"));
-                    lblTotalOutstanding.Text = SafeFormatCurrency(GetPropertyValue(stats, "TotalOutstanding"));
-                    lblCollectionRate.Text = SafeFormatPercentage(GetPropertyValue(stats, "CollectionRate"));
+                    conn.Open();
+                    string query = @"
+                        SELECT 
+                            COALESCE(SUM(TotalAmount), 0) AS TotalBilled,
+                            COALESCE(SUM(AmountPaid), 0) AS TotalCollected,
+                            COALESCE(SUM(Balance), 0) AS TotalOutstanding
+                        FROM FeePayments
+                        WHERE PaymentDate >= DATEADD(month, DATEDIFF(month, 0, GETDATE()), 0)";
 
-                    decimal rate = Convert.ToDecimal(GetPropertyValue(stats, "CollectionRate") ?? 0);
-                    collectionProgress.Style["width"] = rate.ToString("0.0") + "%";
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                decimal billed = Convert.ToDecimal(reader["TotalBilled"] ?? 0);
+                                decimal collected = Convert.ToDecimal(reader["TotalCollected"] ?? 0);
+                                decimal outstanding = Convert.ToDecimal(reader["TotalOutstanding"] ?? 0);
+
+                                lblTotalBilled.Text = billed.ToString("C2");
+                                lblTotalCollected.Text = collected.ToString("C2");
+                                lblTotalOutstanding.Text = outstanding.ToString("C2");
+
+                                decimal rate = billed > 0 ? Math.Round(collected / billed * 100, 1) : 0;
+                                lblCollectionRate.Text = rate.ToString("0.0") + "%";
+                                collectionProgress.Style["width"] = rate.ToString("0.0") + "%";
+                            }
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -129,17 +173,38 @@ namespace AQOONHUB_SMS.Modules.Dashboard
         {
             try
             {
-                object stats = CallBLLMethod("GetDashboardStats", null);
-                if (stats != null)
+                using (SqlConnection conn = new SqlConnection(ConnectionString))
                 {
-                    lblUpcomingExams.Text = SafeFormatNumber(GetPropertyValue(stats, "UpcomingExams"));
-                    lblActiveExams.Text = SafeFormatNumber(GetPropertyValue(stats, "ActiveExams"));
-                    lblPendingApplications.Text = SafeFormatNumber(GetPropertyValue(stats, "PendingApplications"));
-                    lblCurrentTerm.Text = SafeString(GetPropertyValue(stats, "CurrentTerm")?.ToString(), "-");
+                    conn.Open();
+                    string query = @"
+                        SELECT 
+                            (SELECT COUNT(*) FROM Exams WHERE ExamDate > GETDATE()) AS UpcomingExams,
+                            (SELECT COUNT(*) FROM Exams WHERE ExamDate <= GETDATE() AND EndDate >= GETDATE()) AS ActiveExams,
+                            (SELECT COUNT(*) FROM Applications WHERE Status = 'Pending') AS PendingApplications,
+                            (SELECT TOP 1 TermName FROM AcademicTerms WHERE StartDate <= GETDATE() AND EndDate >= GETDATE()) AS CurrentTerm,
+                            (SELECT TOP 1 StartDate FROM AcademicTerms WHERE StartDate <= GETDATE() AND EndDate >= GETDATE()) AS TermStartDate,
+                            (SELECT TOP 1 EndDate FROM AcademicTerms WHERE StartDate <= GETDATE() AND EndDate >= GETDATE()) AS TermEndDate";
 
-                    decimal termProgress = CalculateTermProgress(stats);
-                    lblTermProgress.Text = termProgress.ToString("0.0") + "%";
-                    termProgressBar.Style["width"] = termProgress.ToString("0.0") + "%";
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                lblUpcomingExams.Text = SafeFormatNumber(reader["UpcomingExams"]);
+                                lblActiveExams.Text = SafeFormatNumber(reader["ActiveExams"]);
+                                lblPendingApplications.Text = SafeFormatNumber(reader["PendingApplications"]);
+                                lblCurrentTerm.Text = SafeString(reader["CurrentTerm"]?.ToString(), "-");
+
+                                DateTime? startDate = reader["TermStartDate"] != DBNull.Value ? (DateTime?)reader["TermStartDate"] : null;
+                                DateTime? endDate = reader["TermEndDate"] != DBNull.Value ? (DateTime?)reader["TermEndDate"] : null;
+
+                                decimal termProgress = CalculateTermProgress(startDate, endDate);
+                                lblTermProgress.Text = termProgress.ToString("0.0") + "%";
+                                termProgressBar.Style["width"] = termProgress.ToString("0.0") + "%";
+                            }
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -152,18 +217,28 @@ namespace AQOONHUB_SMS.Modules.Dashboard
         {
             try
             {
-                object result = CallBLLMethod("GetRecentActivities", new object[] { 10 });
-                DataTable activities = result as DataTable;
+                using (SqlConnection conn = new SqlConnection(ConnectionString))
+                {
+                    conn.Open();
+                    string query = @"
+                        SELECT TOP 10 
+                            ActivityType,
+                            Description,
+                            ActivityDate,
+                            PerformedBy
+                        FROM AuditLog
+                        ORDER BY ActivityDate DESC";
 
-                if (activities != null && activities.Rows.Count > 0)
-                {
-                    gvRecentActivities.DataSource = activities;
-                    gvRecentActivities.DataBind();
-                }
-                else
-                {
-                    gvRecentActivities.DataSource = null;
-                    gvRecentActivities.DataBind();
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                        {
+                            DataTable dt = new DataTable();
+                            da.Fill(dt);
+                            gvRecentActivities.DataSource = dt;
+                            gvRecentActivities.DataBind();
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -179,26 +254,35 @@ namespace AQOONHUB_SMS.Modules.Dashboard
             try
             {
                 int userId = GetCurrentUserId();
-                object result = CallBLLMethod("GetUserNotifications", new object[] { userId, 5 });
-                DataTable notifications = result as DataTable;
+                using (SqlConnection conn = new SqlConnection(ConnectionString))
+                {
+                    conn.Open();
+                    string query = @"
+                        SELECT TOP 5 
+                            NotificationID,
+                            UserID,
+                            Title,
+                            Message,
+                            NotificationType,
+                            Priority,
+                            IsRead,
+                            CreatedAt
+                        FROM Notifications
+                        WHERE (UserID = @UserID OR UserID IS NULL)
+                        AND IsRead = 0
+                        ORDER BY CreatedAt DESC";
 
-                if (notifications != null)
-                {
-                    if (notifications.Rows.Count > 0)
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
-                        lvNotifications.DataSource = notifications;
-                        lvNotifications.DataBind();
+                        cmd.Parameters.AddWithValue("@UserID", userId);
+                        using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                        {
+                            DataTable dt = new DataTable();
+                            da.Fill(dt);
+                            lvNotifications.DataSource = dt;
+                            lvNotifications.DataBind();
+                        }
                     }
-                    else
-                    {
-                        lvNotifications.DataSource = null;
-                        lvNotifications.DataBind();
-                    }
-                }
-                else
-                {
-                    lvNotifications.DataSource = null;
-                    lvNotifications.DataBind();
                 }
             }
             catch (Exception ex)
@@ -213,18 +297,36 @@ namespace AQOONHUB_SMS.Modules.Dashboard
         {
             try
             {
-                object result = CallBLLMethod("GetAttendanceByClass", null);
-                DataTable attendanceData = result as DataTable;
+                using (SqlConnection conn = new SqlConnection(ConnectionString))
+                {
+                    conn.Open();
+                    string query = @"
+                        SELECT 
+                            c.ClassName,
+                            COUNT(DISTINCT s.StudentID) AS TotalStudents,
+                            COUNT(DISTINCT CASE WHEN a.Status = 'Present' THEN s.StudentID END) AS PresentCount,
+                            COUNT(DISTINCT CASE WHEN a.Status = 'Absent' THEN s.StudentID END) AS AbsentCount,
+                            COUNT(DISTINCT CASE WHEN a.Status = 'Late' THEN s.StudentID END) AS LateCount,
+                            CASE 
+                                WHEN COUNT(DISTINCT s.StudentID) = 0 THEN 0
+                                ELSE CAST(COUNT(DISTINCT CASE WHEN a.Status = 'Present' THEN s.StudentID END) AS DECIMAL(10,2)) * 100.0 / COUNT(DISTINCT s.StudentID)
+                            END AS AttendanceRate
+                        FROM Classes c
+                        LEFT JOIN Students s ON c.ClassID = s.ClassID AND s.IsActive = 1
+                        LEFT JOIN Attendance a ON s.StudentID = a.StudentID AND CAST(a.AttendanceDate AS DATE) = CAST(GETDATE() AS DATE)
+                        GROUP BY c.ClassID, c.ClassName
+                        ORDER BY c.ClassName";
 
-                if (attendanceData != null && attendanceData.Rows.Count > 0)
-                {
-                    gvAttendanceByClass.DataSource = attendanceData;
-                    gvAttendanceByClass.DataBind();
-                }
-                else
-                {
-                    gvAttendanceByClass.DataSource = null;
-                    gvAttendanceByClass.DataBind();
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                        {
+                            DataTable dt = new DataTable();
+                            da.Fill(dt);
+                            gvAttendanceByClass.DataSource = dt;
+                            gvAttendanceByClass.DataBind();
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -236,46 +338,6 @@ namespace AQOONHUB_SMS.Modules.Dashboard
         }
         #endregion
 
-        #region Reflection Helpers
-        private object CallBLLMethod(string methodName, object[] parameters)
-        {
-            if (_dashboardBLL == null) return null;
-
-            try
-            {
-                System.Reflection.MethodInfo method = _dashboardBLL.GetType().GetMethod(methodName);
-                if (method != null)
-                {
-                    return method.Invoke(_dashboardBLL, parameters);
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("[Dashboard] CallBLLMethod failed for " + methodName + ": " + ex.ToString());
-            }
-            return null;
-        }
-
-        private object GetPropertyValue(object obj, string propertyName)
-        {
-            if (obj == null) return null;
-
-            try
-            {
-                System.Reflection.PropertyInfo prop = obj.GetType().GetProperty(propertyName);
-                if (prop != null)
-                {
-                    return prop.GetValue(obj);
-                }
-            }
-            catch (Exception)
-            {
-                // Property not found
-            }
-            return null;
-        }
-        #endregion
-
         #region Event Handlers
         protected void gvAttendanceByClass_RowDataBound(object sender, GridViewRowEventArgs e)
         {
@@ -283,14 +345,31 @@ namespace AQOONHUB_SMS.Modules.Dashboard
             {
                 HiddenField hdnRate = (HiddenField)e.Row.FindControl("hdnRate");
                 Panel pnlAttBar = (Panel)e.Row.FindControl("pnlAttBar");
+                Label lblAttRate = (Label)e.Row.FindControl("lblAttRate");
 
                 if (hdnRate != null && pnlAttBar != null)
                 {
                     decimal rate = 0;
-                    if (decimal.TryParse(hdnRate.Value, out rate))
+                    if (decimal.TryParse(hdnRate.Value, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out rate))
                     {
-                        pnlAttBar.Style["width"] = rate.ToString("0.0") + "%";
+                        // Clamp to 0-100
+                        rate = Math.Max(0, Math.Min(100, rate));
+
+                        pnlAttBar.Style["width"] = rate.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture) + "%";
                         pnlAttBar.Style["background"] = GetAttendanceBarColor(rate);
+
+                        if (lblAttRate != null)
+                        {
+                            lblAttRate.Text = rate.ToString("0.0") + "%";
+                        }
+                    }
+                    else
+                    {
+                        pnlAttBar.Style["width"] = "0%";
+                        if (lblAttRate != null)
+                        {
+                            lblAttRate.Text = "0.0%";
+                        }
                     }
                 }
             }
@@ -300,7 +379,7 @@ namespace AQOONHUB_SMS.Modules.Dashboard
         #region Helper Methods
         private string SafeFormatNumber(object value)
         {
-            if (value == null) return "0";
+            if (value == null || value == DBNull.Value) return "0";
             int intVal;
             if (int.TryParse(value.ToString(), out intVal))
                 return intVal.ToString("N0");
@@ -309,7 +388,7 @@ namespace AQOONHUB_SMS.Modules.Dashboard
 
         private string SafeFormatCurrency(object value)
         {
-            if (value == null) return "$0.00";
+            if (value == null || value == DBNull.Value) return "$0.00";
             decimal decVal;
             if (decimal.TryParse(value.ToString(), out decVal))
                 return decVal.ToString("C2");
@@ -318,7 +397,7 @@ namespace AQOONHUB_SMS.Modules.Dashboard
 
         private string SafeFormatPercentage(object value)
         {
-            if (value == null) return "0.0%";
+            if (value == null || value == DBNull.Value) return "0.0%";
             decimal decVal;
             if (decimal.TryParse(value.ToString(), out decVal))
                 return decVal.ToString("0.0") + "%";
@@ -340,39 +419,32 @@ namespace AQOONHUB_SMS.Modules.Dashboard
                     return userId;
                 }
             }
-            return 1; // Default fallback
+            return 1;
         }
 
-        private decimal CalculateTermProgress(object stats)
+        private decimal CalculateTermProgress(DateTime? startDate, DateTime? endDate)
         {
             try
             {
-                if (stats != null)
+                if (startDate.HasValue && endDate.HasValue)
                 {
-                    object startDateObj = GetPropertyValue(stats, "TermStartDate");
-                    object endDateObj = GetPropertyValue(stats, "TermEndDate");
+                    DateTime today = DateTime.Now;
 
-                    if (startDateObj != null && endDateObj != null)
+                    if (today < startDate.Value)
+                        return 0;
+                    if (today > endDate.Value)
+                        return 100;
+
+                    int totalDays = (endDate.Value - startDate.Value).Days;
+                    int elapsedDays = (today - startDate.Value).Days;
+
+                    if (totalDays > 0)
                     {
-                        DateTime startDate = Convert.ToDateTime(startDateObj);
-                        DateTime endDate = Convert.ToDateTime(endDateObj);
-                        DateTime today = DateTime.Now;
-
-                        if (today < startDate)
-                            return 0;
-                        if (today > endDate)
-                            return 100;
-
-                        int totalDays = (endDate - startDate).Days;
-                        int elapsedDays = (today - startDate).Days;
-
-                        if (totalDays > 0)
-                        {
-                            return Math.Round((decimal)elapsedDays / totalDays * 100, 1);
-                        }
+                        return Math.Round((decimal)elapsedDays / totalDays * 100, 1);
                     }
                 }
 
+                // Fallback: use day of year
                 int dayOfYear = DateTime.Now.DayOfYear;
                 int termLength = 90;
                 return Math.Min(100, Math.Round((decimal)(dayOfYear % termLength) / termLength * 100, 1));

@@ -1,15 +1,13 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Login.aspx.cs" 
-    Inherits="AQOONHUB_SMS.Modules.Authentication.Login" 
-    MasterPageFile="" %>
+    Inherits="AQOONHUB_SMS.Modules.Authentication.Login" %>
 
 <!DOCTYPE html>
 <html lang="en" class="">
-<!-- rest of your Login.aspx stays exactly the same -->
 <head runat="server">
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sign In — AQOONHUB SMS</title>
-    <link rel="icon" type="image/png" href="../../assets/logo.png" />
+    <link rel="icon" type="image/png" href="<%= ResolveUrl("~/Assets/images/logo.png") %>" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
@@ -118,7 +116,7 @@
             <div class="absolute bottom-0 -left-24 w-96 h-96 rounded-full bg-violet-600/30 blur-3xl"></div>
 
             <div class="relative flex items-center gap-3 z-10">
-                <img src="../../assets/logo.png" class="w-11 h-11 rounded-xl bg-white p-1" alt="AQOONHUB Logo" />
+                <img src="~/assets/logo.png" class="w-11 h-11 rounded-xl bg-white p-1" alt="AQOONHUB Logo" />
                 <p class="text-xl font-extrabold tracking-tight">AQOON<span class="text-violet-300">HUB</span></p>
             </div>
 
@@ -155,7 +153,7 @@
 
                 <!-- Mobile Logo -->
                 <div class="lg:hidden text-center mb-6">
-                    <img src="../../assets/logo.png" class="w-14 h-14 rounded-2xl mx-auto mb-3" alt="AQOONHUB Logo" />
+                    <img src="~/assets/logo.png" class="w-14 h-14 rounded-2xl mx-auto mb-3" alt="AQOONHUB Logo" />
                     <p class="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
                         AQOON<span class="text-brand-600">HUB</span>
                     </p>
