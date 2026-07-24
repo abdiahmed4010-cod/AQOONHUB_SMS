@@ -1,12 +1,6 @@
-﻿// ------------------------------------------------------------------------------
-// Generated to match AddStudent.aspx. If Visual Studio regenerates this file
-// automatically on next markup save, that's expected — field names below match
-// exactly what the markup declares.
-// ------------------------------------------------------------------------------
-
-namespace AQOONHUB_SMS.Modules.Students
+﻿namespace AQOONHUB_SMS.Modules.Students
 {
-    public partial class AddStudent
+    public partial class EditStudent
     {
         protected global::System.Web.UI.WebControls.Panel pnlSuccess;
         protected global::System.Web.UI.WebControls.Label lblSuccess;
@@ -14,13 +8,11 @@ namespace AQOONHUB_SMS.Modules.Students
         protected global::System.Web.UI.WebControls.Label lblError;
         protected global::System.Web.UI.WebControls.ValidationSummary valSummary;
 
+        protected global::System.Web.UI.WebControls.Panel pnlNotFound;
         protected global::System.Web.UI.WebControls.Panel pnlFormBody;
 
         protected global::System.Web.UI.WebControls.Label lblStudentCode;
-        protected global::System.Web.UI.WebControls.HiddenField hdnStudentCode;
-
         protected global::System.Web.UI.WebControls.Label lblAdmissionNo;
-        protected global::System.Web.UI.WebControls.HiddenField hdnAdmissionNo;
 
         protected global::System.Web.UI.WebControls.TextBox txtFirstName;
         protected global::System.Web.UI.WebControls.TextBox txtLastName;
@@ -44,13 +36,13 @@ namespace AQOONHUB_SMS.Modules.Students
         protected global::System.Web.UI.WebControls.TextBox txtAddress;
         protected global::System.Web.UI.WebControls.TextBox txtMedicalNotes;
 
+        protected global::System.Web.UI.WebControls.Image imgCurrentPhoto;
+        protected global::System.Web.UI.WebControls.Panel pnlCurrentPhotoFallback;
         protected global::System.Web.UI.WebControls.FileUpload fuPhoto;
         protected global::System.Web.UI.WebControls.RegularExpressionValidator revPhoto;
         protected global::System.Web.UI.WebControls.CustomValidator cvPhoto;
 
         protected global::System.Web.UI.WebControls.LinkButton btnCancel;
-        protected global::System.Web.UI.WebControls.LinkButton btnReset;
-        protected global::System.Web.UI.WebControls.LinkButton btnSaveAndAddAnother;
         protected global::System.Web.UI.WebControls.LinkButton btnSave;
     }
 }

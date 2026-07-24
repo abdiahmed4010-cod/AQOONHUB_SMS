@@ -1,0 +1,48 @@
+﻿namespace AQOONHUB_SMS.Modules.Students
+{
+    public partial class StudentDetails
+    {
+        protected global::System.Web.UI.WebControls.Panel pnlSuccess;
+        protected global::System.Web.UI.WebControls.Label lblSuccess;
+        protected global::System.Web.UI.WebControls.Panel pnlError;
+        protected global::System.Web.UI.WebControls.Label lblError;
+
+        protected global::System.Web.UI.WebControls.Panel pnlNotFound;
+        protected global::System.Web.UI.WebControls.Panel pnlBody;
+
+        protected global::System.Web.UI.WebControls.Image imgPhoto;
+        protected global::System.Web.UI.WebControls.Panel pnlPhotoFallback;
+        protected global::System.Web.UI.WebControls.Label lblInitials;
+
+        protected global::System.Web.UI.WebControls.Label lblFullName;
+        protected global::System.Web.UI.WebControls.Label lblStatusBadge;
+        protected global::System.Web.UI.WebControls.Label lblStudentCode;
+        protected global::System.Web.UI.WebControls.Label lblAdmissionNo;
+        protected global::System.Web.UI.WebControls.Label lblClassSection;
+
+        protected global::System.Web.UI.WebControls.Label lblGenderStat;
+        protected global::System.Web.UI.WebControls.Label lblAgeStat;
+        protected global::System.Web.UI.WebControls.Label lblStatusStat;
+
+        protected global::System.Web.UI.WebControls.HyperLink lnkEdit;
+        protected global::System.Web.UI.WebControls.LinkButton btnToggleActive;
+        protected global::System.Web.UI.WebControls.Label lblToggleActiveText;
+        protected global::System.Web.UI.WebControls.LinkButton btnGraduate;
+        protected global::System.Web.UI.WebControls.LinkButton btnTransfer;
+        protected global::System.Web.UI.WebControls.LinkButton btnDelete;
+        protected global::System.Web.UI.WebControls.HyperLink lnkBack;
+
+        protected global::System.Web.UI.WebControls.Label lblDetailName;
+        protected global::System.Web.UI.WebControls.Label lblDetailGender;
+        protected global::System.Web.UI.WebControls.Label lblDetailDob;
+        protected global::System.Web.UI.WebControls.Label lblDetailAddress;
+        protected global::System.Web.UI.WebControls.Label lblDetailMedical;
+
+        protected global::System.Web.UI.WebControls.Label lblDetailStudentCode;
+        protected global::System.Web.UI.WebControls.Label lblDetailAdmissionNo;
+        protected global::System.Web.UI.WebControls.Label lblDetailClassSection;
+        protected global::System.Web.UI.WebControls.Label lblDetailAcademicYear;
+        protected global::System.Web.UI.WebControls.Label lblDetailGuardian;
+        protected global::System.Web.UI.WebControls.Label lblDetailEnrolled;
+    }
+}

@@ -1,238 +1,182 @@
-﻿<%@ Page Title="Add Student | AQOONHUB SMS" Language="C#" MasterPageFile="~/MasterPages/MainMaster.master" AutoEventWireup="true" CodeBehind="AddStudent.aspx.cs" Inherits="AQOONHUB_SMS.Modules.Students.AddStudent" %>
+﻿<%@ Page Title="Students | AQOONHUB SMS" Language="C#" MasterPageFile="~/MasterPages/MainMaster.master" AutoEventWireup="true" CodeBehind="Students.aspx.cs" Inherits="AQOONHUB_SMS.Modules.Students.Students" %>
 
 <asp:Content ID="ContentHead" ContentPlaceHolderID="head" runat="server">
     <style>
-        /* Only page-specific additions — btn, input, card, badge, avatar already
-           come from MainMaster.master's shared stylesheet. */
-        .form-wrap { padding: 1.25rem; max-width: 1100px; margin: 0 auto; }
-        .form-section { margin-bottom: 1.25rem; }
-        .form-section h2 { font-size: .9rem; font-weight: 800; margin: 0 0 .2rem; display:flex; align-items:center; gap:.5rem; }
-        .form-section p.sub { font-size:.75rem; color:#6B7280; margin:0 0 1rem; }
-        .dark .form-section p.sub { color:#94A3B8; }
-        .form-grid { display:grid; grid-template-columns:1fr; gap:1rem; }
-        @media (min-width:768px){ .form-grid.two-col { grid-template-columns:repeat(2,1fr); } }
-        .field label { display:block; font-size:.75rem; font-weight:700; margin-bottom:.35rem; color:#374151; }
-        .dark .field label { color:#CBD5E1; }
-        .field label .req { color:#EF4444; margin-left:.15rem; }
-        .field-error { font-size:.72rem; color:#EF4444; margin-top:.3rem; display:block; }
-        .readonly-pill { display:inline-flex; align-items:center; gap:.4rem; background:#EFF6FF; color:#1D4ED8; font-weight:700; font-size:.85rem; padding:.55rem .8rem; border-radius:.6rem; border:1px solid #DBEAFE; }
-        .dark .readonly-pill { background:#1E293B; color:#93C5FD; border-color:#334155; }
-        .photo-uploader { display:flex; align-items:center; gap:1.25rem; flex-wrap:wrap; }
-        .photo-preview { width:96px; height:96px; border-radius:.9rem; object-fit:cover; border:1px solid #E5E7EB; background:#F1F5F9; display:flex; align-items:center; justify-content:center; color:#9CA3AF; flex-shrink:0; }
-        .dark .photo-preview { border-color:#334155; background:#1E293B; }
-        .alert { border-radius:.7rem; padding:.85rem 1rem; font-size:.82rem; display:flex; gap:.6rem; align-items:flex-start; margin-bottom:1rem; }
-        .alert-success { background:#ECFDF5; color:#166534; border:1px solid #BBF7D0; }
-        .alert-danger { background:#FEF2F2; color:#991B1B; border:1px solid #FECACA; }
-        .guardian-empty { background:#FFFBEB; border:1px solid #FDE68A; color:#92400E; font-size:.78rem; border-radius:.6rem; padding:.7rem .9rem; margin-top:.5rem; }
-        .dark .guardian-empty { background:#3F2D0A; border-color:#78350F; color:#FCD34D; }
-        .form-actions { display:flex; gap:.6rem; flex-wrap:wrap; justify-content:flex-end; padding-top:1rem; border-top:1px solid #E5E7EB; margin-top:.5rem; }
-        .dark .form-actions { border-color:#334155; }
-        @media (max-width:768px){ .form-wrap{padding:.875rem;} .form-actions{justify-content:stretch;} .form-actions .btn{flex:1;justify-content:center;} }
+        /* Only page-specific additions — everything else (btn, input, card, th, td,
+           badge, avatar, tr.rowlink, tab-btn) already comes from MainMaster.master. */
+        .students-wrap { padding: 1.25rem; max-width: 1440px; margin: 0 auto; }
+        .stat-tile { display: flex; align-items: center; gap: .875rem; }
+        .stat-tile .ic { width: 2.5rem; height: 2.5rem; border-radius: .6rem; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .stat-tile .lbl { font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:#6B7280; }
+        .dark .stat-tile .lbl { color:#94A3B8; }
+        .stat-tile .val { font-size:1.3rem; font-weight:800; line-height:1.15; }
+        .filter-bar { display:flex; flex-wrap:wrap; align-items:center; gap:.625rem; }
+        .filter-bar .grow { flex:1; min-width:200px; position:relative; }
+        .filter-bar .grow svg { position:absolute; left:.75rem; top:50%; transform:translateY(-50%); color:#9CA3AF; width:1rem; height:1rem; }
+        .filter-bar .grow input { padding-left:2.25rem; }
+        @media (max-width: 768px) { .students-wrap { padding: .875rem; } }
     </style>
 </asp:Content>
 
 <asp:Content ID="ContentBody" ContentPlaceHolderID="MainContent" runat="server">
-    <div class="form-wrap">
+    <div class="students-wrap">
 
         <!-- Header -->
         <nav class="flex items-center gap-1.5 text-xs text-gray-500 dark:text-slate-400 mb-1.5">
             <a href="~/Modules/Dashboard/Dashboard.aspx" runat="server" class="hover:text-brand-600">Dashboard</a>
-            <span>/</span>
-            <a href="~/Modules/Students/Students.aspx" runat="server" class="hover:text-brand-600">Student Management</a>
-            <span>/</span><span class="font-semibold text-gray-700 dark:text-slate-200">Add Student</span>
+            <span>/</span><span class="font-semibold text-gray-700 dark:text-slate-200">Students</span>
         </nav>
         <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
             <div>
-                <h1 class="text-xl md:text-2xl font-bold tracking-tight">Add Student</h1>
-                <p class="text-sm text-gray-500 dark:text-slate-400 mt-1">Register a new student in AQOONHUB</p>
+                <h1 class="text-xl md:text-2xl font-bold tracking-tight">Students</h1>
+                <p class="text-sm text-gray-500 dark:text-slate-400 mt-1">Register, manage and track all enrolled students.</p>
             </div>
-            <asp:HyperLink ID="lnkBackToStudents" runat="server" CssClass="btn btn-secondary" NavigateUrl="~/Modules/Students/Students.aspx">
-                <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Students
-            </asp:HyperLink>
-        </div>
-
-        <asp:Panel ID="pnlSuccess" runat="server" CssClass="alert alert-success" Visible="false">
-            <i data-lucide="check-circle-2" class="w-4 h-4 mt-0.5"></i>
-            <asp:Label ID="lblSuccess" runat="server" />
-        </asp:Panel>
-        <asp:Panel ID="pnlError" runat="server" CssClass="alert alert-danger" Visible="false">
-            <i data-lucide="alert-triangle" class="w-4 h-4 mt-0.5"></i>
-            <asp:Label ID="lblError" runat="server" />
-        </asp:Panel>
-
-        <asp:ValidationSummary ID="valSummary" runat="server" CssClass="alert alert-danger" DisplayMode="BulletList" ValidationGroup="Save" />
-
-        <asp:Panel ID="pnlFormBody" runat="server">
-        <div class="card p-6">
-
-            <!-- SECTION 1 — Student Identification -->
-            <div class="form-section">
-                <h2><i data-lucide="id-card" class="w-4 h-4 text-brand-600"></i> Student Identification</h2>
-                <p class="sub">Student Code is generated automatically; Admission Number must be entered.</p>
-                <div class="form-grid two-col">
-                    <div class="field">
-                        <label>Student Code</label>
-                        <asp:Label ID="lblStudentCode" runat="server" CssClass="readonly-pill" />
-                        <asp:HiddenField ID="hdnStudentCode" runat="server" />
-                    </div>
-                    <div class="field">
-                        <label for="<%= txtAdmissionNo.ClientID %>">Admission Number <span class="req">*</span></label>
-                        <asp:TextBox ID="txtAdmissionNo" runat="server" CssClass="input" placeholder="e.g. ADM-1045" MaxLength="20" />
-                        <asp:RequiredFieldValidator runat="server" ControlToValidate="txtAdmissionNo" CssClass="field-error" Display="Dynamic" ValidationGroup="Save" ErrorMessage="Admission Number is required." Text="Admission Number is required." />
-                        <asp:CustomValidator ID="cvAdmissionNo" runat="server" ControlToValidate="txtAdmissionNo" CssClass="field-error" Display="Dynamic" ValidationGroup="Save" OnServerValidate="cvAdmissionNo_ServerValidate" ErrorMessage="This Admission Number is already in use." Text="This Admission Number is already in use." />
-                    </div>
-                    <div class="field">
-                        <label for="<%= txtFirstName.ClientID %>">First Name <span class="req">*</span></label>
-                        <asp:TextBox ID="txtFirstName" runat="server" CssClass="input" MaxLength="50" placeholder="e.g. Ayan" />
-                        <asp:RequiredFieldValidator runat="server" ControlToValidate="txtFirstName" CssClass="field-error" Display="Dynamic" ValidationGroup="Save" ErrorMessage="First name is required." Text="First name is required." />
-                    </div>
-                    <div class="field">
-                        <label for="<%= txtLastName.ClientID %>">Last Name <span class="req">*</span></label>
-                        <asp:TextBox ID="txtLastName" runat="server" CssClass="input" MaxLength="50" placeholder="e.g. Abdirahman" />
-                        <asp:RequiredFieldValidator runat="server" ControlToValidate="txtLastName" CssClass="field-error" Display="Dynamic" ValidationGroup="Save" ErrorMessage="Last name is required." Text="Last name is required." />
-                    </div>
-                    <div class="field">
-                        <label for="<%= ddlGender.ClientID %>">Gender <span class="req">*</span></label>
-                        <asp:DropDownList ID="ddlGender" runat="server" CssClass="input">
-                            <asp:ListItem Text="Select Gender" Value="" />
-                            <asp:ListItem Text="Male" Value="Male" />
-                            <asp:ListItem Text="Female" Value="Female" />
-                        </asp:DropDownList>
-                        <asp:RequiredFieldValidator runat="server" ControlToValidate="ddlGender" CssClass="field-error" Display="Dynamic" ValidationGroup="Save" ErrorMessage="Please select a gender." Text="Please select a gender." InitialValue="" />
-                    </div>
-                    <div class="field">
-                        <label for="<%= ddlStatus.ClientID %>">Status <span class="req">*</span></label>
-                        <asp:DropDownList ID="ddlStatus" runat="server" CssClass="input">
-                            <asp:ListItem Text="Active" Value="Active" Selected="True" />
-                            <asp:ListItem Text="Inactive" Value="Inactive" />
-                        </asp:DropDownList>
-                    </div>
-                    <div class="field">
-                        <label for="<%= txtDateOfBirth.ClientID %>">Date of Birth <span class="req">*</span></label>
-                        <asp:TextBox ID="txtDateOfBirth" runat="server" CssClass="input" TextMode="Date" />
-                        <asp:RequiredFieldValidator runat="server" ControlToValidate="txtDateOfBirth" CssClass="field-error" Display="Dynamic" ValidationGroup="Save" ErrorMessage="Date of birth is required." Text="Date of birth is required." />
-                        <asp:CustomValidator ID="cvDateOfBirth" runat="server" ControlToValidate="txtDateOfBirth" CssClass="field-error" Display="Dynamic" ValidationGroup="Save" OnServerValidate="cvDateOfBirth_ServerValidate" ErrorMessage="Date of birth must be in the past and give a reasonable student age (3–25 years)." Text="Date of birth must be in the past and give a reasonable student age (3–25 years)." />
-                    </div>
-                    <div class="field">
-                        <label for="<%= txtEnrollmentDate.ClientID %>">Enrollment Date <span class="req">*</span></label>
-                        <asp:TextBox ID="txtEnrollmentDate" runat="server" CssClass="input" TextMode="Date" />
-                        <asp:RequiredFieldValidator runat="server" ControlToValidate="txtEnrollmentDate" CssClass="field-error" Display="Dynamic" ValidationGroup="Save" ErrorMessage="Enrollment date is required." Text="Enrollment date is required." />
-                    </div>
-                </div>
-            </div>
-
-            <!-- SECTION 2 — Academic Information -->
-            <div class="form-section">
-                <h2><i data-lucide="school" class="w-4 h-4 text-brand-600"></i> Academic Information</h2>
-                <p class="sub">Sections load automatically once a Class is selected.</p>
-                <div class="form-grid two-col">
-                    <div class="field">
-                        <label for="<%= ddlAcademicYear.ClientID %>">Academic Year <span class="req">*</span></label>
-                        <asp:DropDownList ID="ddlAcademicYear" runat="server" CssClass="input" />
-                        <asp:RequiredFieldValidator runat="server" ControlToValidate="ddlAcademicYear" CssClass="field-error" Display="Dynamic" ValidationGroup="Save" ErrorMessage="Please select an academic year." Text="Please select an academic year." InitialValue="0" />
-                    </div>
-                    <div class="field"></div>
-                    <div class="field">
-                        <label for="<%= ddlClass.ClientID %>">Class <span class="req">*</span></label>
-                        <asp:DropDownList ID="ddlClass" runat="server" CssClass="input" AutoPostBack="true" OnSelectedIndexChanged="ddlClass_SelectedIndexChanged" />
-                        <asp:RequiredFieldValidator runat="server" ControlToValidate="ddlClass" CssClass="field-error" Display="Dynamic" ValidationGroup="Save" ErrorMessage="Please select a class." Text="Please select a class." InitialValue="0" />
-                    </div>
-                    <div class="field">
-                        <label for="<%= ddlSection.ClientID %>">Section <span class="req">*</span></label>
-                        <asp:DropDownList ID="ddlSection" runat="server" CssClass="input" />
-                        <asp:RequiredFieldValidator runat="server" ControlToValidate="ddlSection" CssClass="field-error" Display="Dynamic" ValidationGroup="Save" ErrorMessage="Please select a section." Text="Please select a section." InitialValue="0" />
-                    </div>
-                </div>
-            </div>
-
-            <!-- SECTION 3 — Guardian Information -->
-            <div class="form-section">
-                <h2><i data-lucide="users" class="w-4 h-4 text-brand-600"></i> Guardian Information</h2>
-                <p class="sub">Select the guardian responsible for this student.</p>
-                <asp:Panel ID="pnlGuardianField" runat="server">
-                    <div class="field">
-                        <label for="<%= ddlGuardian.ClientID %>">Guardian</label>
-                        <asp:DropDownList ID="ddlGuardian" runat="server" CssClass="input" />
-                    </div>
-                </asp:Panel>
-                <asp:Panel ID="pnlNoGuardians" runat="server" Visible="false">
-                    <div class="guardian-empty">
-                        <i data-lucide="info" class="w-3.5 h-3.5" style="display:inline;vertical-align:-2px;"></i>
-                        No guardian records were found. A guardian must exist in the system before one can be linked here.
-                    </div>
-                </asp:Panel>
-            </div>
-
-            <!-- SECTION 4 — Personal & Health Information -->
-            <div class="form-section">
-                <h2><i data-lucide="heart-pulse" class="w-4 h-4 text-brand-600"></i> Personal &amp; Health Information</h2>
-                <div class="form-grid two-col">
-                    <div class="field">
-                        <label for="<%= txtAddress.ClientID %>">Address</label>
-                        <asp:TextBox ID="txtAddress" runat="server" CssClass="input" TextMode="MultiLine" Rows="3" MaxLength="200" placeholder="District, city…" />
-                    </div>
-                    <div class="field">
-                        <label for="<%= txtMedicalNotes.ClientID %>">Medical Notes</label>
-                        <asp:TextBox ID="txtMedicalNotes" runat="server" CssClass="input" TextMode="MultiLine" Rows="3" MaxLength="500" placeholder="Allergies, conditions, medications… (optional)" />
-                    </div>
-                </div>
-            </div>
-
-            <!-- SECTION 5 — Student Photo -->
-            <div class="form-section">
-                <h2><i data-lucide="camera" class="w-4 h-4 text-brand-600"></i> Student Photo</h2>
-                <p class="sub">JPG, PNG or WEBP — max 2 MB. Optional.</p>
-                <div class="photo-uploader">
-                    <img id="imgPreview" class="photo-preview" alt="Student photo preview" src="" style="display:none;" />
-                    <div id="imgPreviewFallback" class="photo-preview">
-                        <i data-lucide="user" class="w-8 h-8"></i>
-                    </div>
-                    <div>
-                        <asp:FileUpload ID="fuPhoto" runat="server" CssClass="input" onchange="AQPreviewPhoto(this)" />
-                        <asp:RegularExpressionValidator ID="revPhoto" runat="server" ControlToValidate="fuPhoto"
-                            ValidationExpression="^([Cc]:\\fakepath\\)?.*\.([Jj][Pp][Gg]|[Jj][Pp][Ee][Gg]|[Pp][Nn][Gg]|[Ww][Ee][Bb][Pp])$"
-                            CssClass="field-error" Display="Dynamic" ValidationGroup="Save"
-                            ErrorMessage="Only .jpg, .jpeg, .png or .webp files are allowed." Text="Only .jpg, .jpeg, .png or .webp files are allowed." />
-                        <asp:CustomValidator ID="cvPhoto" runat="server" ControlToValidate="fuPhoto" CssClass="field-error" Display="Dynamic" ValidationGroup="Save" OnServerValidate="cvPhoto_ServerValidate" ErrorMessage="Photo must be 2 MB or smaller and a valid image file." Text="Photo must be 2 MB or smaller and a valid image file." />
-                    </div>
-                </div>
-            </div>
-
-            <!-- Actions -->
-            <div class="form-actions">
-                <asp:LinkButton ID="btnCancel" runat="server" CssClass="btn btn-secondary" CausesValidation="false" OnClick="btnCancel_Click">
-                    Cancel
-                </asp:LinkButton>
-                <asp:LinkButton ID="btnReset" runat="server" CssClass="btn btn-secondary" CausesValidation="false" OnClick="btnReset_Click">
-                    <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Reset Form
-                </asp:LinkButton>
-                <asp:LinkButton ID="btnSaveAndAddAnother" runat="server" CssClass="btn btn-secondary" ValidationGroup="Save" OnClick="btnSaveAndAddAnother_Click">
-                    <i data-lucide="repeat" class="w-4 h-4"></i> Save and Add Another
-                </asp:LinkButton>
-                <asp:LinkButton ID="btnSave" runat="server" CssClass="btn btn-primary" ValidationGroup="Save" OnClick="btnSave_Click">
-                    <i data-lucide="check" class="w-4 h-4"></i> Save Student
-                </asp:LinkButton>
+            <div class="flex items-center gap-2 flex-wrap">
+                <asp:HyperLink ID="lnkExport" runat="server" CssClass="btn btn-secondary" NavigateUrl="~/Modules/Reports/Export.aspx?module=students">
+                    <i data-lucide="download" class="w-4 h-4"></i> Export
+                </asp:HyperLink>
+                <asp:HyperLink ID="lnkAddStudent" runat="server" CssClass="btn btn-primary" NavigateUrl="~/Modules/Students/AddStudent.aspx">
+                    <i data-lucide="user-plus" class="w-4 h-4"></i> Add Student
+                </asp:HyperLink>
             </div>
         </div>
-        </asp:Panel>
+
+        <!-- Summary Tiles -->
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-5">
+            <div class="card p-5 stat-tile">
+                <span class="ic" style="background:#EFF6FF;color:#2563EB"><i data-lucide="graduation-cap" class="w-5 h-5"></i></span>
+                <div><p class="lbl">Total</p><p class="val"><asp:Label ID="lblTotalStudents" runat="server" Text="0" /></p></div>
+            </div>
+            <div class="card p-5 stat-tile">
+                <span class="ic" style="background:#ECFDF5;color:#22C55E"><i data-lucide="check-circle-2" class="w-5 h-5"></i></span>
+                <div><p class="lbl">Active</p><p class="val"><asp:Label ID="lblActiveStudents" runat="server" Text="0" /></p></div>
+            </div>
+            <div class="card p-5 stat-tile">
+                <span class="ic" style="background:#F1F5F9;color:#64748B"><i data-lucide="pause-circle" class="w-5 h-5"></i></span>
+                <div><p class="lbl">Inactive</p><p class="val"><asp:Label ID="lblInactiveStudents" runat="server" Text="0" /></p></div>
+            </div>
+            <div class="card p-5 stat-tile">
+                <span class="ic" style="background:#F5F3FF;color:#7C3AED"><i data-lucide="arrow-up-right" class="w-5 h-5"></i></span>
+                <div><p class="lbl">Graduated</p><p class="val"><asp:Label ID="lblGraduatedStudents" runat="server" Text="0" /></p></div>
+            </div>
+            <div class="card p-5 stat-tile">
+                <span class="ic" style="background:#ECFEFF;color:#0EA5E9"><i data-lucide="arrow-right-left" class="w-5 h-5"></i></span>
+                <div><p class="lbl">Transferred</p><p class="val"><asp:Label ID="lblTransferredStudents" runat="server" Text="0" /></p></div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="card p-3.5 mb-4 filter-bar">
+            <div class="grow">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" /></svg>
+                <asp:TextBox ID="txtSearch" runat="server" CssClass="input" placeholder="Search by name, ID, admission no., guardian name or phone…" />
+            </div>
+            <asp:DropDownList ID="ddlClass" runat="server" CssClass="input !w-auto" AutoPostBack="true" OnSelectedIndexChanged="ddlClass_SelectedIndexChanged" />
+            <asp:DropDownList ID="ddlSection" runat="server" CssClass="input !w-auto" />
+            <asp:DropDownList ID="ddlGender" runat="server" CssClass="input !w-auto">
+                <asp:ListItem Text="All Genders" Value="" />
+                <asp:ListItem Text="Male" Value="Male" />
+                <asp:ListItem Text="Female" Value="Female" />
+            </asp:DropDownList>
+            <asp:DropDownList ID="ddlStatus" runat="server" CssClass="input !w-auto">
+                <asp:ListItem Text="All Statuses" Value="" />
+                <asp:ListItem Text="Active" Value="Active" />
+                <asp:ListItem Text="Inactive" Value="Inactive" />
+                <asp:ListItem Text="Graduated" Value="Graduated" />
+                <asp:ListItem Text="Transferred" Value="Transferred" />
+            </asp:DropDownList>
+            <asp:LinkButton ID="btnSearch" runat="server" CssClass="btn btn-primary" OnClick="btnSearch_Click">Search</asp:LinkButton>
+            <asp:LinkButton ID="btnReset" runat="server" CssClass="btn btn-secondary" OnClick="btnReset_Click" CausesValidation="false">Reset</asp:LinkButton>
+        </div>
+
+        <!-- Table -->
+        <div class="card overflow-hidden">
+            <div class="overflow-x-auto">
+                <asp:GridView ID="gvStudents" runat="server" AutoGenerateColumns="false" GridLines="None" ShowHeader="true"
+                    AllowSorting="true" CssClass="w-full" DataKeyNames="StudentID"
+                    OnRowCommand="gvStudents_RowCommand" OnSorting="gvStudents_Sorting">
+                    <HeaderStyle CssClass="" />
+                    <Columns>
+                        <asp:TemplateField HeaderText="Student" SortExpression="FirstName">
+                            <HeaderStyle CssClass="th" />
+                            <ItemStyle CssClass="td" />
+                            <ItemTemplate>
+                                <div class="flex items-center gap-3">
+                                    <asp:Image ID="imgPhoto" runat="server" CssClass="avatar" Style="width:32px;height:32px;object-fit:cover;"
+                                        Visible='<%# !string.IsNullOrEmpty(Eval("PhotoPath") as string) %>'
+                                        ImageUrl='<%# ResolveUrl("~/" + Eval("PhotoPath")) %>' AlternateText='<%# Eval("FullName") + " photo" %>' />
+                                    <span class="avatar" style='<%# "width:32px;height:32px;font-size:12px;background:" + GetAvatarColor(Eval("FullName")) %>'
+                                        visible='<%# string.IsNullOrEmpty(Eval("PhotoPath") as string) %>'><%# GetInitials(Eval("FullName")) %></span>
+                                    <div>
+                                        <p class="font-semibold"><%# Eval("FullName") %></p>
+                                        <p class="text-[11px] text-gray-400"><%# Eval("StudentCode") %></p>
+                                    </div>
+                                </div>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                        <asp:BoundField DataField="AdmissionNo" HeaderText="Admission No." SortExpression="AdmissionNo" HeaderStyle-CssClass="th" ItemStyle-CssClass="td" />
+                        <asp:BoundField DataField="ClassName" HeaderText="Class" SortExpression="ClassName" HeaderStyle-CssClass="th" ItemStyle-CssClass="td" />
+                        <asp:BoundField DataField="SectionName" HeaderText="Section" SortExpression="SectionName" HeaderStyle-CssClass="th" ItemStyle-CssClass="td" />
+                        <asp:BoundField DataField="Gender" HeaderText="Gender" SortExpression="Gender" HeaderStyle-CssClass="th" ItemStyle-CssClass="td" />
+                        <asp:BoundField DataField="DateOfBirth" HeaderText="Date of Birth" SortExpression="DateOfBirth" DataFormatString="{0:MMM dd, yyyy}" HeaderStyle-CssClass="th" ItemStyle-CssClass="td" />
+                        <asp:BoundField DataField="GuardianName" HeaderText="Guardian" SortExpression="GuardianName" HeaderStyle-CssClass="th" ItemStyle-CssClass="td" />
+                        <asp:BoundField DataField="EnrollmentDate" HeaderText="Enrolled" SortExpression="EnrollmentDate" DataFormatString="{0:MMM dd, yyyy}" HeaderStyle-CssClass="th" ItemStyle-CssClass="td" />
+                        <asp:TemplateField HeaderText="Status" SortExpression="Status">
+                            <HeaderStyle CssClass="th" />
+                            <ItemStyle CssClass="td" />
+                            <ItemTemplate>
+                                <span class="badge" style='<%# GetStatusBadgeStyle(Eval("Status")) %>'><%# Eval("Status") %></span>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                        <asp:TemplateField HeaderText="Actions">
+                            <HeaderStyle CssClass="th" />
+                            <ItemStyle CssClass="td" />
+                            <ItemTemplate>
+                                <div class="flex gap-1">
+                                    <asp:HyperLink runat="server" CssClass="btn-ghost btn !p-1.5" NavigateUrl='<%# "~/Modules/Students/StudentDetails.aspx?id=" + Eval("StudentID") %>' ToolTip="View Details">
+                                        <i data-lucide="eye" class="w-4 h-4"></i>
+                                    </asp:HyperLink>
+                                    <asp:LinkButton runat="server" CssClass="btn-ghost btn !p-1.5 !text-red-500" CommandName="SoftDelete"
+                                        CommandArgument='<%# Eval("StudentID") + "|" + Eval("FullName") %>'
+                                        OnClientClick='<%# "return confirm(\x27Delete " + Eval("FullName") + "? This moves the record to Trash — a Super Admin can restore it later.\x27);" %>'
+                                        ToolTip="Delete">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </asp:LinkButton>
+                                </div>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                    </Columns>
+                    <RowStyle CssClass="rowlink" />
+                    <EmptyDataTemplate>
+                        <div class="flex flex-col items-center justify-center py-16 text-center">
+                            <span class="w-14 h-14 rounded-2xl bg-brand-50 dark:bg-slate-800 text-brand-600 dark:text-brand-300 flex items-center justify-center mb-4">
+                                <i data-lucide="users" class="w-7 h-7"></i>
+                            </span>
+                            <h3 class="font-bold">No students found</h3>
+                            <p class="text-sm text-gray-500 dark:text-slate-400 mt-1 mb-4 max-w-sm">Try adjusting your search or filters, or add a new student.</p>
+                            <a href="~/Modules/Students/AddStudent.aspx" runat="server" class="btn btn-primary"><i data-lucide="plus" class="w-4 h-4"></i> Add Student</a>
+                        </div>
+                    </EmptyDataTemplate>
+                </asp:GridView>
+            </div>
+
+            <!-- Pager -->
+            <div class="flex items-center justify-between px-4 py-3 border-t border-gray-100 dark:border-slate-700 flex-wrap gap-2">
+                <asp:Label runat="server" ID="lblResultsSummary" Text="Showing 0 of 0" CssClass="text-xs text-gray-500 dark:text-slate-400" />
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-gray-500 dark:text-slate-400">Page size:</span>
+                    <asp:DropDownList ID="ddlPageSize" runat="server" CssClass="input !w-auto !py-1.5 text-xs" AutoPostBack="true" OnSelectedIndexChanged="ddlPageSize_SelectedIndexChanged">
+                        <asp:ListItem Text="10" Value="10" />
+                        <asp:ListItem Text="25" Value="25" />
+                        <asp:ListItem Text="50" Value="50" />
+                        <asp:ListItem Text="100" Value="100" />
+                    </asp:DropDownList>
+                    <asp:LinkButton ID="btnPrevPage" runat="server" CssClass="btn btn-ghost !p-1.5" OnClick="btnPrevPage_Click"><i data-lucide="chevron-left" class="w-4 h-4"></i></asp:LinkButton>
+                    <asp:Label runat="server" ID="lblPageIndicator" Text="Page 1 of 1" CssClass="text-xs" />
+                    <asp:LinkButton ID="btnNextPage" runat="server" CssClass="btn btn-ghost !p-1.5" OnClick="btnNextPage_Click"><i data-lucide="chevron-right" class="w-4 h-4"></i></asp:LinkButton>
+                </div>
+            </div>
+        </div>
+
     </div>
-
-    <script>
-        function AQPreviewPhoto(input) {
-            var img = document.getElementById('imgPreview');
-            var fallback = document.getElementById('imgPreviewFallback');
-            if (input.files && input.files[0]) {
-                var reader = new FileReader();
-                reader.onload = function (e) {
-                    img.src = e.target.result;
-                    img.style.display = 'block';
-                    fallback.style.display = 'none';
-                };
-                reader.readAsDataURL(input.files[0]);
-            } else {
-                img.style.display = 'none';
-                fallback.style.display = 'flex';
-            }
-        }
-    </script>
 </asp:Content>

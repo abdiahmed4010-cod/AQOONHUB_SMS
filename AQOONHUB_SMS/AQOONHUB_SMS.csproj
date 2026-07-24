@@ -165,6 +165,8 @@
     <Content Include="Modules\Authentication\Login.aspx" />
     <Content Include="Modules\Dashboard\Dashboard.aspx" />
     <Content Include="Modules\Students\Addstudent.aspx" />
+    <Content Include="Modules\Students\EditStudent.aspx" />
+    <Content Include="Modules\Students\StudentDetails.aspx" />
     <Content Include="Modules\Students\Students.aspx" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
@@ -443,6 +445,20 @@
     </Compile>
     <Compile Include="Modules\Students\Addstudent.aspx.designer.cs">
       <DependentUpon>Addstudent.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Students\EditStudent.aspx.cs">
+      <DependentUpon>EditStudent.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Students\EditStudent.aspx.designer.cs">
+      <DependentUpon>EditStudent.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Students\StudentDetails.aspx.cs">
+      <DependentUpon>StudentDetails.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Students\StudentDetails.aspx.designer.cs">
+      <DependentUpon>StudentDetails.aspx</DependentUpon>
     </Compile>
     <Compile Include="Modules\Students\Students.aspx.cs">
       <DependentUpon>Students.aspx</DependentUpon>
