@@ -162,12 +162,22 @@
     <Content Include="Content\bootstrap-theme.css.map" />
     <Content Include="MasterPages\MainMaster.Master" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
+    <Content Include="Modules\Admission\AddAdmission.aspx" />
+    <Content Include="Modules\Admission\AdmissionReview.aspx" />
+    <Content Include="Modules\Admission\Admissions.aspx" />
     <Content Include="Modules\Authentication\Login.aspx" />
     <Content Include="Modules\Dashboard\Dashboard.aspx" />
+    <Content Include="Modules\Parents\AddParent.aspx" />
+    <Content Include="Modules\Parents\AssignStudent.aspx" />
+    <Content Include="Modules\Parents\EditParent.aspx" />
+    <Content Include="Modules\Parents\ParentAccount.aspx" />
+    <Content Include="Modules\Parents\ParentDetails.aspx" />
+    <Content Include="Modules\Parents\Parents.aspx" />
     <Content Include="Modules\Students\Addstudent.aspx" />
     <Content Include="Modules\Students\EditStudent.aspx" />
     <Content Include="Modules\Students\StudentDetails.aspx" />
     <Content Include="Modules\Students\Students.aspx" />
+    <Content Include="Modules\Students\StudentTransfer.aspx" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\jquery-3.4.1.js" />
@@ -425,6 +435,27 @@
     <Compile Include="MasterPages\MainMaster.Master.designer.cs">
       <DependentUpon>MainMaster.Master</DependentUpon>
     </Compile>
+    <Compile Include="Modules\Admission\AddAdmission.aspx.cs">
+      <DependentUpon>AddAdmission.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Admission\AddAdmission.aspx.designer.cs">
+      <DependentUpon>AddAdmission.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Admission\AdmissionReview.aspx.cs">
+      <DependentUpon>AdmissionReview.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Admission\AdmissionReview.aspx.designer.cs">
+      <DependentUpon>AdmissionReview.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Admission\Admissions.aspx.cs">
+      <DependentUpon>Admissions.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Admission\Admissions.aspx.designer.cs">
+      <DependentUpon>Admissions.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Modules\Authentication\Login.aspx.cs">
       <DependentUpon>Login.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -439,6 +470,49 @@
     <Compile Include="Modules\Dashboard\Dashboard.aspx.designer.cs">
       <DependentUpon>Dashboard.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Modules\Parents\AddParent.aspx.cs">
+      <DependentUpon>AddParent.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Parents\AddParent.aspx.designer.cs">
+      <DependentUpon>AddParent.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Parents\AssignStudent.aspx.cs">
+      <DependentUpon>AssignStudent.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Parents\AssignStudent.aspx.designer.cs">
+      <DependentUpon>AssignStudent.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Parents\EditParent.aspx.cs">
+      <DependentUpon>EditParent.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Parents\EditParent.aspx.designer.cs">
+      <DependentUpon>EditParent.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Parents\ParentAccount.aspx.cs">
+      <DependentUpon>ParentAccount.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Parents\ParentAccount.aspx.designer.cs">
+      <DependentUpon>ParentAccount.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Parents\ParentDetails.aspx.cs">
+      <DependentUpon>ParentDetails.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Parents\ParentDetails.aspx.designer.cs">
+      <DependentUpon>ParentDetails.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Parents\Parents.aspx.cs">
+      <DependentUpon>Parents.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Parents\Parents.aspx.designer.cs">
+      <DependentUpon>Parents.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Parents\ParentsRepository.cs" />
     <Compile Include="Modules\Students\Addstudent.aspx.cs">
       <DependentUpon>Addstudent.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -466,6 +540,13 @@
     </Compile>
     <Compile Include="Modules\Students\Students.aspx.designer.cs">
       <DependentUpon>Students.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Students\StudentTransfer.aspx.cs">
+      <DependentUpon>StudentTransfer.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Students\StudentTransfer.aspx.designer.cs">
+      <DependentUpon>StudentTransfer.aspx</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Site.Master.cs">
@@ -500,7 +581,6 @@
     <Folder Include="Modules\Attendance\" />
     <Folder Include="Modules\Examination\" />
     <Folder Include="Modules\Finance\" />
-    <Folder Include="Modules\Parents\" />
     <Folder Include="Modules\Reports\" />
     <Folder Include="Modules\Settings\" />
     <Folder Include="Modules\Staff\" />

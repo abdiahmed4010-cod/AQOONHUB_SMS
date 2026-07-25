@@ -136,6 +136,10 @@
                                     <asp:HyperLink runat="server" CssClass="btn-ghost btn !p-1.5" NavigateUrl='<%# "~/Modules/Students/StudentDetails.aspx?id=" + Eval("StudentID") %>' ToolTip="View Details">
                                         <i data-lucide="eye" class="w-4 h-4"></i>
                                     </asp:HyperLink>
+                                    <asp:HyperLink runat="server" CssClass="btn-ghost btn !p-1.5" NavigateUrl='<%# "~/Modules/Students/StudentTransfer.aspx?id=" + Eval("StudentID") %>'
+                                        ToolTip='<%# Eval("Status").ToString() == "Transferred" ? "Return to School" : "Transfer" %>'>
+                                        <i data-lucide='<%# Eval("Status").ToString() == "Transferred" ? "undo-2" : "arrow-right-left" %>' class="w-4 h-4"></i>
+                                    </asp:HyperLink>
                                     <asp:LinkButton runat="server" CssClass="btn-ghost btn !p-1.5 !text-red-500" CommandName="SoftDelete"
                                         CommandArgument='<%# Eval("StudentID") + "|" + Eval("FullName") %>'
                                         OnClientClick='<%# "return confirm(\x27Delete " + Eval("FullName") + "? This moves the record to Trash — a Super Admin can restore it later.\x27);" %>'

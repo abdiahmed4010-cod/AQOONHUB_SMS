@@ -28,9 +28,13 @@
         protected global::System.Web.UI.WebControls.LinkButton btnToggleActive;
         protected global::System.Web.UI.WebControls.Label lblToggleActiveText;
         protected global::System.Web.UI.WebControls.LinkButton btnGraduate;
-        protected global::System.Web.UI.WebControls.LinkButton btnTransfer;
+        protected global::System.Web.UI.WebControls.HyperLink lnkTransfer;
+        protected global::System.Web.UI.WebControls.Label lblTransferLinkText;
         protected global::System.Web.UI.WebControls.LinkButton btnDelete;
         protected global::System.Web.UI.WebControls.HyperLink lnkBack;
+
+        protected global::System.Web.UI.WebControls.Panel pnlTransferSummary;
+        protected global::System.Web.UI.WebControls.Label lblTransferSummaryText;
 
         protected global::System.Web.UI.WebControls.Label lblDetailName;
         protected global::System.Web.UI.WebControls.Label lblDetailGender;

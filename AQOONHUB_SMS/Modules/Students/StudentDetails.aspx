@@ -71,6 +71,11 @@
                 </div>
             </div>
 
+            <asp:Panel ID="pnlTransferSummary" runat="server" CssClass="alert alert-info" Visible="false" Style="background:#EFF6FF;color:#1D4ED8;border:1px solid #DBEAFE;">
+                <i data-lucide="arrow-right-left" class="w-4 h-4 mt-0.5"></i>
+                <asp:Label ID="lblTransferSummaryText" runat="server" />
+            </asp:Panel>
+
             <div class="flex gap-2 flex-wrap mb-5">
                 <asp:HyperLink ID="lnkEdit" runat="server" CssClass="btn btn-primary">
                     <i data-lucide="pencil" class="w-4 h-4"></i> Edit
@@ -81,9 +86,9 @@
                 <asp:LinkButton ID="btnGraduate" runat="server" CssClass="btn btn-secondary" OnClick="btnGraduate_Click" OnClientClick="return confirm('Mark this student as Graduated?');">
                     <i data-lucide="graduation-cap" class="w-4 h-4"></i> Graduate
                 </asp:LinkButton>
-                <asp:LinkButton ID="btnTransfer" runat="server" CssClass="btn btn-secondary" OnClick="btnTransfer_Click" OnClientClick="return confirm('Mark this student as Transferred?');">
-                    <i data-lucide="arrow-right-left" class="w-4 h-4"></i> Transfer
-                </asp:LinkButton>
+                <asp:HyperLink ID="lnkTransfer" runat="server" CssClass="btn btn-secondary">
+                    <i data-lucide="arrow-right-left" class="w-4 h-4"></i> <asp:Label ID="lblTransferLinkText" runat="server" Text="Transfer Student" />
+                </asp:HyperLink>
                 <asp:LinkButton ID="btnDelete" runat="server" CssClass="btn btn-secondary !text-red-500" OnClick="btnDelete_Click" OnClientClick="return confirm('Delete this student? This moves the record to Trash — a Super Admin can restore it later.');">
                     <i data-lucide="trash-2" class="w-4 h-4"></i> Delete
                 </asp:LinkButton>

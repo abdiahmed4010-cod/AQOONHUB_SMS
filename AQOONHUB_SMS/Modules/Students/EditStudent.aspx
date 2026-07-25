@@ -74,17 +74,17 @@
                         <asp:Label ID="lblAdmissionNo" runat="server" CssClass="readonly-pill" />
                     </div>
                     <div class="field">
-                        <label for="<%= txtFirstName.ClientID %>">First Name <span class="req">*</span></label>
+                        <asp:Label runat="server" AssociatedControlID="txtFirstName" Text="First Name *" />
                         <asp:TextBox ID="txtFirstName" runat="server" CssClass="input" MaxLength="50" />
                         <asp:RequiredFieldValidator runat="server" ControlToValidate="txtFirstName" CssClass="field-error" Display="Dynamic" ValidationGroup="Save" ErrorMessage="First name is required." Text="First name is required." />
                     </div>
                     <div class="field">
-                        <label for="<%= txtLastName.ClientID %>">Last Name <span class="req">*</span></label>
+                        <asp:Label runat="server" AssociatedControlID="txtLastName" Text="Last Name *" />
                         <asp:TextBox ID="txtLastName" runat="server" CssClass="input" MaxLength="50" />
                         <asp:RequiredFieldValidator runat="server" ControlToValidate="txtLastName" CssClass="field-error" Display="Dynamic" ValidationGroup="Save" ErrorMessage="Last name is required." Text="Last name is required." />
                     </div>
                     <div class="field">
-                        <label for="<%= ddlGender.ClientID %>">Gender <span class="req">*</span></label>
+                        <asp:Label runat="server" AssociatedControlID="ddlGender" Text="Gender *" />
                         <asp:DropDownList ID="ddlGender" runat="server" CssClass="input">
                             <asp:ListItem Text="Select Gender" Value="" />
                             <asp:ListItem Text="Male" Value="Male" />
@@ -93,7 +93,7 @@
                         <asp:RequiredFieldValidator runat="server" ControlToValidate="ddlGender" CssClass="field-error" Display="Dynamic" ValidationGroup="Save" ErrorMessage="Please select a gender." Text="Please select a gender." InitialValue="" />
                     </div>
                     <div class="field">
-                        <label for="<%= ddlStatus.ClientID %>">Status <span class="req">*</span></label>
+                        <asp:Label runat="server" AssociatedControlID="ddlStatus" Text="Status *" />
                         <asp:DropDownList ID="ddlStatus" runat="server" CssClass="input">
                             <asp:ListItem Text="Active" Value="Active" />
                             <asp:ListItem Text="Inactive" Value="Inactive" />
@@ -102,13 +102,13 @@
                         </asp:DropDownList>
                     </div>
                     <div class="field">
-                        <label for="<%= txtDateOfBirth.ClientID %>">Date of Birth <span class="req">*</span></label>
+                        <asp:Label runat="server" AssociatedControlID="txtDateOfBirth" Text="Date of Birth *" />
                         <asp:TextBox ID="txtDateOfBirth" runat="server" CssClass="input" TextMode="Date" />
                         <asp:RequiredFieldValidator runat="server" ControlToValidate="txtDateOfBirth" CssClass="field-error" Display="Dynamic" ValidationGroup="Save" ErrorMessage="Date of birth is required." Text="Date of birth is required." />
                         <asp:CustomValidator ID="cvDateOfBirth" runat="server" ControlToValidate="txtDateOfBirth" CssClass="field-error" Display="Dynamic" ValidationGroup="Save" OnServerValidate="cvDateOfBirth_ServerValidate" ErrorMessage="Date of birth must be in the past and give a reasonable student age (3–25 years)." Text="Date of birth must be in the past and give a reasonable student age (3–25 years)." />
                     </div>
                     <div class="field">
-                        <label for="<%= txtEnrollmentDate.ClientID %>">Enrollment Date <span class="req">*</span></label>
+                        <asp:Label runat="server" AssociatedControlID="txtEnrollmentDate" Text="Enrollment Date *" />
                         <asp:TextBox ID="txtEnrollmentDate" runat="server" CssClass="input" TextMode="Date" />
                         <asp:RequiredFieldValidator runat="server" ControlToValidate="txtEnrollmentDate" CssClass="field-error" Display="Dynamic" ValidationGroup="Save" ErrorMessage="Enrollment date is required." Text="Enrollment date is required." />
                     </div>
@@ -119,18 +119,18 @@
                 <h2><i data-lucide="school" class="w-4 h-4 text-brand-600"></i> Academic Information</h2>
                 <div class="form-grid two-col">
                     <div class="field">
-                        <label for="<%= ddlAcademicYear.ClientID %>">Academic Year <span class="req">*</span></label>
+                        <asp:Label runat="server" AssociatedControlID="ddlAcademicYear" Text="Academic Year *" />
                         <asp:DropDownList ID="ddlAcademicYear" runat="server" CssClass="input" />
                         <asp:RequiredFieldValidator runat="server" ControlToValidate="ddlAcademicYear" CssClass="field-error" Display="Dynamic" ValidationGroup="Save" ErrorMessage="Please select an academic year." Text="Please select an academic year." InitialValue="0" />
                     </div>
                     <div class="field"></div>
                     <div class="field">
-                        <label for="<%= ddlClass.ClientID %>">Class <span class="req">*</span></label>
+                        <asp:Label runat="server" AssociatedControlID="ddlClass" Text="Class *" />
                         <asp:DropDownList ID="ddlClass" runat="server" CssClass="input" AutoPostBack="true" OnSelectedIndexChanged="ddlClass_SelectedIndexChanged" />
                         <asp:RequiredFieldValidator runat="server" ControlToValidate="ddlClass" CssClass="field-error" Display="Dynamic" ValidationGroup="Save" ErrorMessage="Please select a class." Text="Please select a class." InitialValue="0" />
                     </div>
                     <div class="field">
-                        <label for="<%= ddlSection.ClientID %>">Section <span class="req">*</span></label>
+                        <asp:Label runat="server" AssociatedControlID="ddlSection" Text="Section *" />
                         <asp:DropDownList ID="ddlSection" runat="server" CssClass="input" />
                         <asp:RequiredFieldValidator runat="server" ControlToValidate="ddlSection" CssClass="field-error" Display="Dynamic" ValidationGroup="Save" ErrorMessage="Please select a section." Text="Please select a section." InitialValue="0" />
                     </div>
@@ -141,7 +141,7 @@
                 <h2><i data-lucide="users" class="w-4 h-4 text-brand-600"></i> Guardian Information</h2>
                 <asp:Panel ID="pnlGuardianField" runat="server">
                     <div class="field">
-                        <label for="<%= ddlGuardian.ClientID %>">Guardian</label>
+                        <asp:Label runat="server" AssociatedControlID="ddlGuardian" Text="Guardian" />
                         <asp:DropDownList ID="ddlGuardian" runat="server" CssClass="input" />
                     </div>
                 </asp:Panel>
@@ -154,11 +154,11 @@
                 <h2><i data-lucide="heart-pulse" class="w-4 h-4 text-brand-600"></i> Personal &amp; Health Information</h2>
                 <div class="form-grid two-col">
                     <div class="field">
-                        <label for="<%= txtAddress.ClientID %>">Address</label>
+                        <asp:Label runat="server" AssociatedControlID="txtAddress" Text="Address" />
                         <asp:TextBox ID="txtAddress" runat="server" CssClass="input" TextMode="MultiLine" Rows="3" MaxLength="200" />
                     </div>
                     <div class="field">
-                        <label for="<%= txtMedicalNotes.ClientID %>">Medical Notes</label>
+                        <asp:Label runat="server" AssociatedControlID="txtMedicalNotes" Text="Medical Notes" />
                         <asp:TextBox ID="txtMedicalNotes" runat="server" CssClass="input" TextMode="MultiLine" Rows="3" MaxLength="500" />
                     </div>
                 </div>

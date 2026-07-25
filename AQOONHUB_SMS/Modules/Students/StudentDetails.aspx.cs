@@ -92,8 +92,9 @@ namespace AQOONHUB_SMS.Modules.Students
             lnkEdit.Visible = canManage;
             btnToggleActive.Visible = canManage;
             btnGraduate.Visible = canManage;
-            btnTransfer.Visible = canManage;
             btnDelete.Visible = canManage;
+            // lnkTransfer stays visible for everyone — StudentTransfer.aspx itself shows
+            // read-only history to Teacher/Accountant and hides the write actions there.
         }
 
         private void LoadStudent()
@@ -184,12 +185,68 @@ namespace AQOONHUB_SMS.Modules.Students
 
             lblToggleActiveText.Text = status == "Active" ? "Deactivate" : "Activate";
             lnkEdit.NavigateUrl = ResolveUrl("~/Modules/Students/EditStudent.aspx?id=" + StudentId);
+            lnkTransfer.NavigateUrl = ResolveUrl("~/Modules/Students/StudentTransfer.aspx?id=" + StudentId);
+            lblTransferLinkText.Text = status == "Transferred" ? "Return to School" : "Transfer Student";
 
-            // Disable graduate/transfer/deactivate actions once a student is already
-            // in a terminal state, to avoid contradictory status changes.
+            // Disable graduate/deactivate actions once a student is already in a
+            // terminal state, to avoid contradictory status changes. Transfer/Return
+            // stays enabled always — that page itself decides which mode to show.
             bool isTerminal = status == "Graduated" || status == "Transferred";
             btnGraduate.Enabled = !isTerminal;
-            btnTransfer.Enabled = !isTerminal;
+
+            LoadLatestTransferSummary();
+        }
+
+        /// <summary>
+        /// Shows a brief summary of the most recent transfer record, if the
+        /// StudentTransfers table exists and has any rows for this student.
+        /// Silently shows nothing if the table isn't present yet.
+        /// </summary>
+        private void LoadLatestTransferSummary()
+        {
+            string query = @"
+                SELECT TOP 1 TransferType, DestinationSchool, TransferDate, TransferStatus, ReturnedDate
+                FROM StudentTransfers
+                WHERE StudentID = @StudentID
+                ORDER BY CreatedAt DESC";
+
+            DataTable dt;
+            try
+            {
+                dt = ExecuteQuery(query, new[] { new SqlParameter("@StudentID", StudentId) });
+            }
+            catch (SqlException)
+            {
+                pnlTransferSummary.Visible = false;
+                return;
+            }
+
+            if (dt.Rows.Count == 0)
+            {
+                pnlTransferSummary.Visible = false;
+                return;
+            }
+
+            DataRow row = dt.Rows[0];
+            string status = row["TransferStatus"].ToString();
+            string dest = row["DestinationSchool"] == DBNull.Value ? "—" : row["DestinationSchool"].ToString();
+            DateTime transferDate = Convert.ToDateTime(row["TransferDate"]);
+
+            if (status == "Active")
+            {
+                lblTransferSummaryText.Text = "Currently transferred to " + dest + " (since " + transferDate.ToString("MMM dd, yyyy") + ").";
+            }
+            else if (status == "Returned")
+            {
+                DateTime returned = row["ReturnedDate"] == DBNull.Value ? transferDate : Convert.ToDateTime(row["ReturnedDate"]);
+                lblTransferSummaryText.Text = "Previously transferred to " + dest + "; returned on " + returned.ToString("MMM dd, yyyy") + ".";
+            }
+            else
+            {
+                lblTransferSummaryText.Text = "Last transfer to " + dest + " was cancelled.";
+            }
+
+            pnlTransferSummary.Visible = true;
         }
 
         private string GetInitials(string fullName)
@@ -256,11 +313,6 @@ namespace AQOONHUB_SMS.Modules.Students
         protected void btnGraduate_Click(object sender, EventArgs e)
         {
             UpdateStatus("Graduated");
-        }
-
-        protected void btnTransfer_Click(object sender, EventArgs e)
-        {
-            UpdateStatus("Transferred");
         }
 
         protected void btnDelete_Click(object sender, EventArgs e)

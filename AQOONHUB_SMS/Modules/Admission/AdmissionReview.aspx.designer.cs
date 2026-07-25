@@ -7,11 +7,11 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace AQOONHUB_SMS.Modules.Students
+namespace AQOONHUB_SMS.Modules.Admission
 {
 
 
-    public partial class AddStudent
+    public partial class AdmissionReview
     {
 
         /// <summary>
@@ -51,121 +51,175 @@ namespace AQOONHUB_SMS.Modules.Students
         protected global::System.Web.UI.WebControls.Label lblError;
 
         /// <summary>
-        /// valSummary control.
+        /// pnlNotFound control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.ValidationSummary valSummary;
+        protected global::System.Web.UI.WebControls.Panel pnlNotFound;
 
         /// <summary>
-        /// pnlFormBody control.
+        /// pnlBody control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel pnlFormBody;
+        protected global::System.Web.UI.WebControls.Panel pnlBody;
 
         /// <summary>
-        /// lblStudentCode control.
+        /// lblFullName control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblStudentCode;
+        protected global::System.Web.UI.WebControls.Label lblFullName;
 
         /// <summary>
-        /// hdnStudentCode control.
+        /// lblStatusBadge control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.HiddenField hdnStudentCode;
+        protected global::System.Web.UI.WebControls.Label lblStatusBadge;
 
         /// <summary>
-        /// lblAdmissionNo control.
+        /// lblApplicationNo control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblAdmissionNo;
+        protected global::System.Web.UI.WebControls.Label lblApplicationNo;
 
         /// <summary>
-        /// hdnAdmissionNo control.
+        /// lblGender control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.HiddenField hdnAdmissionNo;
+        protected global::System.Web.UI.WebControls.Label lblGender;
 
         /// <summary>
-        /// txtFirstName control.
+        /// lblDob control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtFirstName;
+        protected global::System.Web.UI.WebControls.Label lblDob;
 
         /// <summary>
-        /// txtLastName control.
+        /// lblClass control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtLastName;
+        protected global::System.Web.UI.WebControls.Label lblClass;
 
         /// <summary>
-        /// ddlGender control.
+        /// lblAppDate control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlGender;
+        protected global::System.Web.UI.WebControls.Label lblAppDate;
 
         /// <summary>
-        /// ddlStatus control.
+        /// lblGuardianName control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlStatus;
+        protected global::System.Web.UI.WebControls.Label lblGuardianName;
 
         /// <summary>
-        /// txtDateOfBirth control.
+        /// lblGuardianPhone control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtDateOfBirth;
+        protected global::System.Web.UI.WebControls.Label lblGuardianPhone;
 
         /// <summary>
-        /// cvDateOfBirth control.
+        /// lblGuardianEmail control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.CustomValidator cvDateOfBirth;
+        protected global::System.Web.UI.WebControls.Label lblGuardianEmail;
 
         /// <summary>
-        /// txtEnrollmentDate control.
+        /// lblNotes control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtEnrollmentDate;
+        protected global::System.Web.UI.WebControls.Label lblNotes;
+
+        /// <summary>
+        /// lblReviewed control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblReviewed;
+
+        /// <summary>
+        /// pnlNoGuardianWarning control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel pnlNoGuardianWarning;
+
+        /// <summary>
+        /// ddlLinkExistingGuardian control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddlLinkExistingGuardian;
+
+        /// <summary>
+        /// btnLinkExistingGuardian control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.LinkButton btnLinkExistingGuardian;
+
+        /// <summary>
+        /// btnCreateGuardianFromApp control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.LinkButton btnCreateGuardianFromApp;
+
+        /// <summary>
+        /// pnlActionForm control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel pnlActionForm;
 
         /// <summary>
         /// ddlAcademicYear control.
@@ -177,15 +231,6 @@ namespace AQOONHUB_SMS.Modules.Students
         protected global::System.Web.UI.WebControls.DropDownList ddlAcademicYear;
 
         /// <summary>
-        /// ddlClass control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlClass;
-
-        /// <summary>
         /// ddlSection control.
         /// </summary>
         /// <remarks>
@@ -195,111 +240,48 @@ namespace AQOONHUB_SMS.Modules.Students
         protected global::System.Web.UI.WebControls.DropDownList ddlSection;
 
         /// <summary>
-        /// pnlGuardianField control.
+        /// btnUnderReview control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel pnlGuardianField;
+        protected global::System.Web.UI.WebControls.LinkButton btnUnderReview;
 
         /// <summary>
-        /// ddlGuardian control.
+        /// btnReject control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlGuardian;
+        protected global::System.Web.UI.WebControls.LinkButton btnReject;
 
         /// <summary>
-        /// pnlNoGuardians control.
+        /// btnApprove control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel pnlNoGuardians;
+        protected global::System.Web.UI.WebControls.LinkButton btnApprove;
 
         /// <summary>
-        /// txtAddress control.
+        /// pnlAlreadyFinalized control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtAddress;
+        protected global::System.Web.UI.WebControls.Panel pnlAlreadyFinalized;
 
         /// <summary>
-        /// txtMedicalNotes control.
+        /// lblFinalizedText control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtMedicalNotes;
-
-        /// <summary>
-        /// fuPhoto control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.FileUpload fuPhoto;
-
-        /// <summary>
-        /// revPhoto control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.RegularExpressionValidator revPhoto;
-
-        /// <summary>
-        /// cvPhoto control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.CustomValidator cvPhoto;
-
-        /// <summary>
-        /// btnCancel control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.LinkButton btnCancel;
-
-        /// <summary>
-        /// btnReset control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.LinkButton btnReset;
-
-        /// <summary>
-        /// btnSaveAndAddAnother control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.LinkButton btnSaveAndAddAnother;
-
-        /// <summary>
-        /// btnSave control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.LinkButton btnSave;
+        protected global::System.Web.UI.WebControls.Label lblFinalizedText;
     }
 }
