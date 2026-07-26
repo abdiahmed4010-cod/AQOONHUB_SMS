@@ -173,6 +173,10 @@
     <Content Include="Modules\Parents\ParentAccount.aspx" />
     <Content Include="Modules\Parents\ParentDetails.aspx" />
     <Content Include="Modules\Parents\Parents.aspx" />
+    <Content Include="Modules\Staff\AddStaff.aspx" />
+    <Content Include="Modules\Staff\EditStaff.aspx" />
+    <Content Include="Modules\Staff\Staff.aspx" />
+    <Content Include="Modules\Staff\StaffDetails.aspx" />
     <Content Include="Modules\Students\Addstudent.aspx" />
     <Content Include="Modules\Students\EditStudent.aspx" />
     <Content Include="Modules\Students\StudentDetails.aspx" />
@@ -513,6 +517,34 @@
       <DependentUpon>Parents.aspx</DependentUpon>
     </Compile>
     <Compile Include="Modules\Parents\ParentsRepository.cs" />
+    <Compile Include="Modules\Staff\AddStaff.aspx.cs">
+      <DependentUpon>AddStaff.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Staff\AddStaff.aspx.designer.cs">
+      <DependentUpon>AddStaff.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Staff\EditStaff.aspx.cs">
+      <DependentUpon>EditStaff.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Staff\EditStaff.aspx.designer.cs">
+      <DependentUpon>EditStaff.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Staff\Staff.aspx.cs">
+      <DependentUpon>Staff.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Staff\Staff.aspx.designer.cs">
+      <DependentUpon>Staff.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Staff\StaffDetails.aspx.cs">
+      <DependentUpon>StaffDetails.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Staff\StaffDetails.aspx.designer.cs">
+      <DependentUpon>StaffDetails.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Modules\Students\Addstudent.aspx.cs">
       <DependentUpon>Addstudent.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -583,7 +615,6 @@
     <Folder Include="Modules\Finance\" />
     <Folder Include="Modules\Reports\" />
     <Folder Include="Modules\Settings\" />
-    <Folder Include="Modules\Staff\" />
     <Folder Include="Modules\Teachers\" />
   </ItemGroup>
   <ItemGroup>
