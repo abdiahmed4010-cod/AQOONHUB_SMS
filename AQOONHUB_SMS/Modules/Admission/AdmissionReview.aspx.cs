@@ -160,6 +160,7 @@ namespace AQOONHUB_SMS.Modules.Admission
             lblGender.Text = row["Gender"].ToString();
             lblDob.Text = Convert.ToDateTime(row["DateOfBirth"]).ToString("MMM dd, yyyy");
             lblClass.Text = row["ClassName"].ToString();
+            lblShift.Text = (row.Table.Columns.Contains("Shift") && row["Shift"] != DBNull.Value && !string.IsNullOrEmpty(row["Shift"].ToString())) ? row["Shift"].ToString() : "—";
             lblAppDate.Text = Convert.ToDateTime(row["ApplicationDate"]).ToString("MMM dd, yyyy");
             lblGuardianName.Text = row["GuardianName"].ToString();
             lblGuardianPhone.Text = row["GuardianPhone"].ToString();
@@ -472,11 +473,11 @@ namespace AQOONHUB_SMS.Modules.Admission
                         string insertStudent = @"
                             INSERT INTO Students
                                 (StudentCode, AdmissionNo, FirstName, LastName, Gender, DateOfBirth,
-                                 GuardianID, SectionID, AcademicYearID, Status, EnrollmentDate, CreatedAt, UpdatedAt)
+                                 GuardianID, SectionID, AcademicYearID, Shift, Status, EnrollmentDate, CreatedAt, UpdatedAt)
                             OUTPUT INSERTED.StudentID
                             VALUES
                                 (@StudentCode, @AdmissionNo, @FirstName, @LastName, @Gender, @DateOfBirth,
-                                 @GuardianID, @SectionID, @AcademicYearID, 'Active', GETDATE(), GETDATE(), GETDATE())";
+                                 @GuardianID, @SectionID, @AcademicYearID, @Shift, 'Active', GETDATE(), GETDATE(), GETDATE())";
 
                         int newStudentId;
                         using (SqlCommand cmd = new SqlCommand(insertStudent, conn, tx))
@@ -490,6 +491,9 @@ namespace AQOONHUB_SMS.Modules.Admission
                             cmd.Parameters.AddWithValue("@GuardianID", guardianId);
                             cmd.Parameters.AddWithValue("@SectionID", sectionId);
                             cmd.Parameters.AddWithValue("@AcademicYearID", academicYearId);
+                            cmd.Parameters.AddWithValue("@Shift",
+                                (app.Table.Columns.Contains("Shift") && app["Shift"] != DBNull.Value && !string.IsNullOrEmpty(app["Shift"].ToString()))
+                                    ? (object)app["Shift"].ToString() : DBNull.Value);
                             newStudentId = Convert.ToInt32(cmd.ExecuteScalar());
                         }
 

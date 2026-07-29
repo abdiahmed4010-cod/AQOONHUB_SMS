@@ -1,0 +1,1 @@
+using System;namespace AQOONHUB_SMS.Modules.Finance{public partial class ViewInvoice:System.Web.UI.Page{protected void Page_Load(object s,EventArgs e){Response.Redirect("PrintInvoice.aspx?id="+Server.UrlEncode(Request.QueryString["id"]));}}}

@@ -2,6 +2,9 @@
 {
     public partial class AddAdmission
     {
+        protected global::System.Web.UI.WebControls.Literal litPageTitle;
+        protected global::System.Web.UI.WebControls.Literal litPageSubtitle;
+
         protected global::System.Web.UI.WebControls.Panel pnlSuccess;
         protected global::System.Web.UI.WebControls.Label lblSuccess;
         protected global::System.Web.UI.WebControls.Panel pnlError;
@@ -19,7 +22,15 @@
         protected global::System.Web.UI.WebControls.TextBox txtDateOfBirth;
         protected global::System.Web.UI.WebControls.CustomValidator cvDateOfBirth;
 
+        protected global::System.Web.UI.WebControls.Panel pnlStatus;
+        protected global::System.Web.UI.WebControls.DropDownList ddlStatus;
+        protected global::System.Web.UI.WebControls.LinkButton btnUpdateStatus;
+
         protected global::System.Web.UI.WebControls.DropDownList ddlClass;
+        protected global::System.Web.UI.WebControls.DropDownList ddlAcademicYear;
+        protected global::System.Web.UI.WebControls.DropDownList ddlShift;
+        protected global::System.Web.UI.WebControls.TextBox txtPreviousSchool;
+        protected global::System.Web.UI.WebControls.TextBox txtLastGradeCompleted;
 
         protected global::System.Web.UI.WebControls.RadioButtonList rblGuardianMode;
         protected global::System.Web.UI.WebControls.Panel pnlExistingGuardian;

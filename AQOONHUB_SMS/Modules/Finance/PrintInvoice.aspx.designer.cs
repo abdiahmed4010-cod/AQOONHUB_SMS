@@ -1,0 +1,1 @@
+namespace AQOONHUB_SMS.Modules.Finance{public partial class PrintInvoice{protected global::System.Web.UI.WebControls.HyperLink pay;protected global::System.Web.UI.WebControls.Label number,student,studentCode,classInfo,invoiceDate,dueDate,year,status,subtotal,discount,total,paid,balance,remarks,instructions,prepared;protected global::System.Web.UI.WebControls.GridView items;}}

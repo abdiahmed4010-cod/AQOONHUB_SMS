@@ -17,6 +17,9 @@ namespace AQOONHUB_SMS.Modules.Students
         private readonly string connectionString =
             ConfigurationManager.ConnectionStrings["AQOONHUB_DB"].ConnectionString;
 
+        // Exposed to markup: controls per-row Edit action visibility (hidden for read-only Teacher role).
+        public bool CanEdit { get; private set; }
+
         private DataTable ExecuteQuery(string query, SqlParameter[] parameters = null)
         {
             using (SqlConnection conn = new SqlConnection(connectionString))
@@ -119,6 +122,7 @@ namespace AQOONHUB_SMS.Modules.Students
             }
 
             bool readOnly = role.Equals("Teacher", StringComparison.OrdinalIgnoreCase);
+            CanEdit = !readOnly;
             if (readOnly)
             {
                 lnkAddStudent.Visible = false;
@@ -250,6 +254,12 @@ namespace AQOONHUB_SMS.Modules.Students
                 parameters.Add(new SqlParameter("@Status", ddlStatus.SelectedValue));
             }
 
+            if (!string.IsNullOrEmpty(ddlShiftFilter.SelectedValue))
+            {
+                where += " AND s.Shift = @Shift";
+                parameters.Add(new SqlParameter("@Shift", ddlShiftFilter.SelectedValue));
+            }
+
             whereClause = where;
         }
 
@@ -262,6 +272,7 @@ namespace AQOONHUB_SMS.Modules.Students
             { "DateOfBirth", "s.DateOfBirth" },
             { "ClassName", "c.ClassName" },
             { "SectionName", "sec.SectionName" },
+            { "Shift", "s.Shift" },
             { "GuardianName", "g.FullName" },
             { "EnrollmentDate", "s.EnrollmentDate" },
             { "Status", "s.Status" },
@@ -311,7 +322,7 @@ namespace AQOONHUB_SMS.Modules.Students
                     s.StudentID, s.StudentCode, s.AdmissionNo,
                     s.FirstName, s.LastName,
                     LTRIM(RTRIM(ISNULL(s.FirstName, '') + ' ' + ISNULL(s.LastName, ''))) AS FullName,
-                    s.Gender, s.DateOfBirth, s.Status, s.PhotoPath, s.EnrollmentDate,
+                    s.Gender, s.DateOfBirth, s.Status, s.PhotoPath, s.EnrollmentDate, s.Shift,
                     g.FullName AS GuardianName, g.Phone AS GuardianPhone,
                     sec.SectionName, c.ClassName,
                     ay.YearName AS AcademicYearName
@@ -359,6 +370,7 @@ namespace AQOONHUB_SMS.Modules.Students
             LoadSections(0);
             ddlGender.SelectedIndex = 0;
             ddlStatus.SelectedIndex = 0;
+            ddlShiftFilter.SelectedIndex = 0;
             CurrentPage = 1;
             SortExpression = "CreatedAt";
             SortDirection = "DESC";
@@ -505,6 +517,17 @@ namespace AQOONHUB_SMS.Modules.Students
                 case "Inactive": return "background:#F1F5F9;color:#64748B";
                 case "Graduated": return "background:#EDE9FE;color:#6D28D9";
                 case "Transferred": return "background:#E0F2FE;color:#0369A1";
+                default: return "background:#F1F5F9;color:#64748B";
+            }
+        }
+
+        protected string GetShiftBadgeStyle(object shiftValue)
+        {
+            string shift = (shiftValue == null || shiftValue == DBNull.Value) ? "" : shiftValue.ToString();
+            switch (shift)
+            {
+                case "Morning": return "background:#FFFBEB;color:#B45309";
+                case "Afternoon": return "background:#EFF6FF;color:#1D4ED8";
                 default: return "background:#F1F5F9;color:#64748B";
             }
         }

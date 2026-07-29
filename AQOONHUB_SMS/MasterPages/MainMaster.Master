@@ -198,11 +198,15 @@
                 </a>
                 
                 <p class="nav-section">Academics</p>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Academic/Academics.aspx") %>" data-nav="academics">
+                    <i data-lucide="layout-dashboard" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Overview</span>
+                </a>
                 <a class="nav-item" href="<%= ResolveUrl("~/Modules/Academic/AcademicYears.aspx") %>" data-nav="academicyears">
                     <i data-lucide="calendar-range" class="w-[18px] h-[18px]" aria-hidden="true"></i>
                     <span>Academic Years &amp; Terms</span>
                 </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Academic/Classes.aspx") %>" data-nav="classes">
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Academic/ClassesSections.aspx") %>" data-nav="classes">
                     <i data-lucide="school" class="w-[18px] h-[18px]" aria-hidden="true"></i>
                     <span>Classes &amp; Sections</span>
                 </a>
@@ -210,13 +214,17 @@
                     <i data-lucide="book-open" class="w-[18px] h-[18px]" aria-hidden="true"></i>
                     <span>Subjects</span>
                 </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Academic/Timetable.aspx") %>" data-nav="timetable">
-                    <i data-lucide="calendar-days" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Timetable Builder</span>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Academic/TeacherAssignments.aspx") %>" data-nav="teacherassignments">
+                    <i data-lucide="user-cog" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Teacher Assignments</span>
                 </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Academic/Promotion.aspx") %>" data-nav="promotion">
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Academic/Timetable.aspx") %>" data-nav="timetable">
+                    <i data-lucide="calendar-clock" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Timetable</span>
+                </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Academic/Promotions.aspx") %>" data-nav="promotions">
                     <i data-lucide="trending-up" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Promotion Wizard</span>
+                    <span>Promotions</span>
                 </a>
                 <a class="nav-item" href="<%= ResolveUrl("~/Modules/Attendance/Attendance.aspx") %>" data-nav="attendance">
                     <i data-lucide="user-check" class="w-[18px] h-[18px]" aria-hidden="true"></i>
@@ -232,21 +240,41 @@
                 </a>
                 
                 <p class="nav-section">Finance</p>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Finance/FeeStructure.aspx") %>" data-nav="feestructure">
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Finance/FeeManagement.aspx") %>" data-nav="finance/feemanagement">
                     <i data-lucide="wallet" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Fee Structure</span>
+                    <span>Fee Management</span>
                 </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Finance/Invoices.aspx") %>" data-nav="invoices">
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Finance/FeeCategories.aspx") %>" data-nav="finance/feecategories">
+                    <i data-lucide="tags" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Fee Categories</span>
+                </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Finance/FeeStructures.aspx") %>" data-nav="finance/feestructures">
+                    <i data-lucide="layers" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Fee Structures</span>
+                </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Finance/CreateInvoice.aspx") %>" data-nav="finance/createinvoice">
+                    <i data-lucide="file-plus" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Fee Collection</span>
+                </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Finance/Invoices.aspx") %>" data-nav="finance/invoices">
                     <i data-lucide="file-text" class="w-[18px] h-[18px]" aria-hidden="true"></i>
                     <span>Invoices</span>
                 </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Finance/Payments.aspx") %>" data-nav="payments">
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Finance/Payments.aspx") %>" data-nav="finance/payments">
                     <i data-lucide="credit-card" class="w-[18px] h-[18px]" aria-hidden="true"></i>
                     <span>Payments</span>
                 </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Finance/Outstanding.aspx") %>" data-nav="outstanding">
-                    <i data-lucide="alert-circle" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Outstanding Balances</span>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Finance/BalanceTracking.aspx") %>" data-nav="finance/balancetracking">
+                    <i data-lucide="scale" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Balance Tracking</span>
+                </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Finance/FeeReports.aspx") %>" data-nav="finance/feereports">
+                    <i data-lucide="bar-chart-3" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Fee Reports</span>
+                </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Payroll/Payroll.aspx") %>" data-nav="payroll">
+                    <i data-lucide="banknote" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Payroll</span>
                 </a>
                 
                 <p class="nav-section">Communication</p>

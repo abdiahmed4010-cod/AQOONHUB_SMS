@@ -1,0 +1,1 @@
+namespace AQOONHUB_SMS.Modules.Finance{public partial class PrintReceipt{protected global::System.Web.UI.WebControls.HyperLink invoiceLink;protected global::System.Web.UI.WebControls.Repeater details;}}

@@ -222,6 +222,9 @@ namespace AQOONHUB_SMS.Modules.Students
             txtLastName.Text = row["LastName"].ToString();
             ddlGender.SelectedValue = row["Gender"].ToString();
             ddlStatus.SelectedValue = row["Status"].ToString();
+            string shiftVal = row.Table.Columns.Contains("Shift") && row["Shift"] != DBNull.Value ? row["Shift"].ToString() : "";
+            ListItem shiftItem = ddlShift.Items.FindByValue(shiftVal);
+            if (shiftItem != null) { ddlShift.ClearSelection(); shiftItem.Selected = true; }
             txtDateOfBirth.Text = Convert.ToDateTime(row["DateOfBirth"]).ToString("yyyy-MM-dd");
             txtEnrollmentDate.Text = Convert.ToDateTime(row["EnrollmentDate"]).ToString("yyyy-MM-dd");
             txtAddress.Text = row["Address"] == DBNull.Value ? "" : row["Address"].ToString();
@@ -393,7 +396,7 @@ namespace AQOONHUB_SMS.Modules.Students
                     Status = @Status, DateOfBirth = @DateOfBirth, EnrollmentDate = @EnrollmentDate,
                     AcademicYearID = @AcademicYearID, SectionID = @SectionID, GuardianID = @GuardianID,
                     Address = @Address, MedicalNotes = @MedicalNotes, PhotoPath = @PhotoPath,
-                    UpdatedAt = GETDATE()
+                    Shift = @Shift, UpdatedAt = GETDATE()
                 WHERE StudentID = @StudentID";
 
             SqlParameter[] parameters =
@@ -410,6 +413,7 @@ namespace AQOONHUB_SMS.Modules.Students
                 new SqlParameter("@Address", string.IsNullOrEmpty(txtAddress.Text.Trim()) ? (object)DBNull.Value : txtAddress.Text.Trim()),
                 new SqlParameter("@MedicalNotes", string.IsNullOrEmpty(txtMedicalNotes.Text.Trim()) ? (object)DBNull.Value : txtMedicalNotes.Text.Trim()),
                 new SqlParameter("@PhotoPath", (object)newPhotoPath ?? DBNull.Value),
+                new SqlParameter("@Shift", string.IsNullOrEmpty(ddlShift.SelectedValue) ? (object)DBNull.Value : ddlShift.SelectedValue),
                 new SqlParameter("@StudentID", StudentId)
             };
 

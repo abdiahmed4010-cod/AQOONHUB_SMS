@@ -63,6 +63,15 @@ namespace AQOONHUB_SMS.Modules.Admission
 
         #endregion
 
+        private int EditId
+        {
+            get
+            {
+                int id;
+                return int.TryParse(Request.QueryString["id"], out id) ? id : 0;
+            }
+        }
+
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!CheckAuthorization()) return;
@@ -70,8 +79,106 @@ namespace AQOONHUB_SMS.Modules.Admission
             if (!IsPostBack)
             {
                 LoadClasses();
+                LoadAcademicYears();
                 LoadExistingGuardians();
-                GenerateAndDisplayApplicationNo();
+
+                if (EditId > 0)
+                {
+                    LoadForEdit(EditId);
+                }
+                else
+                {
+                    GenerateAndDisplayApplicationNo();
+                }
+            }
+        }
+
+        private void LoadAcademicYears()
+        {
+            ddlAcademicYear.Items.Clear();
+            ddlAcademicYear.Items.Add(new ListItem("Select Year", "0"));
+            try
+            {
+                DataTable dt = ExecuteQuery("SELECT AcademicYearID, YearName FROM AcademicYears ORDER BY AcademicYearID DESC");
+                foreach (DataRow row in dt.Rows)
+                    ddlAcademicYear.Items.Add(new ListItem(row["YearName"].ToString(), row["AcademicYearID"].ToString()));
+            }
+            catch { /* AcademicYears optional */ }
+        }
+
+        private void LoadForEdit(int admissionId)
+        {
+            DataTable dt = ExecuteQuery(
+                "SELECT * FROM Admissions WHERE AdmissionID = @Id",
+                new[] { new SqlParameter("@Id", admissionId) });
+
+            if (dt.Rows.Count == 0)
+            {
+                ShowError("The application could not be found.");
+                pnlFormBody.Visible = false;
+                return;
+            }
+
+            DataRow r = dt.Rows[0];
+
+            // Editable statuses: Pending, Under Review, Approved, Enrolled and Rejected.
+            string status = r["Status"] == DBNull.Value ? "" : r["Status"].ToString();
+            string[] editableStatuses = { "Pending", "Under Review", "Approved", "Enrolled", "Rejected" };
+            if (Array.IndexOf(editableStatuses, status) < 0)
+            {
+                ShowError("This application cannot be edited.");
+                pnlFormBody.Visible = false;
+                return;
+            }
+
+            litPageTitle.Text = "Edit Admission Application";
+            litPageSubtitle.Text = "Update the applicant details or change the application status below.";
+
+            // Status can be changed from the edit form (e.g. Enrolled -> Rejected, Rejected -> Under Review).
+            pnlStatus.Visible = true;
+            ddlStatus.Items.Clear();
+            ddlStatus.Items.Add(new ListItem("Pending", "Pending"));
+            ddlStatus.Items.Add(new ListItem("Under Review", "Under Review"));
+            ddlStatus.Items.Add(new ListItem("Enrolled", "Enrolled"));
+            ddlStatus.Items.Add(new ListItem("Rejected", "Rejected"));
+            if (!string.IsNullOrEmpty(status) && ddlStatus.Items.FindByValue(status) == null)
+                ddlStatus.Items.Add(new ListItem(status, status));
+            SelectIfPresent(ddlStatus, status);
+
+            string appNo = r["ApplicationNo"].ToString();
+            hdnApplicationNo.Value = appNo;
+            lblApplicationNo.Text = appNo;
+
+            txtFirstName.Text = r["FirstName"].ToString();
+            txtLastName.Text = r["LastName"].ToString();
+            ddlGender.SelectedValue = r["Gender"].ToString();
+            if (r["DateOfBirth"] != DBNull.Value)
+                txtDateOfBirth.Text = Convert.ToDateTime(r["DateOfBirth"]).ToString("yyyy-MM-dd");
+
+            SelectIfPresent(ddlClass, r["ApplyingForClassID"].ToString());
+            if (r["AcademicYearID"] != DBNull.Value)
+                SelectIfPresent(ddlAcademicYear, r["AcademicYearID"].ToString());
+            if (r["Shift"] != DBNull.Value)
+                SelectIfPresent(ddlShift, r["Shift"].ToString());
+            txtPreviousSchool.Text = r["PreviousSchool"] == DBNull.Value ? "" : r["PreviousSchool"].ToString();
+            txtLastGradeCompleted.Text = r["LastGradeCompleted"] == DBNull.Value ? "" : r["LastGradeCompleted"].ToString();
+            txtNotes.Text = r["Notes"] == DBNull.Value ? "" : r["Notes"].ToString();
+
+            // In edit mode we keep the guardian already linked (select-existing mode).
+            rblGuardianMode.SelectedValue = "Existing";
+            pnlExistingGuardian.Visible = true;
+            pnlNewGuardian.Visible = false;
+            if (r["GuardianID"] != DBNull.Value)
+                SelectIfPresent(ddlExistingGuardian, r["GuardianID"].ToString());
+        }
+
+        private void SelectIfPresent(DropDownList ddl, string value)
+        {
+            ListItem item = ddl.Items.FindByValue(value);
+            if (item != null)
+            {
+                ddl.ClearSelection();
+                item.Selected = true;
             }
         }
 
@@ -216,6 +323,12 @@ namespace AQOONHUB_SMS.Modules.Admission
                 return;
             }
 
+            if (EditId > 0)
+            {
+                UpdateApplication(EditId);
+                return;
+            }
+
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 conn.Open();
@@ -297,10 +410,12 @@ namespace AQOONHUB_SMS.Modules.Admission
                             INSERT INTO Admissions
                                 (ApplicationNo, FirstName, LastName, Gender, DateOfBirth,
                                  ApplyingForClassID, GuardianID, GuardianName, GuardianPhone, GuardianEmail,
+                                 PreviousSchool, LastGradeCompleted, AcademicYearID, Shift,
                                  ApplicationDate, Status, Notes)
                             VALUES
                                 (@ApplicationNo, @FirstName, @LastName, @Gender, @DateOfBirth,
                                  @ClassID, @GuardianID, @GuardianName, @GuardianPhone, @GuardianEmail,
+                                 @PreviousSchool, @LastGrade, @AcademicYearID, @Shift,
                                  GETDATE(), 'Pending', @Notes)";
 
                         using (SqlCommand cmd = new SqlCommand(insertQuery, conn, tx))
@@ -315,6 +430,11 @@ namespace AQOONHUB_SMS.Modules.Admission
                             cmd.Parameters.AddWithValue("@GuardianName", guardianName);
                             cmd.Parameters.AddWithValue("@GuardianPhone", guardianPhone);
                             cmd.Parameters.AddWithValue("@GuardianEmail", (object)guardianEmail ?? DBNull.Value);
+                            cmd.Parameters.AddWithValue("@PreviousSchool", EmptyToDb(txtPreviousSchool.Text));
+                            cmd.Parameters.AddWithValue("@LastGrade", EmptyToDb(txtLastGradeCompleted.Text));
+                            int ayId; cmd.Parameters.AddWithValue("@AcademicYearID",
+                                int.TryParse(ddlAcademicYear.SelectedValue, out ayId) && ayId > 0 ? (object)ayId : DBNull.Value);
+                            cmd.Parameters.AddWithValue("@Shift", EmptyToDb(ddlShift.SelectedValue));
                             string notes = txtNotes.Text.Trim();
                             cmd.Parameters.AddWithValue("@Notes", string.IsNullOrEmpty(notes) ? (object)DBNull.Value : notes);
                             cmd.ExecuteNonQuery();
@@ -332,6 +452,127 @@ namespace AQOONHUB_SMS.Modules.Admission
             }
         }
 
+        private static object EmptyToDb(string value)
+        {
+            string v = (value ?? string.Empty).Trim();
+            return string.IsNullOrEmpty(v) ? (object)DBNull.Value : v;
+        }
+
+        private void UpdateApplication(int admissionId)
+        {
+            // Edit mode keeps the linked guardian (Existing mode); refresh the
+            // denormalised guardian snapshot from the selected guardian record.
+            int guardianId;
+            if (!int.TryParse(ddlExistingGuardian.SelectedValue, out guardianId) || guardianId <= 0)
+            {
+                ShowError("Please select a guardian.");
+                return;
+            }
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+                using (SqlTransaction tx = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        string guardianName, guardianPhone, guardianEmail;
+                        using (SqlCommand cmd = new SqlCommand("SELECT FullName, Phone, Email FROM Guardians WHERE GuardianID = @Id", conn, tx))
+                        {
+                            cmd.Parameters.AddWithValue("@Id", guardianId);
+                            using (SqlDataReader reader = cmd.ExecuteReader())
+                            {
+                                if (!reader.Read())
+                                {
+                                    tx.Rollback();
+                                    ShowError("The selected guardian could not be found.");
+                                    return;
+                                }
+                                guardianName = reader["FullName"].ToString();
+                                guardianPhone = reader["Phone"].ToString();
+                                guardianEmail = reader["Email"] == DBNull.Value ? null : reader["Email"].ToString();
+                            }
+                        }
+
+                        string updateQuery = @"
+                            UPDATE Admissions SET
+                                FirstName = @FirstName, LastName = @LastName, Gender = @Gender, DateOfBirth = @DateOfBirth,
+                                ApplyingForClassID = @ClassID, GuardianID = @GuardianID,
+                                GuardianName = @GuardianName, GuardianPhone = @GuardianPhone, GuardianEmail = @GuardianEmail,
+                                PreviousSchool = @PreviousSchool, LastGradeCompleted = @LastGrade, AcademicYearID = @AcademicYearID,
+                                Shift = @Shift, Notes = @Notes, Status = @Status
+                            WHERE AdmissionID = @Id AND Status IN ('Pending', 'Under Review', 'Approved', 'Enrolled', 'Rejected')";
+
+                        using (SqlCommand cmd = new SqlCommand(updateQuery, conn, tx))
+                        {
+                            cmd.Parameters.AddWithValue("@Id", admissionId);
+                            cmd.Parameters.AddWithValue("@FirstName", txtFirstName.Text.Trim());
+                            cmd.Parameters.AddWithValue("@LastName", txtLastName.Text.Trim());
+                            cmd.Parameters.AddWithValue("@Gender", ddlGender.SelectedValue);
+                            cmd.Parameters.AddWithValue("@DateOfBirth", DateTime.Parse(txtDateOfBirth.Text));
+                            cmd.Parameters.AddWithValue("@ClassID", int.Parse(ddlClass.SelectedValue));
+                            cmd.Parameters.AddWithValue("@GuardianID", guardianId);
+                            cmd.Parameters.AddWithValue("@GuardianName", guardianName);
+                            cmd.Parameters.AddWithValue("@GuardianPhone", guardianPhone);
+                            cmd.Parameters.AddWithValue("@GuardianEmail", (object)guardianEmail ?? DBNull.Value);
+                            cmd.Parameters.AddWithValue("@PreviousSchool", EmptyToDb(txtPreviousSchool.Text));
+                            cmd.Parameters.AddWithValue("@LastGrade", EmptyToDb(txtLastGradeCompleted.Text));
+                            int ayId; cmd.Parameters.AddWithValue("@AcademicYearID",
+                                int.TryParse(ddlAcademicYear.SelectedValue, out ayId) && ayId > 0 ? (object)ayId : DBNull.Value);
+                            string notes = txtNotes.Text.Trim();
+                            cmd.Parameters.AddWithValue("@Shift", EmptyToDb(ddlShift.SelectedValue));
+                            cmd.Parameters.AddWithValue("@Notes", string.IsNullOrEmpty(notes) ? (object)DBNull.Value : notes);
+                            cmd.Parameters.AddWithValue("@Status", ddlStatus.SelectedValue);
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        tx.Commit();
+                        Response.Redirect("~/Modules/Admission/Admissions.aspx", true);
+                    }
+                    catch (System.Threading.ThreadAbortException)
+                    {
+                        throw; // Response.Redirect
+                    }
+                    catch (Exception)
+                    {
+                        try { tx.Rollback(); } catch { }
+                        ShowError("The application could not be updated due to a system error. Please try again.");
+                    }
+                }
+            }
+        }
+
+        protected void btnUpdateStatus_Click(object sender, EventArgs e)
+        {
+            if (!CanManageAdmissions()) { ShowError("You do not have permission to change the status."); return; }
+            if (EditId <= 0) { ShowError("Invalid application."); return; }
+
+            string newStatus = ddlStatus.SelectedValue;
+            string[] allowed = { "Pending", "Under Review", "Enrolled", "Rejected", "Approved" };
+            if (Array.IndexOf(allowed, newStatus) < 0) { ShowError("Invalid status."); return; }
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                using (SqlCommand cmd = new SqlCommand("UPDATE Admissions SET Status = @Status WHERE AdmissionID = @Id", conn))
+                {
+                    cmd.Parameters.AddWithValue("@Status", newStatus);
+                    cmd.Parameters.AddWithValue("@Id", EditId);
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                }
+                Response.Redirect("~/Modules/Admission/Admissions.aspx", true);
+            }
+            catch (System.Threading.ThreadAbortException)
+            {
+                throw; // Response.Redirect
+            }
+            catch (Exception)
+            {
+                ShowError("The status could not be updated due to a system error. Please try again.");
+            }
+        }
+
         protected void btnReset_Click(object sender, EventArgs e)
         {
             txtFirstName.Text = "";
@@ -339,6 +580,7 @@ namespace AQOONHUB_SMS.Modules.Admission
             ddlGender.SelectedIndex = 0;
             txtDateOfBirth.Text = "";
             ddlClass.SelectedIndex = 0;
+            ddlShift.SelectedIndex = 0;
             rblGuardianMode.SelectedValue = "Existing";
             pnlExistingGuardian.Visible = true;
             pnlNewGuardian.Visible = false;

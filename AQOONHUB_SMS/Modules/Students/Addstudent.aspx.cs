@@ -582,12 +582,12 @@ namespace AQOONHUB_SMS.Modules.Students
                             INSERT INTO Students
                                 (StudentCode, AdmissionNo, FirstName, LastName, Gender, DateOfBirth,
                                  GuardianID, SectionID, AcademicYearID, Status, PhotoPath,
-                                 MedicalNotes, Address, EnrollmentDate, CreatedAt, UpdatedAt)
+                                 MedicalNotes, Address, EnrollmentDate, Shift, CreatedAt, UpdatedAt)
                             OUTPUT INSERTED.StudentID
                             VALUES
                                 (@StudentCode, @AdmissionNo, @FirstName, @LastName, @Gender, @DateOfBirth,
                                  @GuardianID, @SectionID, @AcademicYearID, @Status, @PhotoPath,
-                                 @MedicalNotes, @Address, @EnrollmentDate, GETDATE(), GETDATE())";
+                                 @MedicalNotes, @Address, @EnrollmentDate, @Shift, GETDATE(), GETDATE())";
 
                         using (SqlCommand cmd = new SqlCommand(insertQuery, conn, tx))
                         {
@@ -607,6 +607,7 @@ namespace AQOONHUB_SMS.Modules.Students
                             string address = txtAddress.Text.Trim();
                             cmd.Parameters.Add(new SqlParameter("@Address", string.IsNullOrEmpty(address) ? (object)DBNull.Value : address));
                             cmd.Parameters.Add(new SqlParameter("@EnrollmentDate", DateTime.Parse(txtEnrollmentDate.Text)));
+                            cmd.Parameters.Add(new SqlParameter("@Shift", string.IsNullOrEmpty(ddlShift.SelectedValue) ? (object)DBNull.Value : ddlShift.SelectedValue));
 
                             int newStudentId = Convert.ToInt32(cmd.ExecuteScalar());
 

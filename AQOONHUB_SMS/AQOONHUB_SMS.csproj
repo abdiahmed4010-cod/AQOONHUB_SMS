@@ -167,12 +167,43 @@
     <Content Include="Modules\Admission\Admissions.aspx" />
     <Content Include="Modules\Authentication\Login.aspx" />
     <Content Include="Modules\Dashboard\Dashboard.aspx" />
+    <Content Include="Modules\Finance\AddFeeStructure.aspx" />
+    <Content Include="Modules\Finance\AddInvoice.aspx" />
+    <Content Include="Modules\Finance\AddPayment.aspx" />
+    <Content Include="Modules\Finance\EditFeeStructure.aspx" />
+    <Content Include="Modules\Finance\FeeStructures.aspx" />
+    <Content Include="Modules\Finance\FeeManagement.aspx" />
+    <Content Include="Modules\Finance\FeeCategories.aspx" />
+    <Content Include="Modules\Finance\CreateInvoice.aspx" />
+    <Content Include="Modules\Finance\RecordPayment.aspx" />
+    <Content Include="Modules\Finance\BalanceTracking.aspx" />
+    <Content Include="Modules\Finance\FeeReports.aspx" />
+    <Content Include="Modules\Finance\ViewInvoice.aspx" />
+    <Content Include="Modules\Finance\PrintInvoice.aspx" />
+    <Content Include="Modules\Finance\PrintReceipt.aspx" />
+    <None Include="Database\Scripts\FeeManagementModule.sql" />
+    <Content Include="Modules\Finance\InvoiceDetails.aspx" />
+    <Content Include="Modules\Finance\Invoices.aspx" />
+    <Content Include="Modules\Finance\Payments.aspx" />
     <Content Include="Modules\Parents\AddParent.aspx" />
     <Content Include="Modules\Parents\AssignStudent.aspx" />
     <Content Include="Modules\Parents\EditParent.aspx" />
     <Content Include="Modules\Parents\ParentAccount.aspx" />
     <Content Include="Modules\Parents\ParentDetails.aspx" />
     <Content Include="Modules\Parents\Parents.aspx" />
+    <Content Include="Modules\Academic\Academics.aspx" />
+    <Content Include="Modules\Academic\AcademicYears.aspx" />
+    <Content Include="Modules\Academic\ClassesSections.aspx" />
+    <Content Include="Modules\Academic\Subjects.aspx" />
+    <Content Include="Modules\Academic\TeacherAssignments.aspx" />
+    <Content Include="Modules\Academic\Timetable.aspx" />
+    <Content Include="Modules\Academic\Promotions.aspx" />
+    <Content Include="Modules\Payroll\Payroll.aspx" />
+    <Content Include="Modules\Payroll\CreatePayRun.aspx" />
+    <Content Include="Modules\Payroll\PayrollDetails.aspx" />
+    <Content Include="Modules\Payroll\Payslip.aspx" />
+    <Content Include="Modules\Payroll\PayrollReports.aspx" />
+    <Content Include="Modules\Payroll\PayrollPeriods.aspx" />
     <Content Include="Modules\Staff\AddStaff.aspx" />
     <Content Include="Modules\Staff\EditStaff.aspx" />
     <Content Include="Modules\Staff\Staff.aspx" />
@@ -474,6 +505,126 @@
     <Compile Include="Modules\Dashboard\Dashboard.aspx.designer.cs">
       <DependentUpon>Dashboard.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Modules\Finance\AddFeeStructure.aspx.cs">
+      <DependentUpon>AddFeeStructure.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Finance\AddFeeStructure.aspx.designer.cs">
+      <DependentUpon>AddFeeStructure.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Finance\AddInvoice.aspx.cs">
+      <DependentUpon>AddInvoice.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Finance\AddInvoice.aspx.designer.cs">
+      <DependentUpon>AddInvoice.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Finance\AddPayment.aspx.cs">
+      <DependentUpon>AddPayment.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Finance\AddPayment.aspx.designer.cs">
+      <DependentUpon>AddPayment.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Finance\EditFeeStructure.aspx.cs">
+      <DependentUpon>EditFeeStructure.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Finance\EditFeeStructure.aspx.designer.cs">
+      <DependentUpon>EditFeeStructure.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Finance\FeeStructures.aspx.cs">
+      <DependentUpon>FeeStructures.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Finance\FeeRepository.cs" />
+    <Compile Include="Modules\Finance\FeeManagement.aspx.cs">
+      <DependentUpon>FeeManagement.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Finance\FeeManagement.aspx.designer.cs">
+      <DependentUpon>FeeManagement.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Finance\FeeCategories.aspx.cs">
+      <DependentUpon>FeeCategories.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Finance\FeeCategories.aspx.designer.cs">
+      <DependentUpon>FeeCategories.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Finance\CreateInvoice.aspx.cs">
+      <DependentUpon>CreateInvoice.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Finance\CreateInvoice.aspx.designer.cs">
+      <DependentUpon>CreateInvoice.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Finance\RecordPayment.aspx.cs">
+      <DependentUpon>RecordPayment.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Finance\RecordPayment.aspx.designer.cs">
+      <DependentUpon>RecordPayment.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Finance\BalanceTracking.aspx.cs">
+      <DependentUpon>BalanceTracking.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Finance\BalanceTracking.aspx.designer.cs">
+      <DependentUpon>BalanceTracking.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Finance\FeeReports.aspx.cs">
+      <DependentUpon>FeeReports.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Finance\FeeReports.aspx.designer.cs">
+      <DependentUpon>FeeReports.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Finance\ViewInvoice.aspx.cs">
+      <DependentUpon>ViewInvoice.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Finance\ViewInvoice.aspx.designer.cs">
+      <DependentUpon>ViewInvoice.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Finance\PrintInvoice.aspx.cs">
+      <DependentUpon>PrintInvoice.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Finance\PrintInvoice.aspx.designer.cs">
+      <DependentUpon>PrintInvoice.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Finance\PrintReceipt.aspx.cs">
+      <DependentUpon>PrintReceipt.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Finance\PrintReceipt.aspx.designer.cs">
+      <DependentUpon>PrintReceipt.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Finance\FeeStructures.aspx.designer.cs">
+      <DependentUpon>FeeStructures.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Finance\InvoiceDetails.aspx.cs">
+      <DependentUpon>InvoiceDetails.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Finance\InvoiceDetails.aspx.designer.cs">
+      <DependentUpon>InvoiceDetails.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Finance\Invoices.aspx.cs">
+      <DependentUpon>Invoices.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Finance\Invoices.aspx.designer.cs">
+      <DependentUpon>Invoices.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Finance\Payments.aspx.cs">
+      <DependentUpon>Payments.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Finance\Payments.aspx.designer.cs">
+      <DependentUpon>Payments.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Modules\Parents\AddParent.aspx.cs">
       <DependentUpon>AddParent.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -517,6 +668,99 @@
       <DependentUpon>Parents.aspx</DependentUpon>
     </Compile>
     <Compile Include="Modules\Parents\ParentsRepository.cs" />
+    <Compile Include="Modules\Payroll\Payroll.aspx.cs">
+      <DependentUpon>Payroll.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Payroll\Payroll.aspx.designer.cs">
+      <DependentUpon>Payroll.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Payroll\CreatePayRun.aspx.cs">
+      <DependentUpon>CreatePayRun.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Payroll\CreatePayRun.aspx.designer.cs">
+      <DependentUpon>CreatePayRun.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Payroll\PayrollDetails.aspx.cs">
+      <DependentUpon>PayrollDetails.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Payroll\PayrollDetails.aspx.designer.cs">
+      <DependentUpon>PayrollDetails.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Payroll\Payslip.aspx.cs">
+      <DependentUpon>Payslip.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Payroll\Payslip.aspx.designer.cs">
+      <DependentUpon>Payslip.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Payroll\PayrollReports.aspx.cs">
+      <DependentUpon>PayrollReports.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Payroll\PayrollReports.aspx.designer.cs">
+      <DependentUpon>PayrollReports.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Payroll\PayrollPeriods.aspx.cs">
+      <DependentUpon>PayrollPeriods.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Payroll\PayrollPeriods.aspx.designer.cs">
+      <DependentUpon>PayrollPeriods.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Payroll\PayrollRepository.cs" />
+    <Compile Include="Modules\Academic\AcademicsRepository.cs" />
+    <Compile Include="Modules\Academic\Academics.aspx.cs">
+      <DependentUpon>Academics.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Academic\Academics.aspx.designer.cs">
+      <DependentUpon>Academics.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Academic\AcademicYears.aspx.cs">
+      <DependentUpon>AcademicYears.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Academic\AcademicYears.aspx.designer.cs">
+      <DependentUpon>AcademicYears.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Academic\ClassesSections.aspx.cs">
+      <DependentUpon>ClassesSections.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Academic\ClassesSections.aspx.designer.cs">
+      <DependentUpon>ClassesSections.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Academic\Subjects.aspx.cs">
+      <DependentUpon>Subjects.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Academic\Subjects.aspx.designer.cs">
+      <DependentUpon>Subjects.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Academic\TeacherAssignments.aspx.cs">
+      <DependentUpon>TeacherAssignments.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Academic\TeacherAssignments.aspx.designer.cs">
+      <DependentUpon>TeacherAssignments.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Academic\Timetable.aspx.cs">
+      <DependentUpon>Timetable.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Academic\Timetable.aspx.designer.cs">
+      <DependentUpon>Timetable.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Academic\Promotions.aspx.cs">
+      <DependentUpon>Promotions.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Academic\Promotions.aspx.designer.cs">
+      <DependentUpon>Promotions.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Modules\Staff\AddStaff.aspx.cs">
       <DependentUpon>AddStaff.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -612,7 +856,6 @@
     <Folder Include="Modules\Administration\" />
     <Folder Include="Modules\Attendance\" />
     <Folder Include="Modules\Examination\" />
-    <Folder Include="Modules\Finance\" />
     <Folder Include="Modules\Reports\" />
     <Folder Include="Modules\Settings\" />
     <Folder Include="Modules\Teachers\" />

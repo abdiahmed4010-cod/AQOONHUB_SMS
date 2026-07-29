@@ -1,4 +1,4 @@
-﻿namespace AQOONHUB_SMS.Modules.Admission
+namespace AQOONHUB_SMS.Modules.Admission
 {
     public partial class Admissions
     {
@@ -9,16 +9,26 @@
         protected global::System.Web.UI.WebControls.Panel pnlError;
         protected global::System.Web.UI.WebControls.Label lblError;
 
+        protected global::System.Web.UI.WebControls.Label lblTotalCount;
+        protected global::System.Web.UI.WebControls.Label lblNewCount;
         protected global::System.Web.UI.WebControls.Label lblPendingCount;
         protected global::System.Web.UI.WebControls.Label lblUnderReviewCount;
         protected global::System.Web.UI.WebControls.Label lblApprovedCount;
         protected global::System.Web.UI.WebControls.Label lblRejectedCount;
+        protected global::System.Web.UI.WebControls.Label lblExpiredCount;
 
         protected global::System.Web.UI.WebControls.TextBox txtSearch;
         protected global::System.Web.UI.WebControls.DropDownList ddlStatus;
+        protected global::System.Web.UI.WebControls.DropDownList ddlClassFilter;
+        protected global::System.Web.UI.WebControls.TextBox txtFromDate;
+        protected global::System.Web.UI.WebControls.TextBox txtToDate;
         protected global::System.Web.UI.WebControls.LinkButton btnSearch;
         protected global::System.Web.UI.WebControls.LinkButton btnReset;
 
         protected global::System.Web.UI.WebControls.GridView gvAdmissions;
+        protected global::System.Web.UI.WebControls.Label lblResultInfo;
+
+        protected global::System.Web.UI.WebControls.Repeater rptRecent;
+        protected global::System.Web.UI.WebControls.Panel pnlNoRecent;
     }
 }

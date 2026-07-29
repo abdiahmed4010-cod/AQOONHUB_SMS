@@ -85,6 +85,11 @@
                 <asp:ListItem Text="Graduated" Value="Graduated" />
                 <asp:ListItem Text="Transferred" Value="Transferred" />
             </asp:DropDownList>
+            <asp:DropDownList ID="ddlShiftFilter" runat="server" CssClass="input !w-auto">
+                <asp:ListItem Text="All Shifts" Value="" />
+                <asp:ListItem Text="Morning" Value="Morning" />
+                <asp:ListItem Text="Afternoon" Value="Afternoon" />
+            </asp:DropDownList>
             <asp:LinkButton ID="btnSearch" runat="server" CssClass="btn btn-primary" OnClick="btnSearch_Click">Search</asp:LinkButton>
             <asp:LinkButton ID="btnReset" runat="server" CssClass="btn btn-secondary" OnClick="btnReset_Click" CausesValidation="false">Reset</asp:LinkButton>
         </div>
@@ -117,6 +122,13 @@
                         <asp:BoundField DataField="AdmissionNo" HeaderText="Admission No." SortExpression="AdmissionNo" HeaderStyle-CssClass="th" ItemStyle-CssClass="td" />
                         <asp:BoundField DataField="ClassName" HeaderText="Class" SortExpression="ClassName" HeaderStyle-CssClass="th" ItemStyle-CssClass="td" />
                         <asp:BoundField DataField="SectionName" HeaderText="Section" SortExpression="SectionName" HeaderStyle-CssClass="th" ItemStyle-CssClass="td" />
+                        <asp:TemplateField HeaderText="Shift" SortExpression="Shift">
+                            <HeaderStyle CssClass="th" />
+                            <ItemStyle CssClass="td" />
+                            <ItemTemplate>
+                                <span class="badge" style='<%# GetShiftBadgeStyle(Eval("Shift")) %>'><%# Eval("Shift") == null || Eval("Shift").ToString() == "" ? "—" : Eval("Shift") %></span>
+                            </ItemTemplate>
+                        </asp:TemplateField>
                         <asp:BoundField DataField="Gender" HeaderText="Gender" SortExpression="Gender" HeaderStyle-CssClass="th" ItemStyle-CssClass="td" />
                         <asp:BoundField DataField="DateOfBirth" HeaderText="Date of Birth" SortExpression="DateOfBirth" DataFormatString="{0:MMM dd, yyyy}" HeaderStyle-CssClass="th" ItemStyle-CssClass="td" />
                         <asp:BoundField DataField="GuardianName" HeaderText="Guardian" SortExpression="GuardianName" HeaderStyle-CssClass="th" ItemStyle-CssClass="td" />
@@ -135,6 +147,9 @@
                                 <div class="flex gap-1">
                                     <asp:HyperLink runat="server" CssClass="btn-ghost btn !p-1.5" NavigateUrl='<%# "~/Modules/Students/StudentDetails.aspx?id=" + Eval("StudentID") %>' ToolTip="View Details">
                                         <i data-lucide="eye" class="w-4 h-4"></i>
+                                    </asp:HyperLink>
+                                    <asp:HyperLink ID="lnkEditStudent" runat="server" CssClass="btn-ghost btn !p-1.5" Visible='<%# CanEdit %>' NavigateUrl='<%# "~/Modules/Students/EditStudent.aspx?id=" + Eval("StudentID") %>' ToolTip="Edit">
+                                        <i data-lucide="pencil" class="w-4 h-4"></i>
                                     </asp:HyperLink>
                                     <asp:HyperLink runat="server" CssClass="btn-ghost btn !p-1.5" NavigateUrl='<%# "~/Modules/Students/StudentTransfer.aspx?id=" + Eval("StudentID") %>'
                                         ToolTip='<%# Eval("Status").ToString() == "Transferred" ? "Return to School" : "Transfer" %>'>
