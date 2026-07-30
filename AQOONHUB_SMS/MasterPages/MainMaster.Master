@@ -230,14 +230,39 @@
                     <i data-lucide="user-check" class="w-[18px] h-[18px]" aria-hidden="true"></i>
                     <span>Attendance</span>
                 </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Examination/Exams.aspx") %>" data-nav="exams">
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Examinations/Examinations.aspx") %>" data-nav="examinations">
                     <i data-lucide="file-edit" class="w-[18px] h-[18px]" aria-hidden="true"></i>
                     <span>Examinations</span>
                 </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Examination/Transcripts.aspx") %>" data-nav="transcripts">
-                    <i data-lucide="scroll" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Transcript Center</span>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Examinations/CreateExamination.aspx") %>" data-nav="createexamination">
+                    <i data-lucide="plus-circle" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Create Examination</span>
                 </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Examinations/ExamSchedule.aspx") %>" data-nav="examschedule">
+                    <i data-lucide="calendar-clock" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Exam Schedule</span>
+                </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Examinations/MarksEntry.aspx") %>" data-nav="marksentry">
+                    <i data-lucide="pencil-ruler" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Marks Entry</span>
+                </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Examinations/Results.aspx") %>" data-nav="results">
+                    <i data-lucide="award" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Results</span>
+                </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Examinations/ReportCards.aspx") %>" data-nav="reportcards">
+                    <i data-lucide="file-text" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Report Cards</span>
+                </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Examinations/ExamRooms.aspx") %>" data-nav="examrooms">
+                    <i data-lucide="building" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Invigilators &amp; Rooms</span>
+                </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Examinations/GradingScales.aspx") %>" data-nav="gradingscales">
+                    <i data-lucide="award" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Grading Scales</span>
+                </a>
+                <%-- Marks Entry, Results, Report Cards are added in later stages. --%>
                 
                 <p class="nav-section">Finance</p>
                 <a class="nav-item" href="<%= ResolveUrl("~/Modules/Finance/FeeManagement.aspx") %>" data-nav="finance/feemanagement">

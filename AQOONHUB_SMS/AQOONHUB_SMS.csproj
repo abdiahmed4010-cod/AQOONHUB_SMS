@@ -191,6 +191,16 @@
     <Content Include="Modules\Parents\ParentAccount.aspx" />
     <Content Include="Modules\Parents\ParentDetails.aspx" />
     <Content Include="Modules\Parents\Parents.aspx" />
+    <Content Include="Modules\Examinations\Examinations.aspx" />
+    <Content Include="Modules\Examinations\GradingScales.aspx" />
+    <Content Include="Modules\Examinations\CreateExamination.aspx" />
+    <Content Include="Modules\Examinations\ExaminationDetails.aspx" />
+    <Content Include="Modules\Examinations\ExamSchedule.aspx" />
+    <Content Include="Modules\Examinations\ExamRooms.aspx" />
+    <Content Include="Modules\Examinations\MarksEntry.aspx" />
+    <Content Include="Modules\Examinations\Results.aspx" />
+    <Content Include="Modules\Examinations\ReportCard.aspx" />
+    <Content Include="Modules\Examinations\ReportCards.aspx" />
     <Content Include="Modules\Academic\Academics.aspx" />
     <Content Include="Modules\Academic\AcademicYears.aspx" />
     <Content Include="Modules\Academic\ClassesSections.aspx" />
@@ -712,6 +722,77 @@
     </Compile>
     <Compile Include="Modules\Payroll\PayrollRepository.cs" />
     <Compile Include="Modules\Academic\AcademicsRepository.cs" />
+    <Compile Include="Modules\Examinations\ExaminationsRepository.cs" />
+    <Compile Include="Modules\Examinations\Examinations.aspx.cs">
+      <DependentUpon>Examinations.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Examinations\Examinations.aspx.designer.cs">
+      <DependentUpon>Examinations.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Examinations\GradingScales.aspx.cs">
+      <DependentUpon>GradingScales.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Examinations\GradingScales.aspx.designer.cs">
+      <DependentUpon>GradingScales.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Examinations\CreateExamination.aspx.cs">
+      <DependentUpon>CreateExamination.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Examinations\CreateExamination.aspx.designer.cs">
+      <DependentUpon>CreateExamination.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Examinations\ExaminationDetails.aspx.cs">
+      <DependentUpon>ExaminationDetails.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Examinations\ExaminationDetails.aspx.designer.cs">
+      <DependentUpon>ExaminationDetails.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Examinations\ExamSchedule.aspx.cs">
+      <DependentUpon>ExamSchedule.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Examinations\ExamSchedule.aspx.designer.cs">
+      <DependentUpon>ExamSchedule.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Examinations\ExamRooms.aspx.cs">
+      <DependentUpon>ExamRooms.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Examinations\ExamRooms.aspx.designer.cs">
+      <DependentUpon>ExamRooms.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Examinations\MarksEntry.aspx.cs">
+      <DependentUpon>MarksEntry.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Examinations\MarksEntry.aspx.designer.cs">
+      <DependentUpon>MarksEntry.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Examinations\Results.aspx.cs">
+      <DependentUpon>Results.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Examinations\Results.aspx.designer.cs">
+      <DependentUpon>Results.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Examinations\ReportCard.aspx.cs">
+      <DependentUpon>ReportCard.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Examinations\ReportCard.aspx.designer.cs">
+      <DependentUpon>ReportCard.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Examinations\ReportCards.aspx.cs">
+      <DependentUpon>ReportCards.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Examinations\ReportCards.aspx.designer.cs">
+      <DependentUpon>ReportCards.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Modules\Academic\Academics.aspx.cs">
       <DependentUpon>Academics.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
