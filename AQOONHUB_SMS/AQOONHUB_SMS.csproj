@@ -201,6 +201,13 @@
     <Content Include="Modules\Examinations\Results.aspx" />
     <Content Include="Modules\Examinations\ReportCard.aspx" />
     <Content Include="Modules\Examinations\ReportCards.aspx" />
+    <Content Include="Modules\Attendance\Attendance.aspx" />
+    <Content Include="Modules\Attendance\MarkAttendance.aspx" />
+    <Content Include="Modules\Attendance\AttendanceByDate.aspx" />
+    <Content Include="Modules\Attendance\StudentAttendanceReport.aspx" />
+    <Content Include="Modules\Attendance\ClassAttendanceReport.aspx" />
+    <Content Include="Modules\Attendance\AttendanceCalendar.aspx" />
+    <Content Include="Modules\Attendance\AttendanceSettings.aspx" />
     <Content Include="Modules\Academic\Academics.aspx" />
     <Content Include="Modules\Academic\AcademicYears.aspx" />
     <Content Include="Modules\Academic\ClassesSections.aspx" />
@@ -793,6 +800,57 @@
     <Compile Include="Modules\Examinations\ReportCards.aspx.designer.cs">
       <DependentUpon>ReportCards.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Modules\Attendance\AttendanceRepository.cs" />
+    <Compile Include="Modules\Attendance\Attendance.aspx.cs">
+      <DependentUpon>Attendance.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Attendance\Attendance.aspx.designer.cs">
+      <DependentUpon>Attendance.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Attendance\MarkAttendance.aspx.cs">
+      <DependentUpon>MarkAttendance.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Attendance\MarkAttendance.aspx.designer.cs">
+      <DependentUpon>MarkAttendance.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Attendance\AttendanceUi.cs" />
+    <Compile Include="Modules\Attendance\AttendanceByDate.aspx.cs">
+      <DependentUpon>AttendanceByDate.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Attendance\AttendanceByDate.aspx.designer.cs">
+      <DependentUpon>AttendanceByDate.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Attendance\StudentAttendanceReport.aspx.cs">
+      <DependentUpon>StudentAttendanceReport.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Attendance\StudentAttendanceReport.aspx.designer.cs">
+      <DependentUpon>StudentAttendanceReport.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Attendance\ClassAttendanceReport.aspx.cs">
+      <DependentUpon>ClassAttendanceReport.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Attendance\ClassAttendanceReport.aspx.designer.cs">
+      <DependentUpon>ClassAttendanceReport.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Attendance\AttendanceCalendar.aspx.cs">
+      <DependentUpon>AttendanceCalendar.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Attendance\AttendanceCalendar.aspx.designer.cs">
+      <DependentUpon>AttendanceCalendar.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Attendance\AttendanceSettings.aspx.cs">
+      <DependentUpon>AttendanceSettings.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Attendance\AttendanceSettings.aspx.designer.cs">
+      <DependentUpon>AttendanceSettings.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Modules\Academic\Academics.aspx.cs">
       <DependentUpon>Academics.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -935,7 +993,6 @@
     <Folder Include="Assets\uploads\" />
     <Folder Include="Modules\Academic\" />
     <Folder Include="Modules\Administration\" />
-    <Folder Include="Modules\Attendance\" />
     <Folder Include="Modules\Examination\" />
     <Folder Include="Modules\Reports\" />
     <Folder Include="Modules\Settings\" />

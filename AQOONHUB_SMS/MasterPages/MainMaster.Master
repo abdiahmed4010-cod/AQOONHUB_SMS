@@ -230,6 +230,30 @@
                     <i data-lucide="user-check" class="w-[18px] h-[18px]" aria-hidden="true"></i>
                     <span>Attendance</span>
                 </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Attendance/MarkAttendance.aspx") %>" data-nav="markattendance">
+                    <i data-lucide="clipboard-check" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Mark Attendance</span>
+                </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Attendance/AttendanceByDate.aspx") %>" data-nav="attendancebydate">
+                    <i data-lucide="calendar-days" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Attendance by Date</span>
+                </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Attendance/StudentAttendanceReport.aspx") %>" data-nav="studentattendancereport">
+                    <i data-lucide="user" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Student Report</span>
+                </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Attendance/ClassAttendanceReport.aspx") %>" data-nav="classattendancereport">
+                    <i data-lucide="users" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Class Report</span>
+                </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Attendance/AttendanceCalendar.aspx") %>" data-nav="attendancecalendar">
+                    <i data-lucide="calendar" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Calendar</span>
+                </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Attendance/AttendanceSettings.aspx") %>" data-nav="attendancesettings">
+                    <i data-lucide="settings" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Attendance Settings</span>
+                </a>
                 <a class="nav-item" href="<%= ResolveUrl("~/Modules/Examinations/Examinations.aspx") %>" data-nav="examinations">
                     <i data-lucide="file-edit" class="w-[18px] h-[18px]" aria-hidden="true"></i>
                     <span>Examinations</span>
