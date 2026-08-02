@@ -33,6 +33,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <NoWarn>$(NoWarn);0108</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -42,6 +43,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <NoWarn>$(NoWarn);0108</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
@@ -917,7 +919,9 @@
     <Compile Include="Modules\Reports\ReportsRepository.Exports.cs" />
     <Compile Include="Modules\Reports\ReportsRepository.Audit.cs" />
     <Compile Include="Modules\Reports\ReportBuilderMetadata.cs" />
-    <Compile Include="Modules\Reports\ReportStage5Base.cs" />
+    <Compile Include="Modules\Reports\ReportStage5Base.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="Modules\Reports\ReportExportService.cs" />
     <Compile Include="Modules\Reports\ReportCategoryBase.cs">
       <SubType>ASPXCodeBehind</SubType>
@@ -1020,16 +1024,41 @@
     <Compile Include="Modules\Reports\PerformanceAnalytics.aspx.designer.cs">
       <DependentUpon>PerformanceAnalytics.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Modules\Reports\CustomReportBuilder.aspx.cs"><DependentUpon>CustomReportBuilder.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
-    <Compile Include="Modules\Reports\CustomReportBuilder.aspx.designer.cs"><DependentUpon>CustomReportBuilder.aspx</DependentUpon></Compile>
-    <Compile Include="Modules\Reports\SavedReports.aspx.cs"><DependentUpon>SavedReports.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
-    <Compile Include="Modules\Reports\SavedReports.aspx.designer.cs"><DependentUpon>SavedReports.aspx</DependentUpon></Compile>
-    <Compile Include="Modules\Reports\ScheduledReports.aspx.cs"><DependentUpon>ScheduledReports.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
-    <Compile Include="Modules\Reports\ScheduledReports.aspx.designer.cs"><DependentUpon>ScheduledReports.aspx</DependentUpon></Compile>
-    <Compile Include="Modules\Reports\ExportHistory.aspx.cs"><DependentUpon>ExportHistory.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
-    <Compile Include="Modules\Reports\ExportHistory.aspx.designer.cs"><DependentUpon>ExportHistory.aspx</DependentUpon></Compile>
-    <Compile Include="Modules\Reports\ReportAuditLog.aspx.cs"><DependentUpon>ReportAuditLog.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
-    <Compile Include="Modules\Reports\ReportAuditLog.aspx.designer.cs"><DependentUpon>ReportAuditLog.aspx</DependentUpon></Compile>
+    <Compile Include="Modules\Reports\CustomReportBuilder.aspx.cs">
+      <DependentUpon>CustomReportBuilder.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Reports\CustomReportBuilder.aspx.designer.cs">
+      <DependentUpon>CustomReportBuilder.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Reports\SavedReports.aspx.cs">
+      <DependentUpon>SavedReports.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Reports\SavedReports.aspx.designer.cs">
+      <DependentUpon>SavedReports.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Reports\ScheduledReports.aspx.cs">
+      <DependentUpon>ScheduledReports.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Reports\ScheduledReports.aspx.designer.cs">
+      <DependentUpon>ScheduledReports.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Reports\ExportHistory.aspx.cs">
+      <DependentUpon>ExportHistory.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Reports\ExportHistory.aspx.designer.cs">
+      <DependentUpon>ExportHistory.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Reports\ReportAuditLog.aspx.cs">
+      <DependentUpon>ReportAuditLog.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Reports\ReportAuditLog.aspx.designer.cs">
+      <DependentUpon>ReportAuditLog.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Modules\Academic\Academics.aspx.cs">
       <DependentUpon>Academics.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1223,4 +1252,24 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <ItemGroup>
+    <Content Include="Assets\css\system-module.css" />
+    <Content Include="Assets\css\system-completion.css" />
+    <Content Include="Assets\js\modules\system\system-module.js" />
+    <Content Include="Modules\Administration\Users.aspx" />
+    <Content Include="Modules\Administration\AuditLog.aspx" />
+    <Content Include="Modules\Administration\LoginActivity.aspx" />
+    <Content Include="Modules\Settings\Settings.aspx" />
+    <Compile Include="Modules\Administration\SystemAuthorization.cs" />
+    <Compile Include="Modules\Administration\SystemRepository.cs" />
+    <Compile Include="Modules\Administration\SystemSecurity.cs" />
+    <Compile Include="Modules\Administration\Users.aspx.cs"><DependentUpon>Users.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
+    <Compile Include="Modules\Administration\Users.aspx.designer.cs"><DependentUpon>Users.aspx</DependentUpon></Compile>
+    <Compile Include="Modules\Administration\AuditLog.aspx.cs"><DependentUpon>AuditLog.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
+    <Compile Include="Modules\Administration\AuditLog.aspx.designer.cs"><DependentUpon>AuditLog.aspx</DependentUpon></Compile>
+    <Compile Include="Modules\Administration\LoginActivity.aspx.cs"><DependentUpon>LoginActivity.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
+    <Compile Include="Modules\Administration\LoginActivity.aspx.designer.cs"><DependentUpon>LoginActivity.aspx</DependentUpon></Compile>
+    <Compile Include="Modules\Settings\Settings.aspx.cs"><DependentUpon>Settings.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
+    <Compile Include="Modules\Settings\Settings.aspx.designer.cs"><DependentUpon>Settings.aspx</DependentUpon></Compile>
+  </ItemGroup>
 </Project>

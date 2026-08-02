@@ -1,0 +1,2 @@
+using System;using System.Net.Mail;using System.Security.Cryptography;using System.Text;
+namespace AQOONHUB_SMS.Modules.Administration{public static class SecurityHelper{public static bool IsValidEmail(string value){try{return new MailAddress(value).Address==value;}catch{return false;}}public static string HashPassword(string value){using(var sha=SHA256.Create()){byte[] bytes=sha.ComputeHash(Encoding.UTF8.GetBytes(value));var b=new StringBuilder();foreach(byte x in bytes)b.Append(x.ToString("x2"));return b.ToString();}}}}

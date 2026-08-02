@@ -371,11 +371,13 @@
                 <%-- Stage 3-5 categories are added here as their pages are built, so no link ever 404s. --%>
                 <% } %>
 
-                <p class="nav-section">System</p>
+                <% if (CanAdminSystem || CanViewSystemSecurity) { %><p class="nav-section">System</p>
+                <% if (CanAdminSystem) { %>
                 <a class="nav-item" href="<%= ResolveUrl("~/Modules/Administration/Users.aspx") %>" data-nav="users">
                     <i data-lucide="shield" class="w-[18px] h-[18px]" aria-hidden="true"></i>
                     <span>Users &amp; Roles</span>
                 </a>
+                <% } %><% if (CanViewSystemSecurity) { %>
                 <a class="nav-item" href="<%= ResolveUrl("~/Modules/Administration/AuditLog.aspx") %>" data-nav="auditlog">
                     <i data-lucide="history" class="w-[18px] h-[18px]" aria-hidden="true"></i>
                     <span>Audit Log</span>
@@ -384,10 +386,12 @@
                     <i data-lucide="key-round" class="w-[18px] h-[18px]" aria-hidden="true"></i>
                     <span>Login Activity</span>
                 </a>
+                <% } %><% if (CanAdminSystem) { %>
                 <a class="nav-item" href="<%= ResolveUrl("~/Modules/Settings/Settings.aspx") %>" data-nav="settings">
                     <i data-lucide="settings" class="w-[18px] h-[18px]" aria-hidden="true"></i>
                     <span>Settings</span>
                 </a>
+                <% } %><% } %>
             </nav>
             
             <div class="p-4 border-t border-white/10 shrink-0">
