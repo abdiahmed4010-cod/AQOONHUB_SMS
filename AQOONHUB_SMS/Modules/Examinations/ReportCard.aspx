@@ -57,7 +57,7 @@
                     </div>
 
                     <table class="rc-tbl">
-                        <thead><tr><th>Subject</th><th>Max Marks</th><th>Obtained</th><th>%</th><th>Grade</th><th>Attendance</th><th>Remarks</th></tr></thead>
+                        <thead><tr><th scope="col">Subject</th><th scope="col">Max Marks</th><th scope="col">Obtained</th><th scope="col">%</th><th scope="col">Grade</th><th scope="col">Attendance</th><th scope="col">Remarks</th></tr></thead>
                         <asp:Repeater ID="rptSubjects" runat="server">
                             <ItemTemplate>
                                 <tr>

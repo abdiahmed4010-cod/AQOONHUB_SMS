@@ -120,6 +120,11 @@ namespace AQOONHUB_SMS.MasterPages
             return Session["UserName"] as string ?? "Guest";
         }
 
+        public string GetCurrentUserEmail()
+        {
+            return Session["UserEmail"] as string ?? string.Empty;
+        }
+
         public string GetCurrentUserRole()
         {
             // Canonical session key set by Login is "Role" (fallback to legacy "UserRole").

@@ -55,12 +55,12 @@ namespace AQOONHUB_SMS.Modules.Finance
         void Export()
         {
             DataTable d = Data();
-            StringBuilder b = new StringBuilder();
-            foreach (DataColumn c in d.Columns) b.Append('"').Append(c.ColumnName.Replace("\"", "\"\"")).Append("\",");
+            StringBuilder b = new StringBuilder("\uFEFF");
+            foreach (DataColumn c in d.Columns) b.Append(CsvCell(c.ColumnName)).Append(',');
             b.AppendLine();
             foreach (DataRow r in d.Rows)
             {
-                foreach (object v in r.ItemArray) b.Append('"').Append(Convert.ToString(v).Replace("\"", "\"\"")).Append("\",");
+                foreach (object v in r.ItemArray) b.Append(CsvCell(Convert.ToString(v))).Append(',');
                 b.AppendLine();
             }
             Response.Clear();
@@ -68,6 +68,13 @@ namespace AQOONHUB_SMS.Modules.Finance
             Response.AddHeader("Content-Disposition", "attachment; filename=fee-report.csv");
             Response.Write(b.ToString());
             Response.End();
+        }
+
+        private static string CsvCell(string value)
+        {
+            string s = value ?? string.Empty;
+            if (s.Length > 0 && "=+-@\t\r".IndexOf(s[0]) >= 0) s = "'" + s;
+            return "\"" + s.Replace("\"", "\"\"") + "\"";
         }
     }
 }

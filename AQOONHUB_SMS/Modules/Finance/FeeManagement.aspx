@@ -176,8 +176,8 @@
                     <table class="w-full">
                         <thead>
                             <tr>
-                                <th class="th">Invoice</th><th class="th">Student</th><th class="th">Fee Type</th>
-                                <th class="th">Amount</th><th class="th">Balance</th><th class="th">Status</th><th class="th">Action</th>
+                                <th class="th" scope="col">Invoice</th><th class="th" scope="col">Student</th><th class="th" scope="col">Fee Type</th>
+                                <th class="th" scope="col">Amount</th><th class="th" scope="col">Balance</th><th class="th" scope="col">Status</th><th class="th" scope="col">Action</th>
                             </tr>
                         </thead>
                         <tbody>

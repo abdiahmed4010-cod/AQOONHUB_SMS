@@ -346,16 +346,6 @@
                     <span>Payroll</span>
                 </a>
                 
-                <p class="nav-section">Communication</p>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Administration/Announcements.aspx") %>" data-nav="announcements">
-                    <i data-lucide="megaphone" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Announcements</span>
-                </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Administration/Events.aspx") %>" data-nav="events">
-                    <i data-lucide="calendar" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Events Calendar</span>
-                </a>
-                
                 <% if (!IsParentRole && CanAccessReports) { %>
                 <p class="nav-section">Reports</p>
                 <a class="nav-item" href="<%= ResolveUrl("~/Modules/Reports/Reports.aspx") %>" data-nav="reports">
@@ -398,8 +388,8 @@
                 <div class="rounded-xl bg-white/5 p-3 flex items-center gap-3">
                     <span class="avatar" style="width:36px;height:36px;font-size:13.5px;background:#7C3AED" aria-hidden="true">AY</span>
                     <div class="min-w-0">
-                        <p class="text-xs font-bold truncate" id="sidebar-user-name">Amina Yusuf</p>
-                        <p class="text-[10px] text-indigo-300">Super Admin</p>
+                        <p class="text-xs font-bold truncate" id="sidebar-user-name"><%= Server.HtmlEncode(GetCurrentUserName()) %></p>
+                        <p class="text-[10px] text-indigo-300"><%= Server.HtmlEncode(GetCurrentUserRole()) %></p>
                     </div>
                     <asp:LinkButton ID="lnkSidebarLogout" runat="server" CssClass="ml-auto text-indigo-300 hover:text-white p-1 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50" 
                         ToolTip="Sign out" OnClientClick="return confirmLogout();" OnClick="lnkLogout_Click" aria-label="Sign out">
@@ -436,50 +426,6 @@
                 <div class="ml-auto flex items-center gap-1.5">
                     <span class="hidden md:inline-flex badge mr-1" style="background:#7C3AED18;color:#7C3AED">Super Admin view</span>
                     
-                    <!-- Notifications Dropdown -->
-                    <div class="relative">
-                        <button type="button" class="btn-ghost btn !p-2 relative" onclick="toggleDropdown('dd-notif')" title="Notifications" aria-label="Notifications" aria-haspopup="true" aria-expanded="false">
-                            <i data-lucide="bell" class="w-5 h-5" aria-hidden="true"></i>
-                            <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500" aria-hidden="true"></span>
-                        </button>
-                        <div id="dd-notif" class="hidden absolute right-0 mt-2 w-80 card shadow-pop p-2 z-50" role="menu" aria-label="Notifications menu">
-                            <div class="flex items-center justify-between px-2 py-1.5">
-                                <p class="text-sm font-bold">Notifications</p>
-                                <button type="button" class="text-xs text-brand-600 font-semibold hover:underline" onclick="markAllRead()">Mark all read</button>
-                            </div>
-                            <a href="#" class="flex gap-3 p-2.5 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700/50" role="menuitem">
-                                <span class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style="background:#F59E0B18;color:#F59E0B" aria-hidden="true">
-                                    <i data-lucide="alert-circle" class="w-4 h-4"></i>
-                                </span>
-                                <div class="min-w-0">
-                                    <p class="text-xs font-semibold leading-snug">2 invoices are overdue</p>
-                                    <p class="text-[11px] text-gray-500 dark:text-slate-400 truncate">INV-2026-0004 · INV-2026-0008</p>
-                                    <p class="text-[10px] text-gray-400 mt-0.5">2h ago</p>
-                                </div>
-                            </a>
-                            <a href="#" class="flex gap-3 p-2.5 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700/50" role="menuitem">
-                                <span class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style="background:#2563EB18;color:#2563EB" aria-hidden="true">
-                                    <i data-lucide="clipboard-list" class="w-4 h-4"></i>
-                                </span>
-                                <div class="min-w-0">
-                                    <p class="text-xs font-semibold leading-snug">2 admission applications awaiting review</p>
-                                    <p class="text-[11px] text-gray-500 dark:text-slate-400 truncate">APP-0101 · APP-0104</p>
-                                    <p class="text-[10px] text-gray-400 mt-0.5">5h ago</p>
-                                </div>
-                            </a>
-                            <a href="#" class="flex gap-3 p-2.5 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700/50 opacity-60" role="menuitem">
-                                <span class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style="background:#22C55E18;color:#22C55E" aria-hidden="true">
-                                    <i data-lucide="user-check" class="w-4 h-4"></i>
-                                </span>
-                                <div class="min-w-0">
-                                    <p class="text-xs font-semibold leading-snug">Leave request from Asha Ali</p>
-                                    <p class="text-[11px] text-gray-500 dark:text-slate-400 truncate">Sick leave · Jul 20–21</p>
-                                    <p class="text-[10px] text-gray-400 mt-0.5">1d ago</p>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                    
                     <!-- Theme Toggle -->
                     <button type="button" class="btn-ghost btn !p-2" onclick="toggleTheme()" title="Toggle dark mode" aria-label="Toggle dark mode">
                         <i data-lucide="moon" id="theme-icon" class="w-5 h-5" aria-hidden="true"></i>
@@ -493,20 +439,8 @@
                         </button>
                         <div id="dd-user" class="hidden absolute right-0 mt-2 w-64 card shadow-pop p-2 z-50" role="menu" aria-label="User menu">
                             <div class="px-3 py-2.5 border-b border-gray-100 dark:border-slate-700 mb-1">
-                                <p class="text-sm font-bold">Amina Yusuf</p>
-                                <p class="text-xs text-gray-500 dark:text-slate-400">amina.yusuf@aqoonhub.edu</p>
-                            </div>
-                            <a href="<%= ResolveUrl("~/Modules/Settings/Profile.aspx") %>" class="nav-item !text-gray-600 dark:!text-slate-300 hover:!bg-gray-100 dark:hover:!bg-slate-700" role="menuitem">
-                                <i data-lucide="user" class="w-4 h-4" aria-hidden="true"></i> Profile Settings
-                            </a>
-                            <p class="nav-section !text-gray-400 !pt-2">Switch role (demo)</p>
-                            <div class="grid grid-cols-2 gap-1 px-1 pb-1">
-                                <button type="button" class="text-[11px] font-semibold rounded-lg px-2 py-1.5 text-left bg-brand-600 text-white">Super Admin</button>
-                                <button type="button" class="text-[11px] font-semibold rounded-lg px-2 py-1.5 text-left bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 hover:opacity-80">Admin / Registrar</button>
-                                <button type="button" class="text-[11px] font-semibold rounded-lg px-2 py-1.5 text-left bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 hover:opacity-80">Teacher</button>
-                                <button type="button" class="text-[11px] font-semibold rounded-lg px-2 py-1.5 text-left bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 hover:opacity-80">Accountant</button>
-                                <button type="button" class="text-[11px] font-semibold rounded-lg px-2 py-1.5 text-left bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 hover:opacity-80">HR / Staff Manager</button>
-                                <button type="button" class="text-[11px] font-semibold rounded-lg px-2 py-1.5 text-left bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 hover:opacity-80">Parent</button>
+                                <p class="text-sm font-bold"><%= Server.HtmlEncode(GetCurrentUserName()) %></p>
+                                <p class="text-xs text-gray-500 dark:text-slate-400"><%= Server.HtmlEncode(GetCurrentUserEmail()) %></p>
                             </div>
                             <asp:LinkButton ID="lnkHeaderLogout" runat="server" CssClass="nav-item w-full !text-red-500 hover:!bg-red-50 dark:hover:!bg-red-500/10" 
                                 OnClientClick="return confirmLogout();" OnClick="lnkLogout_Click" role="menuitem">

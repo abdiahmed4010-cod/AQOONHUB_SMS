@@ -127,7 +127,7 @@ namespace AQOONHUB_SMS.Modules.Payroll
             if (!authorized)
             {
                 Response.Redirect(
-                    ResolveUrl("~/access-denied.html"),
+                    ResolveUrl("~/Modules/Dashboard/Dashboard.aspx?denied=payroll"),
                     false);
                 Context.ApplicationInstance.CompleteRequest();
                 return false;

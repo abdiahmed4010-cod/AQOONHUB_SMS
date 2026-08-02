@@ -147,7 +147,7 @@ namespace AQOONHUB_SMS.Modules.Examinations
             string termName = ex != null ? Convert.ToString(ex["TermName"]) : "";
             bool published = _repo.ResultsArePublished(CurrentExamId);
 
-            StringBuilder b = new StringBuilder();
+            StringBuilder b = new StringBuilder("\uFEFF");
             string[] headers = { "Student Code", "Student Name", "Academic Year", "Term", "Examination", "Class", "Section", "Total Obtained", "Total Maximum", "Average %", "Overall Grade", "Rank", "Result Status", "Publication Status" };
             foreach (string h in headers) b.Append(Csv(h)).Append(',');
             b.AppendLine();

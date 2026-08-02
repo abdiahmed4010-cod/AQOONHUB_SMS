@@ -33,7 +33,7 @@ namespace AQOONHUB_SMS.App_Code.BusinessLogic
             }
 
             // Get user by email
-            string query = "SELECT * FROM Users WHERE Email = @Email";
+            string query = "SELECT UserID, FullName, Email, PasswordHash, Phone, Role, IsActive, LastLogin, CreatedAt FROM dbo.Users WHERE Email = @Email";
             SqlParameter[] parameters = new SqlParameter[]
             {
                 new SqlParameter("@Email", email)
@@ -93,7 +93,7 @@ namespace AQOONHUB_SMS.App_Code.BusinessLogic
         public bool ChangePassword(int userId, string currentPassword, string newPassword, int changedBy)
         {
             // Get user
-            string query = "SELECT * FROM Users WHERE UserID = @UserID";
+            string query = "SELECT UserID, PasswordHash FROM dbo.Users WHERE UserID = @UserID";
             SqlParameter[] parameters = new SqlParameter[]
             {
                 new SqlParameter("@UserID", userId)
@@ -214,7 +214,7 @@ namespace AQOONHUB_SMS.App_Code.BusinessLogic
         public DataTable GetAllUsers()
         {
             string query = @"
-                SELECT u.*, 
+                SELECT u.UserID, u.FullName, u.Email, u.Phone, u.Role, u.IsActive, u.LastLogin, u.CreatedAt, u.UpdatedAt,
                     CASE WHEN s.StaffID IS NOT NULL THEN 'Staff' 
                          WHEN g.GuardianID IS NOT NULL THEN 'Parent' 
                          ELSE 'System' END as UserType
@@ -228,7 +228,7 @@ namespace AQOONHUB_SMS.App_Code.BusinessLogic
 
         public User GetUser(int userId)
         {
-            string query = "SELECT * FROM Users WHERE UserID = @UserID";
+            string query = "SELECT UserID, FullName, Email, Phone, Role, IsActive, LastLogin, CreatedAt FROM dbo.Users WHERE UserID = @UserID";
             SqlParameter[] parameters = new SqlParameter[]
             {
                 new SqlParameter("@UserID", userId)

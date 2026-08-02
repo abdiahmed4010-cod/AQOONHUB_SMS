@@ -32,7 +32,7 @@ namespace AQOONHUB_SMS.App_Code.DataAccess
         {
             List<User> users = new List<User>();
 
-            string query = "SELECT * FROM Users ORDER BY FullName";
+            string query = "SELECT UserID, FullName, Email, PasswordHash, Phone, Role, IsActive, LastLogin, CreatedAt, UpdatedAt FROM dbo.Users ORDER BY FullName";
 
             DataTable dt = db.ExecuteQuery(query);
 
@@ -49,7 +49,7 @@ namespace AQOONHUB_SMS.App_Code.DataAccess
         /// </summary>
         public User GetUserById(int userId)
         {
-            string query = "SELECT * FROM Users WHERE UserID = @UserID";
+            string query = "SELECT UserID, FullName, Email, PasswordHash, Phone, Role, IsActive, LastLogin, CreatedAt, UpdatedAt FROM dbo.Users WHERE UserID = @UserID";
 
             SqlParameter[] parameters = new SqlParameter[]
             {
@@ -69,7 +69,7 @@ namespace AQOONHUB_SMS.App_Code.DataAccess
         /// </summary>
         public User GetUserByEmail(string email)
         {
-            string query = "SELECT * FROM Users WHERE Email = @Email";
+            string query = "SELECT UserID, FullName, Email, PasswordHash, Phone, Role, IsActive, LastLogin, CreatedAt, UpdatedAt FROM dbo.Users WHERE Email = @Email";
 
             SqlParameter[] parameters = new SqlParameter[]
             {

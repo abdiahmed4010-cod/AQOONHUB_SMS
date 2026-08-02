@@ -32,9 +32,9 @@
                 <p class="text-sm text-gray-500 dark:text-slate-400 mt-1">Register, manage and track all enrolled students.</p>
             </div>
             <div class="flex items-center gap-2 flex-wrap">
-                <asp:HyperLink ID="lnkExport" runat="server" CssClass="btn btn-secondary" NavigateUrl="~/Modules/Reports/Export.aspx?module=students">
+                <asp:LinkButton ID="lnkExport" runat="server" CssClass="btn btn-secondary" OnClick="lnkExport_Click" CausesValidation="false">
                     <i data-lucide="download" class="w-4 h-4"></i> Export
-                </asp:HyperLink>
+                </asp:LinkButton>
                 <asp:HyperLink ID="lnkAddStudent" runat="server" CssClass="btn btn-primary" NavigateUrl="~/Modules/Students/AddStudent.aspx">
                     <i data-lucide="user-plus" class="w-4 h-4"></i> Add Student
                 </asp:HyperLink>
@@ -42,7 +42,7 @@
         </div>
 
         <!-- Summary Tiles -->
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-5">
+        <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4 mb-5">
             <div class="card p-5 stat-tile">
                 <span class="ic" style="background:#EFF6FF;color:#2563EB"><i data-lucide="graduation-cap" class="w-5 h-5"></i></span>
                 <div><p class="lbl">Total</p><p class="val"><asp:Label ID="lblTotalStudents" runat="server" Text="0" /></p></div>

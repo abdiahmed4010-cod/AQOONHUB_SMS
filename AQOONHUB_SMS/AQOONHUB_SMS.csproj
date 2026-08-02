@@ -14,7 +14,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>AQOONHUB_SMS</RootNamespace>
     <AssemblyName>AQOONHUB_SMS</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <UseIISExpress>true</UseIISExpress>
     <Use64BitIISExpress />
     <IISExpressSSLPort>44388</IISExpressSSLPort>
@@ -1253,6 +1253,27 @@
   </Target>
   -->
   <ItemGroup>
+    <Content Include="README.md" />
+    <Content Include="SYSTEM_OVERVIEW.md" />
+    <Content Include="INSTALLATION_GUIDE.md" />
+    <Content Include="DATABASE_SETUP.md" />
+    <Content Include="ROLE_PERMISSION_MATRIX.md" />
+    <Content Include="MODULE_STATUS.md" />
+    <Content Include="TESTING_REPORT.md" />
+    <Content Include="DEPLOYMENT_GUIDE.md" />
+    <Content Include="DEMO_GUIDE.md" />
+    <Content Include="Database\Deployment\README.md" />
+    <Content Include="Database\Deployment\00_CreateDatabase.sql" />
+    <Content Include="Database\Deployment\01_BaseSchema.sql" />
+    <Content Include="Database\Deployment\02_Constraints.sql" />
+    <Content Include="Database\Deployment\03_Indexes.sql" />
+    <Content Include="Database\Deployment\04_ViewsAndProcedures.sql" />
+    <Content Include="Database\Deployment\05_ReferenceSeed.sql" />
+    <Content Include="Database\Deployment\06_ModuleMigrations.sql" />
+    <Content Include="Database\Deployment\07_VerifyDeployment.sql" />
+    <Content Include="Database\Deployment\TrustForeignKeys.sql" />
+    <Content Include="Database\Deployment\Deploy-All.ps1" />
+    <Content Include="Database\Deployment\VerifyDeployment.sql" />
     <Content Include="Assets\css\system-module.css" />
     <Content Include="Assets\css\system-completion.css" />
     <Content Include="Assets\js\modules\system\system-module.js" />

@@ -42,7 +42,7 @@ namespace AQOONHUB_SMS.App_Code.BusinessLogic
             }
 
             // Get user by email
-            string query = "SELECT * FROM Users WHERE Email = @Email";
+            string query = "SELECT UserID, FullName, Email, PasswordHash, Phone, Role, IsActive, LastLogin, CreatedAt FROM dbo.Users WHERE Email = @Email";
             SqlParameter[] parameters = new SqlParameter[]
             {
                 new SqlParameter("@Email", email)
@@ -182,7 +182,7 @@ namespace AQOONHUB_SMS.App_Code.BusinessLogic
         public bool ChangePassword(int userId, string currentPassword, string newPassword, int changedBy)
         {
             // Get user
-            string query = "SELECT * FROM Users WHERE UserID = @UserID";
+            string query = "SELECT UserID, PasswordHash FROM dbo.Users WHERE UserID = @UserID";
             SqlParameter[] parameters = new SqlParameter[]
             {
                 new SqlParameter("@UserID", userId)

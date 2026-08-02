@@ -94,7 +94,7 @@ namespace AQOONHUB_SMS.Modules.Payroll
         protected void btnExport_Click(object sender, EventArgs e)
         {
             DataTable dt = _repo.GetPayrollByDepartment(PeriodFilter(), ddlStatus.SelectedValue);
-            StringBuilder b = new StringBuilder();
+            StringBuilder b = new StringBuilder("\uFEFF");
             foreach (DataColumn c in dt.Columns) b.Append(CsvCell(c.ColumnName)).Append(',');
             b.AppendLine();
             foreach (DataRow row in dt.Rows)

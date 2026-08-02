@@ -100,8 +100,8 @@
                     <table class="w-full">
                         <thead>
                             <tr>
-                                <th class="th">#</th><th class="th">Category Name</th><th class="th">Code</th>
-                                <th class="th">Billing Term</th><th class="th">Description</th><th class="th">Status</th><th class="th">Actions</th>
+                                <th class="th" scope="col">#</th><th class="th" scope="col">Category Name</th><th class="th" scope="col">Code</th>
+                                <th class="th" scope="col">Billing Term</th><th class="th" scope="col">Description</th><th class="th" scope="col">Status</th><th class="th" scope="col">Actions</th>
                             </tr>
                         </thead>
                         <tbody>

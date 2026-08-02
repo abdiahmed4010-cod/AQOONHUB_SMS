@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Text;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
@@ -117,7 +118,7 @@ namespace AQOONHUB_SMS.Modules.Students
 
             if (role.Equals("Accountant", StringComparison.OrdinalIgnoreCase))
             {
-                Response.Redirect("~/Modules/Authentication/NotAuthorized.aspx", true);
+                Response.Redirect("~/Modules/Dashboard/Dashboard.aspx?denied=students", true);
                 return false;
             }
 
@@ -375,6 +376,41 @@ namespace AQOONHUB_SMS.Modules.Students
             SortExpression = "CreatedAt";
             SortDirection = "DESC";
             LoadStudents();
+        }
+
+        protected void lnkExport_Click(object sender, EventArgs e)
+        {
+            string whereClause;
+            List<SqlParameter> parameters;
+            BuildStudentFilter(out whereClause, out parameters);
+            string query = @"
+                SELECT s.StudentCode, s.AdmissionNo,
+                    LTRIM(RTRIM(ISNULL(s.FirstName, '') + ' ' + ISNULL(s.LastName, ''))) AS FullName,
+                    s.Gender, c.ClassName, sec.SectionName, s.Shift,
+                    g.FullName AS GuardianName, g.Phone AS GuardianPhone,
+                    s.EnrollmentDate, s.Status
+                FROM Students s
+                INNER JOIN Guardians g ON s.GuardianID = g.GuardianID
+                INNER JOIN Sections sec ON s.SectionID = sec.SectionID
+                INNER JOIN Classes c ON sec.ClassID = c.ClassID
+                LEFT JOIN AcademicYears ay ON s.AcademicYearID = ay.AcademicYearID" + whereClause +
+                " ORDER BY s.StudentCode";
+            DataTable rows = ExecuteQuery(query, CloneParameters(parameters));
+            StringBuilder csv = new StringBuilder("\uFEFFStudent Code,Admission No,Student Name,Gender,Class,Section,Shift,Guardian,Guardian Phone,Enrollment Date,Status\r\n");
+            foreach (DataRow row in rows.Rows)
+                csv.AppendLine(Csv(row["StudentCode"]) + "," + Csv(row["AdmissionNo"]) + "," + Csv(row["FullName"]) + "," + Csv(row["Gender"]) + "," + Csv(row["ClassName"]) + "," + Csv(row["SectionName"]) + "," + Csv(row["Shift"]) + "," + Csv(row["GuardianName"]) + "," + Csv(row["GuardianPhone"]) + "," + Csv(row["EnrollmentDate"]) + "," + Csv(row["Status"]));
+            Response.Clear();
+            Response.ContentType = "text/csv";
+            Response.AddHeader("Content-Disposition", "attachment; filename=students-" + DateTime.Now.ToString("yyyyMMdd-HHmm") + ".csv");
+            Response.BinaryWrite(Encoding.UTF8.GetBytes(csv.ToString()));
+            Response.End();
+        }
+
+        private static string Csv(object value)
+        {
+            string text = Convert.ToString(value);
+            if (text.Length > 0 && "=+-@\t\r".IndexOf(text[0]) >= 0) text = "'" + text;
+            return "\"" + text.Replace("\"", "\"\"") + "\"";
         }
 
         protected void ddlPageSize_SelectedIndexChanged(object sender, EventArgs e)

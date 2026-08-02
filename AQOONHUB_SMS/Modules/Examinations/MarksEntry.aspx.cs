@@ -208,7 +208,7 @@ namespace AQOONHUB_SMS.Modules.Examinations
             if (ExamV() <= 0 || SectionV() <= 0 || SubjectV() <= 0) { Show(false, "Select an examination, section and subject to export."); return; }
             DataTable dt = _repo.GetStudentsForMarksEntry(ExamV(), SectionV(), SubjectV());
             int total = CurrentTotalMarks();
-            StringBuilder b = new StringBuilder();
+            StringBuilder b = new StringBuilder("\uFEFF");
             string[] headers = { "Student Code", "Student Name", "Admission No", "Score", "Total Marks", "Grade", "Attendance", "Remarks", "Status" };
             foreach (string h in headers) b.Append(Csv(h)).Append(',');
             b.AppendLine();
