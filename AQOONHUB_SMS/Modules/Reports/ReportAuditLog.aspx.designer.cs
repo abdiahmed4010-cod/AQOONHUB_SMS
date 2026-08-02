@@ -1,0 +1,1 @@
+namespace AQOONHUB_SMS.Modules.Reports{public partial class ReportAuditLog{protected global::System.Web.UI.WebControls.Literal litTotal,litSuccess,litFailed,litExports,litSchedules,litSaved;protected global::System.Web.UI.WebControls.GridView gv;}}

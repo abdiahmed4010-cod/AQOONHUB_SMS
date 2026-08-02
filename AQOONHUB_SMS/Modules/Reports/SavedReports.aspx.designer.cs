@@ -1,0 +1,1 @@
+namespace AQOONHUB_SMS.Modules.Reports{public partial class SavedReports{protected global::System.Web.UI.WebControls.Literal litMessage,litTotal,litPrivate,litRole,litSchool,litActive,litRecent;protected global::System.Web.UI.WebControls.GridView gv;}}

@@ -9,7 +9,7 @@
     <title><%: Page.Title %> - My ASP.NET Application</title>
 
     <asp:PlaceHolder runat="server">
-        <%: Scripts.Render("~/bundles/modernizr") %>
+        <%: System.Web.Optimization.Scripts.Render("~/bundles/modernizr") %>
     </asp:PlaceHolder>
 
     <%-- webopt:bundlereference removed: the Microsoft.AspNet.Web.Optimization.WebForms

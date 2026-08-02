@@ -117,7 +117,6 @@
     <Content Include="Assets\js\core\validation.js" />
     <Content Include="Assets\js\modules\finance\finance.js" />
     <Content Include="Assets\js\modules\parents\parents.js" />
-    <Content Include="Assets\js\modules\reports\reports.js" />
     <Content Include="Assets\js\modules\settings\settings.js" />
     <Content Include="Assets\js\modules\staff\staff.js" />
     <Content Include="Assets\js\modules\teachers\teachers.js" />
@@ -207,7 +206,32 @@
     <Content Include="Modules\Attendance\StudentAttendanceReport.aspx" />
     <Content Include="Modules\Attendance\ClassAttendanceReport.aspx" />
     <Content Include="Modules\Attendance\AttendanceCalendar.aspx" />
+    <Content Include="Modules\Attendance\ImportAttendance.aspx" />
+    <Content Include="Modules\Attendance\AttendanceAnalytics.aspx" />
+    <Content Include="Modules\Attendance\AttendanceAlerts.aspx" />
+    <Content Include="Modules\Attendance\ParentAttendance.aspx" />
     <Content Include="Modules\Attendance\AttendanceSettings.aspx" />
+    <Content Include="Modules\Reports\Reports.aspx" />
+    <Content Include="Modules\Reports\ReportViewer.aspx" />
+    <Content Include="Modules\Reports\StudentReports.aspx" />
+    <Content Include="Modules\Reports\AcademicReports.aspx" />
+    <Content Include="Modules\Reports\TeacherStaffReports.aspx" />
+    <Content Include="Modules\Reports\EnrollmentReports.aspx" />
+    <Content Include="Modules\Reports\GuardianReports.aspx" />
+    <Content Include="Modules\Reports\LibraryReports.aspx" />
+    <Content Include="Modules\Reports\ExaminationReports.aspx" />
+    <Content Include="Modules\Reports\AttendanceReports.aspx" />
+    <Content Include="Modules\Reports\FinanceReports.aspx" />
+    <Content Include="Modules\Reports\PayrollReports.aspx" />
+    <Content Include="Modules\Reports\SecurityReports.aspx" />
+    <Content Include="Modules\Reports\PerformanceAnalytics.aspx" />
+    <Content Include="Modules\Reports\CustomReportBuilder.aspx" />
+    <Content Include="Modules\Reports\SavedReports.aspx" />
+    <Content Include="Modules\Reports\ScheduledReports.aspx" />
+    <Content Include="Modules\Reports\ExportHistory.aspx" />
+    <Content Include="Modules\Reports\ReportAuditLog.aspx" />
+    <Content Include="Assets\css\reports-stage5.css" />
+    <Content Include="Database\Scripts\ReportsStage5.sql" />
     <Content Include="Modules\Academic\Academics.aspx" />
     <Content Include="Modules\Academic\AcademicYears.aspx" />
     <Content Include="Modules\Academic\ClassesSections.aspx" />
@@ -301,10 +325,7 @@
     <Content Include="App_Code\Models\Notification.cs" />
     <Content Include="App_Code\DataAccess\NotificationDAL.cs" />
     <Content Include="App_Code\BusinessLogic\NotificationBLL.cs" />
-    <Content Include="App_Code\Models\Report.cs" />
     <Content Include="App_Code\Models\Settings.cs" />
-    <Content Include="App_Code\DataAccess\ReportDAL.cs" />
-    <Content Include="App_Code\BusinessLogic\ReportBLL.cs" />
     <Content Include="App_Code\DataAccess\SettingsDAL.cs" />
     <Content Include="App_Code\BusinessLogic\SettingsBLL.cs" />
     <Content Include="App_Code\Models\AcademicYear.cs" />
@@ -844,6 +865,34 @@
     <Compile Include="Modules\Attendance\AttendanceCalendar.aspx.designer.cs">
       <DependentUpon>AttendanceCalendar.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Modules\Attendance\ImportAttendance.aspx.cs">
+      <DependentUpon>ImportAttendance.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Attendance\ImportAttendance.aspx.designer.cs">
+      <DependentUpon>ImportAttendance.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Attendance\AttendanceAnalytics.aspx.cs">
+      <DependentUpon>AttendanceAnalytics.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Attendance\AttendanceAnalytics.aspx.designer.cs">
+      <DependentUpon>AttendanceAnalytics.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Attendance\AttendanceAlerts.aspx.cs">
+      <DependentUpon>AttendanceAlerts.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Attendance\AttendanceAlerts.aspx.designer.cs">
+      <DependentUpon>AttendanceAlerts.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Attendance\ParentAttendance.aspx.cs">
+      <DependentUpon>ParentAttendance.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Attendance\ParentAttendance.aspx.designer.cs">
+      <DependentUpon>ParentAttendance.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Modules\Attendance\AttendanceSettings.aspx.cs">
       <DependentUpon>AttendanceSettings.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -851,6 +900,136 @@
     <Compile Include="Modules\Attendance\AttendanceSettings.aspx.designer.cs">
       <DependentUpon>AttendanceSettings.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Modules\Reports\ReportUi.cs" />
+    <Compile Include="Modules\Reports\ReportAuthorization.cs" />
+    <Compile Include="Modules\Reports\ReportCatalog.cs" />
+    <Compile Include="Modules\Reports\ReportsRepository.cs" />
+    <Compile Include="Modules\Reports\ReportsRepository.Data.cs" />
+    <Compile Include="Modules\Reports\ReportsRepository.Examinations.cs" />
+    <Compile Include="Modules\Reports\ReportsRepository.Attendance.cs" />
+    <Compile Include="Modules\Reports\ReportsRepository.Finance.cs" />
+    <Compile Include="Modules\Reports\ReportsRepository.Payroll.cs" />
+    <Compile Include="Modules\Reports\ReportsRepository.Security.cs" />
+    <Compile Include="Modules\Reports\ReportsRepository.Analytics.cs" />
+    <Compile Include="Modules\Reports\ReportsRepository.Builder.cs" />
+    <Compile Include="Modules\Reports\ReportsRepository.Saved.cs" />
+    <Compile Include="Modules\Reports\ReportsRepository.Scheduled.cs" />
+    <Compile Include="Modules\Reports\ReportsRepository.Exports.cs" />
+    <Compile Include="Modules\Reports\ReportsRepository.Audit.cs" />
+    <Compile Include="Modules\Reports\ReportBuilderMetadata.cs" />
+    <Compile Include="Modules\Reports\ReportStage5Base.cs" />
+    <Compile Include="Modules\Reports\ReportExportService.cs" />
+    <Compile Include="Modules\Reports\ReportCategoryBase.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Reports\Reports.aspx.cs">
+      <DependentUpon>Reports.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Reports\Reports.aspx.designer.cs">
+      <DependentUpon>Reports.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Reports\ReportViewer.aspx.cs">
+      <DependentUpon>ReportViewer.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Reports\ReportViewer.aspx.designer.cs">
+      <DependentUpon>ReportViewer.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Reports\StudentReports.aspx.cs">
+      <DependentUpon>StudentReports.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Reports\StudentReports.aspx.designer.cs">
+      <DependentUpon>StudentReports.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Reports\AcademicReports.aspx.cs">
+      <DependentUpon>AcademicReports.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Reports\AcademicReports.aspx.designer.cs">
+      <DependentUpon>AcademicReports.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Reports\TeacherStaffReports.aspx.cs">
+      <DependentUpon>TeacherStaffReports.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Reports\TeacherStaffReports.aspx.designer.cs">
+      <DependentUpon>TeacherStaffReports.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Reports\EnrollmentReports.aspx.cs">
+      <DependentUpon>EnrollmentReports.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Reports\EnrollmentReports.aspx.designer.cs">
+      <DependentUpon>EnrollmentReports.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Reports\GuardianReports.aspx.cs">
+      <DependentUpon>GuardianReports.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Reports\GuardianReports.aspx.designer.cs">
+      <DependentUpon>GuardianReports.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Reports\LibraryReports.aspx.cs">
+      <DependentUpon>LibraryReports.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Reports\LibraryReports.aspx.designer.cs">
+      <DependentUpon>LibraryReports.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Reports\ExaminationReports.aspx.cs">
+      <DependentUpon>ExaminationReports.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Reports\ExaminationReports.aspx.designer.cs">
+      <DependentUpon>ExaminationReports.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Reports\AttendanceReports.aspx.cs">
+      <DependentUpon>AttendanceReports.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Reports\AttendanceReports.aspx.designer.cs">
+      <DependentUpon>AttendanceReports.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Reports\FinanceReports.aspx.cs">
+      <DependentUpon>FinanceReports.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Reports\FinanceReports.aspx.designer.cs">
+      <DependentUpon>FinanceReports.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Reports\PayrollReports.aspx.cs">
+      <DependentUpon>PayrollReports.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Reports\PayrollReports.aspx.designer.cs">
+      <DependentUpon>PayrollReports.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Reports\SecurityReports.aspx.cs">
+      <DependentUpon>SecurityReports.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Reports\SecurityReports.aspx.designer.cs">
+      <DependentUpon>SecurityReports.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Reports\PerformanceAnalytics.aspx.cs">
+      <DependentUpon>PerformanceAnalytics.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Reports\PerformanceAnalytics.aspx.designer.cs">
+      <DependentUpon>PerformanceAnalytics.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Reports\CustomReportBuilder.aspx.cs"><DependentUpon>CustomReportBuilder.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
+    <Compile Include="Modules\Reports\CustomReportBuilder.aspx.designer.cs"><DependentUpon>CustomReportBuilder.aspx</DependentUpon></Compile>
+    <Compile Include="Modules\Reports\SavedReports.aspx.cs"><DependentUpon>SavedReports.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
+    <Compile Include="Modules\Reports\SavedReports.aspx.designer.cs"><DependentUpon>SavedReports.aspx</DependentUpon></Compile>
+    <Compile Include="Modules\Reports\ScheduledReports.aspx.cs"><DependentUpon>ScheduledReports.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
+    <Compile Include="Modules\Reports\ScheduledReports.aspx.designer.cs"><DependentUpon>ScheduledReports.aspx</DependentUpon></Compile>
+    <Compile Include="Modules\Reports\ExportHistory.aspx.cs"><DependentUpon>ExportHistory.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
+    <Compile Include="Modules\Reports\ExportHistory.aspx.designer.cs"><DependentUpon>ExportHistory.aspx</DependentUpon></Compile>
+    <Compile Include="Modules\Reports\ReportAuditLog.aspx.cs"><DependentUpon>ReportAuditLog.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
+    <Compile Include="Modules\Reports\ReportAuditLog.aspx.designer.cs"><DependentUpon>ReportAuditLog.aspx</DependentUpon></Compile>
     <Compile Include="Modules\Academic\Academics.aspx.cs">
       <DependentUpon>Academics.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -991,10 +1170,7 @@
     <Folder Include="Assets\fonts\" />
     <Folder Include="Assets\icons\" />
     <Folder Include="Assets\uploads\" />
-    <Folder Include="Modules\Academic\" />
     <Folder Include="Modules\Administration\" />
-    <Folder Include="Modules\Examination\" />
-    <Folder Include="Modules\Reports\" />
     <Folder Include="Modules\Settings\" />
     <Folder Include="Modules\Teachers\" />
   </ItemGroup>

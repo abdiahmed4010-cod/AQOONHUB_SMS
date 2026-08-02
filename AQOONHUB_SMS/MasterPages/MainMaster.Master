@@ -226,6 +226,13 @@
                     <i data-lucide="trending-up" class="w-[18px] h-[18px]" aria-hidden="true"></i>
                     <span>Promotions</span>
                 </a>
+                <% if (IsParentRole) { %>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Attendance/ParentAttendance.aspx") %>" data-nav="parentattendance">
+                    <i data-lucide="user-check" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>My Children Attendance</span>
+                </a>
+                <% } %>
+                <% if (!IsParentRole) { %>
                 <a class="nav-item" href="<%= ResolveUrl("~/Modules/Attendance/Attendance.aspx") %>" data-nav="attendance">
                     <i data-lucide="user-check" class="w-[18px] h-[18px]" aria-hidden="true"></i>
                     <span>Attendance</span>
@@ -250,10 +257,23 @@
                     <i data-lucide="calendar" class="w-[18px] h-[18px]" aria-hidden="true"></i>
                     <span>Calendar</span>
                 </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Attendance/ImportAttendance.aspx") %>" data-nav="importattendance">
+                    <i data-lucide="upload" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Import Attendance</span>
+                </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Attendance/AttendanceAnalytics.aspx") %>" data-nav="attendanceanalytics">
+                    <i data-lucide="bar-chart-3" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Analytics</span>
+                </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Attendance/AttendanceAlerts.aspx") %>" data-nav="attendancealerts">
+                    <i data-lucide="bell" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span>Alerts</span>
+                </a>
                 <a class="nav-item" href="<%= ResolveUrl("~/Modules/Attendance/AttendanceSettings.aspx") %>" data-nav="attendancesettings">
                     <i data-lucide="settings" class="w-[18px] h-[18px]" aria-hidden="true"></i>
                     <span>Attendance Settings</span>
                 </a>
+                <% } %>
                 <a class="nav-item" href="<%= ResolveUrl("~/Modules/Examinations/Examinations.aspx") %>" data-nav="examinations">
                     <i data-lucide="file-edit" class="w-[18px] h-[18px]" aria-hidden="true"></i>
                     <span>Examinations</span>
@@ -336,24 +356,21 @@
                     <span>Events Calendar</span>
                 </a>
                 
-                <p class="nav-section">Reports &amp; Tools</p>
+                <% if (!IsParentRole && CanAccessReports) { %>
+                <p class="nav-section">Reports</p>
                 <a class="nav-item" href="<%= ResolveUrl("~/Modules/Reports/Reports.aspx") %>" data-nav="reports">
                     <i data-lucide="bar-chart-3" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Reports Center</span>
+                    <span>Overview</span>
                 </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Reports/Print.aspx") %>" data-nav="print">
-                    <i data-lucide="printer" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Print Center</span>
+                <% foreach (var rc in ReportsMenu) { %>
+                <a class="nav-item" href="<%= ResolveUrl(rc.Item2) %>" data-nav="<%= rc.Item3 %>">
+                    <i data-lucide="<%= rc.Item4 %>" class="w-[18px] h-[18px]" aria-hidden="true"></i>
+                    <span><%= rc.Item1 %></span>
                 </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Reports/Export.aspx") %>" data-nav="export">
-                    <i data-lucide="download" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Export Center</span>
-                </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Reports/Import.aspx") %>" data-nav="import">
-                    <i data-lucide="upload" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Import Center</span>
-                </a>
-                
+                <% } %>
+                <%-- Stage 3-5 categories are added here as their pages are built, so no link ever 404s. --%>
+                <% } %>
+
                 <p class="nav-section">System</p>
                 <a class="nav-item" href="<%= ResolveUrl("~/Modules/Administration/Users.aspx") %>" data-nav="users">
                     <i data-lucide="shield" class="w-[18px] h-[18px]" aria-hidden="true"></i>

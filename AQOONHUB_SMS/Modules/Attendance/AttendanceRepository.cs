@@ -1319,6 +1319,477 @@ ORDER BY b.AttendanceImportBatchID DESC";
         }
 
         // ================================================================
+        // STAGE 5 — ANALYTICS, ALERTS, PARENT ACCESS
+        // ================================================================
+
+        public bool UserCanViewAttendanceAnalytics(string role)
+        {
+            string r = NormalizeRole(role);
+            return CanManageAttendance(role) || r == "registrar" || r == "teacher";
+        }
+        public bool UserCanViewAttendanceAlerts(string role)
+        {
+            string r = NormalizeRole(role);
+            return CanManageAttendance(role) || r == "registrar" || r == "teacher";
+        }
+
+        private string AnalyticsWhere()
+        {
+            return @"ss.Status IN ('Submitted','Locked')
+  AND (@y=0 OR ss.AcademicYearID=@y) AND (@tm IS NULL OR ss.TermID=@tm)
+  AND (@c IS NULL OR ss.ClassID=@c) AND (@sec IS NULL OR ss.SectionID=@sec)
+  AND (@type='' OR ss.SessionType=@type) AND (@subj IS NULL OR ss.SubjectID=@subj)
+  AND ss.AttendanceDate BETWEEN @from AND @to";
+        }
+        private SqlParameter[] AnalyticsParams(int y, int? tm, int? c, int? sec, string type, int? subj, DateTime from, DateTime to)
+        {
+            return new[]
+            {
+                P("@y", y), P("@tm", (object)tm ?? DBNull.Value), P("@c", (object)c ?? DBNull.Value), P("@sec", (object)sec ?? DBNull.Value),
+                P("@type", type ?? ""), P("@subj", (object)subj ?? DBNull.Value), P("@from", from.Date), P("@to", to.Date)
+            };
+        }
+
+        public DataRow GetAttendanceAnalyticsSummary(int y, int? tm, int? c, int? sec, string type, int? subj, DateTime from, DateTime to)
+        {
+            string sql = @"
+SELECT
+  (SELECT COUNT(*) FROM AttendanceSessions ss WHERE " + AnalyticsWhere() + @") AS Sessions,
+  (SELECT COUNT(DISTINCT r.StudentID) FROM AttendanceSessions ss JOIN AttendanceRecords r ON r.AttendanceSessionID=ss.AttendanceSessionID WHERE " + AnalyticsWhere() + @") AS Students,
+  SUM(CASE WHEN r.AttendanceStatus='Present' THEN 1 ELSE 0 END) AS P,
+  SUM(CASE WHEN r.AttendanceStatus='Absent'  THEN 1 ELSE 0 END) AS A,
+  SUM(CASE WHEN r.AttendanceStatus='Late'    THEN 1 ELSE 0 END) AS L,
+  SUM(CASE WHEN r.AttendanceStatus='Excused' THEN 1 ELSE 0 END) AS E
+FROM AttendanceSessions ss JOIN AttendanceRecords r ON r.AttendanceSessionID=ss.AttendanceSessionID
+WHERE " + AnalyticsWhere();
+            DataRow row = ExecuteDataTable(sql, AnalyticsParams(y, tm, c, sec, type, subj, from, to)).Rows[0];
+            int p = N(row["P"]), a = N(row["A"]), l = N(row["L"]), e = N(row["E"]);
+            decimal rate = CalculateAttendanceRate(p, a, l, e);
+            int atRisk = GetAtRiskStudents(y, tm, c, sec, type, subj, from, to).Rows.Count;
+
+            DataTable outT = new DataTable();
+            outT.Columns.Add("Rate", typeof(decimal)); outT.Columns.Add("Sessions", typeof(int)); outT.Columns.Add("Students", typeof(int));
+            outT.Columns.Add("Present", typeof(int)); outT.Columns.Add("Absent", typeof(int)); outT.Columns.Add("Late", typeof(int));
+            outT.Columns.Add("Excused", typeof(int)); outT.Columns.Add("AtRisk", typeof(int));
+            outT.Rows.Add(rate, N(row["Sessions"]), N(row["Students"]), p, a, l, e, atRisk);
+            return outT.Rows[0];
+        }
+
+        public DataTable GetAttendanceStatusBreakdown(int y, int? tm, int? c, int? sec, string type, int? subj, DateTime from, DateTime to)
+        {
+            string sql = @"
+SELECT r.AttendanceStatus, COUNT(*) AS Cnt
+FROM AttendanceSessions ss JOIN AttendanceRecords r ON r.AttendanceSessionID=ss.AttendanceSessionID
+WHERE " + AnalyticsWhere() + " GROUP BY r.AttendanceStatus";
+            return ExecuteDataTable(sql, AnalyticsParams(y, tm, c, sec, type, subj, from, to));
+        }
+
+        /// <summary>Daily rate for the last N days ending at 'to' (weekly trend uses days=7-ish range).</summary>
+        public DataTable GetWeeklyAttendanceTrend(int y, int? tm, int? c, int? sec, string type, int? subj, DateTime from, DateTime to)
+        {
+            string sql = @"
+SELECT ss.AttendanceDate AS Bucket,
+  SUM(CASE WHEN r.AttendanceStatus='Present' THEN 1 ELSE 0 END) AS P,
+  SUM(CASE WHEN r.AttendanceStatus='Absent'  THEN 1 ELSE 0 END) AS A,
+  SUM(CASE WHEN r.AttendanceStatus='Late'    THEN 1 ELSE 0 END) AS L,
+  SUM(CASE WHEN r.AttendanceStatus='Excused' THEN 1 ELSE 0 END) AS E
+FROM AttendanceSessions ss JOIN AttendanceRecords r ON r.AttendanceSessionID=ss.AttendanceSessionID
+WHERE " + AnalyticsWhere() + @"
+GROUP BY ss.AttendanceDate ORDER BY ss.AttendanceDate";
+            return RateBuckets(ExecuteDataTable(sql, AnalyticsParams(y, tm, c, sec, type, subj, from, to)), "Bucket", "d");
+        }
+
+        public DataTable GetMonthlyAttendanceTrend(int y, int? tm, int? c, int? sec, string type, int? subj, DateTime from, DateTime to)
+        {
+            string sql = @"
+SELECT DATEFROMPARTS(YEAR(ss.AttendanceDate), MONTH(ss.AttendanceDate), 1) AS Bucket,
+  SUM(CASE WHEN r.AttendanceStatus='Present' THEN 1 ELSE 0 END) AS P,
+  SUM(CASE WHEN r.AttendanceStatus='Absent'  THEN 1 ELSE 0 END) AS A,
+  SUM(CASE WHEN r.AttendanceStatus='Late'    THEN 1 ELSE 0 END) AS L,
+  SUM(CASE WHEN r.AttendanceStatus='Excused' THEN 1 ELSE 0 END) AS E
+FROM AttendanceSessions ss JOIN AttendanceRecords r ON r.AttendanceSessionID=ss.AttendanceSessionID
+WHERE " + AnalyticsWhere() + @"
+GROUP BY DATEFROMPARTS(YEAR(ss.AttendanceDate), MONTH(ss.AttendanceDate), 1) ORDER BY Bucket";
+            return RateBuckets(ExecuteDataTable(sql, AnalyticsParams(y, tm, c, sec, type, subj, from, to)), "Bucket", "m");
+        }
+
+        private DataTable RateBuckets(DataTable raw, string bucketCol, string mode)
+        {
+            DataTable outT = new DataTable();
+            outT.Columns.Add("Label", typeof(string)); outT.Columns.Add("Rate", typeof(decimal));
+            foreach (DataRow r in raw.Rows)
+            {
+                int p = N(r["P"]), a = N(r["A"]), l = N(r["L"]), e = N(r["E"]);
+                DateTime d = Convert.ToDateTime(r[bucketCol]);
+                outT.Rows.Add(mode == "m" ? d.ToString("MMM yyyy") : d.ToString("dd MMM"), CalculateAttendanceRate(p, a, l, e));
+            }
+            return outT;
+        }
+
+        private DataTable GroupRate(string groupExpr, string groupName, int y, int? tm, int? c, int? sec, string type, int? subj, DateTime from, DateTime to)
+        {
+            string sql = @"
+SELECT " + groupExpr + @" AS GroupName,
+  SUM(CASE WHEN r.AttendanceStatus='Present' THEN 1 ELSE 0 END) AS P,
+  SUM(CASE WHEN r.AttendanceStatus='Absent'  THEN 1 ELSE 0 END) AS A,
+  SUM(CASE WHEN r.AttendanceStatus='Late'    THEN 1 ELSE 0 END) AS L,
+  SUM(CASE WHEN r.AttendanceStatus='Excused' THEN 1 ELSE 0 END) AS E
+FROM AttendanceSessions ss
+JOIN AttendanceRecords r ON r.AttendanceSessionID=ss.AttendanceSessionID
+JOIN Classes cls ON cls.ClassID=ss.ClassID
+JOIN Sections secn ON secn.SectionID=ss.SectionID
+WHERE " + AnalyticsWhere() + " GROUP BY " + groupExpr + " ORDER BY " + groupExpr;
+            DataTable raw = ExecuteDataTable(sql, AnalyticsParams(y, tm, c, sec, type, subj, from, to));
+            DataTable outT = new DataTable();
+            outT.Columns.Add(groupName, typeof(string)); outT.Columns.Add("Rate", typeof(decimal));
+            outT.Columns.Add("Present", typeof(int)); outT.Columns.Add("Absent", typeof(int));
+            foreach (DataRow r in raw.Rows)
+            {
+                int p = N(r["P"]), a = N(r["A"]), l = N(r["L"]), e = N(r["E"]);
+                outT.Rows.Add(Convert.ToString(r["GroupName"]), CalculateAttendanceRate(p, a, l, e), p, a);
+            }
+            return outT;
+        }
+
+        public DataTable GetAttendanceByClassAnalytics(int y, int? tm, int? c, int? sec, string type, int? subj, DateTime from, DateTime to)
+        { return GroupRate("cls.ClassName", "ClassName", y, tm, c, sec, type, subj, from, to); }
+        public DataTable GetAttendanceBySectionAnalytics(int y, int? tm, int? c, int? sec, string type, int? subj, DateTime from, DateTime to)
+        { return GroupRate("cls.ClassName + ' / ' + secn.SectionName", "SectionName", y, tm, c, sec, type, subj, from, to); }
+
+        /// <summary>Per-student aggregates (rate/absent/late) for ranking + risk. Historical: joins through sessions.</summary>
+        private DataTable StudentAggregates(int y, int? tm, int? c, int? sec, string type, int? subj, DateTime from, DateTime to)
+        {
+            string sql = @"
+SELECT st.StudentID, st.FullName, st.StudentCode,
+  SUM(CASE WHEN r.AttendanceStatus='Present' THEN 1 ELSE 0 END) AS P,
+  SUM(CASE WHEN r.AttendanceStatus='Absent'  THEN 1 ELSE 0 END) AS A,
+  SUM(CASE WHEN r.AttendanceStatus='Late'    THEN 1 ELSE 0 END) AS L,
+  SUM(CASE WHEN r.AttendanceStatus='Excused' THEN 1 ELSE 0 END) AS E,
+  ISNULL(SUM(r.LateMinutes),0) AS LateMin, COUNT(*) AS Total
+FROM AttendanceSessions ss JOIN AttendanceRecords r ON r.AttendanceSessionID=ss.AttendanceSessionID
+JOIN Students st ON st.StudentID=r.StudentID
+WHERE " + AnalyticsWhere() + @"
+GROUP BY st.StudentID, st.FullName, st.StudentCode";
+            DataTable raw = ExecuteDataTable(sql, AnalyticsParams(y, tm, c, sec, type, subj, from, to));
+            DataTable outT = new DataTable();
+            outT.Columns.Add("StudentID", typeof(int)); outT.Columns.Add("FullName", typeof(string)); outT.Columns.Add("StudentCode", typeof(string));
+            foreach (string cn in new[] { "Present", "Absent", "Late", "Excused", "LateMinutes", "TotalSessions" }) outT.Columns.Add(cn, typeof(int));
+            outT.Columns.Add("Percentage", typeof(decimal));
+            foreach (DataRow r in raw.Rows)
+            {
+                int p = N(r["P"]), a = N(r["A"]), l = N(r["L"]), e = N(r["E"]);
+                outT.Rows.Add(Convert.ToInt32(r["StudentID"]), Convert.ToString(r["FullName"]), Convert.ToString(r["StudentCode"]),
+                    p, a, l, e, N(r["LateMin"]), N(r["Total"]), CalculateAttendanceRate(p, a, l, e));
+            }
+            return outT;
+        }
+
+        public DataTable GetTopAttendanceStudents(int y, int? tm, int? c, int? sec, string type, int? subj, DateTime from, DateTime to, int top)
+        {
+            DataTable t = StudentAggregates(y, tm, c, sec, type, subj, from, to);
+            DataView dv = t.DefaultView; dv.RowFilter = "TotalSessions >= 1"; dv.Sort = "Percentage DESC, TotalSessions DESC";
+            return TopN(dv.ToTable(), top);
+        }
+        public DataTable GetMostAbsentStudents(int y, int? tm, int? c, int? sec, string type, int? subj, DateTime from, DateTime to, int top)
+        {
+            DataTable t = StudentAggregates(y, tm, c, sec, type, subj, from, to);
+            DataView dv = t.DefaultView; dv.RowFilter = "Absent > 0"; dv.Sort = "Absent DESC, Percentage ASC";
+            return TopN(dv.ToTable(), top);
+        }
+        public DataTable GetFrequentLateStudents(int y, int? tm, int? c, int? sec, string type, int? subj, DateTime from, DateTime to, int top)
+        {
+            DataTable t = StudentAggregates(y, tm, c, sec, type, subj, from, to);
+            DataView dv = t.DefaultView; dv.RowFilter = "Late > 0"; dv.Sort = "Late DESC, LateMinutes DESC";
+            return TopN(dv.ToTable(), top);
+        }
+        public DataTable GetAtRiskStudents(int y, int? tm, int? c, int? sec, string type, int? subj, DateTime from, DateTime to)
+        {
+            decimal threshold = LowAttendanceThreshold();
+            DataTable t = StudentAggregates(y, tm, c, sec, type, subj, from, to);
+            DataView dv = t.DefaultView;
+            dv.RowFilter = "TotalSessions >= 3 AND Percentage < " + threshold.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            dv.Sort = "Percentage ASC";
+            return dv.ToTable();
+        }
+        private static DataTable TopN(DataTable t, int n)
+        {
+            if (n <= 0 || t.Rows.Count <= n) return t;
+            DataTable outT = t.Clone();
+            for (int i = 0; i < n; i++) outT.ImportRow(t.Rows[i]);
+            return outT;
+        }
+
+        // ---------- ALERTS ----------
+        public DataRow GetAlertSettings()
+        {
+            DataRow s = GetAttendanceSettings();
+            return s;
+        }
+
+        /// <summary>Recompute alerts from current submitted/locked data in one transaction.
+        /// Upserts active alerts (updates LastDetectedAt), never deletes resolved history.
+        /// Excused breaks the consecutive-absence sequence (documented policy).</summary>
+        public int GenerateAttendanceAlerts(int academicYearId)
+        {
+            DataRow s = GetAttendanceSettings();
+            int consecThreshold = Convert.ToInt32(s["ConsecutiveAbsenceAlert"]);
+            decimal lowThreshold = Convert.ToDecimal(s["LowAttendanceThreshold"]);
+            int lateThreshold = Convert.ToInt32(s["FrequentLateThreshold"]);
+            int unsubmittedHours = Convert.ToInt32(s["UnsubmittedSessionAgeHours"]);
+            int lookbackDays = Convert.ToInt32(s["AlertLookbackDays"]);
+            DateTime from = DateTime.Today.AddDays(-lookbackDays);
+            int generated = 0;
+
+            using (SqlConnection cn = CreateConnection())
+            {
+                cn.Open();
+                using (SqlTransaction tx = cn.BeginTransaction(IsolationLevel.Serializable))
+                {
+                    // ---- Low attendance + frequent late (per student, from aggregates) ----
+                    DataTable perStudent = StudentAggForAlerts(cn, tx, academicYearId, from);
+                    foreach (DataRow r in perStudent.Rows)
+                    {
+                        int sid = Convert.ToInt32(r["StudentID"]); int total = N(r["Total"]);
+                        int p = N(r["P"]), a = N(r["A"]), l = N(r["L"]), e = N(r["E"]); int lateMin = N(r["LateMin"]);
+                        decimal rate = CalculateAttendanceRate(p, a, l, e);
+
+                        if (total >= 3 && rate < lowThreshold)
+                            generated += UpsertAlert(cn, tx, "LowAttendance", "LowAttendance:" + sid, sid, null, null, null,
+                                "Low attendance", Convert.ToString(r["FullName"]) + " is at " + rate.ToString("0.0") + "% (below " + lowThreshold.ToString("0.#") + "%).",
+                                rate < lowThreshold - 10 ? "Critical" : "Warning", rate, lowThreshold, true);
+
+                        if (l >= lateThreshold)
+                            generated += UpsertAlert(cn, tx, "FrequentLate", "FrequentLate:" + sid, sid, null, null, null,
+                                "Frequent late arrivals", Convert.ToString(r["FullName"]) + " has " + l + " late arrivals (" + lateMin + " total minutes).",
+                                "Warning", l, lateThreshold, true);
+                    }
+
+                    // ---- Consecutive absences (Excused breaks the sequence) ----
+                    DataTable seq = ExecuteInTx(cn, tx, @"
+SELECT r.StudentID, ss.AttendanceDate, r.AttendanceStatus, st.FullName
+FROM AttendanceSessions ss JOIN AttendanceRecords r ON r.AttendanceSessionID=ss.AttendanceSessionID
+JOIN Students st ON st.StudentID=r.StudentID
+WHERE ss.Status IN ('Submitted','Locked') AND (@y=0 OR ss.AcademicYearID=@y) AND ss.AttendanceDate >= @from
+ORDER BY r.StudentID, ss.AttendanceDate",
+                        P("@y", academicYearId), P("@from", from));
+                    int curStudent = -1, run = 0; string curName = "";
+                    var flagged = new System.Collections.Generic.HashSet<int>();
+                    foreach (DataRow r in seq.Rows)
+                    {
+                        int sid = Convert.ToInt32(r["StudentID"]);
+                        string status = Convert.ToString(r["AttendanceStatus"]);
+                        if (sid != curStudent) { curStudent = sid; run = 0; curName = Convert.ToString(r["FullName"]); }
+                        if (status == "Absent") run++;
+                        else run = 0;   // Present, Late, Excused all break the streak
+                        if (run >= consecThreshold && !flagged.Contains(sid))
+                        {
+                            flagged.Add(sid);
+                            generated += UpsertAlert(cn, tx, "ConsecutiveAbsence", "ConsecutiveAbsence:" + sid, sid, null, null, null,
+                                "Consecutive absences", curName + " has " + run + " consecutive absences.", "Critical", run, consecThreshold, true);
+                        }
+                    }
+
+                    // ---- Unsubmitted (old Draft) sessions — operational, NOT visible to parents ----
+                    DataTable drafts = ExecuteInTx(cn, tx, @"
+SELECT ss.AttendanceSessionID, ss.ClassID, ss.SectionID, ss.AttendanceDate, c.ClassName, sec.SectionName
+FROM AttendanceSessions ss JOIN Classes c ON c.ClassID=ss.ClassID JOIN Sections sec ON sec.SectionID=ss.SectionID
+WHERE ss.Status='Draft' AND (@y=0 OR ss.AcademicYearID=@y) AND ss.CreatedAt < DATEADD(HOUR, -@h, GETDATE())",
+                        P("@y", academicYearId), P("@h", unsubmittedHours));
+                    foreach (DataRow r in drafts.Rows)
+                    {
+                        int did = Convert.ToInt32(r["AttendanceSessionID"]);
+                        generated += UpsertAlert(cn, tx, "UnsubmittedSession", "UnsubmittedSession:" + did, null,
+                            Convert.ToInt32(r["ClassID"]), Convert.ToInt32(r["SectionID"]), did,
+                            "Unsubmitted attendance", Convert.ToString(r["ClassName"]) + " / " + Convert.ToString(r["SectionName"]) + " on " + Convert.ToDateTime(r["AttendanceDate"]).ToString("dd MMM yyyy") + " is still Draft.",
+                            "Warning", null, unsubmittedHours, false);
+                    }
+
+                    tx.Commit();
+                }
+            }
+            return generated;
+        }
+
+        private DataTable StudentAggForAlerts(SqlConnection cn, SqlTransaction tx, int y, DateTime from)
+        {
+            return ExecuteInTx(cn, tx, @"
+SELECT st.StudentID, st.FullName,
+  SUM(CASE WHEN r.AttendanceStatus='Present' THEN 1 ELSE 0 END) AS P,
+  SUM(CASE WHEN r.AttendanceStatus='Absent'  THEN 1 ELSE 0 END) AS A,
+  SUM(CASE WHEN r.AttendanceStatus='Late'    THEN 1 ELSE 0 END) AS L,
+  SUM(CASE WHEN r.AttendanceStatus='Excused' THEN 1 ELSE 0 END) AS E,
+  ISNULL(SUM(r.LateMinutes),0) AS LateMin, COUNT(*) AS Total
+FROM AttendanceSessions ss JOIN AttendanceRecords r ON r.AttendanceSessionID=ss.AttendanceSessionID
+JOIN Students st ON st.StudentID=r.StudentID
+WHERE ss.Status IN ('Submitted','Locked') AND (@y=0 OR ss.AcademicYearID=@y) AND ss.AttendanceDate >= @from
+GROUP BY st.StudentID, st.FullName",
+                P("@y", y), P("@from", from));
+        }
+
+        private int UpsertAlert(SqlConnection cn, SqlTransaction tx, string type, string key, int? studentId, int? classId, int? sectionId, int? sessionId,
+            string title, string desc, string severity, decimal? trigger, decimal? threshold, bool visibleToParent)
+        {
+            int updated = Convert.ToInt32(Scalar(cn, tx, @"
+UPDATE AttendanceAlerts SET LastDetectedAt=GETDATE(), TriggerValue=@tr, Description=@d, Severity=@sev, UpdatedAt=GETDATE()
+WHERE AlertKey=@k AND Status IN ('New','Reviewed'); SELECT @@ROWCOUNT",
+                P("@tr", (object)trigger ?? DBNull.Value), P("@d", desc), P("@sev", severity), P("@k", key)));
+            if (updated > 0) return 0;
+            NonQuery(cn, tx, @"
+INSERT INTO AttendanceAlerts (AlertType, AlertKey, StudentID, ClassID, SectionID, AttendanceSessionID, Title, Description, Severity, Status, TriggerValue, ThresholdValue, IsVisibleToParent, FirstDetectedAt, LastDetectedAt, CreatedAt)
+VALUES (@type,@k,@st,@c,@sec,@ses,@title,@d,@sev,'New',@tr,@th,@vis,GETDATE(),GETDATE(),GETDATE())",
+                P("@type", type), P("@k", key), P("@st", (object)studentId ?? DBNull.Value), P("@c", (object)classId ?? DBNull.Value),
+                P("@sec", (object)sectionId ?? DBNull.Value), P("@ses", (object)sessionId ?? DBNull.Value), P("@title", title), P("@d", desc),
+                P("@sev", severity), P("@tr", (object)trigger ?? DBNull.Value), P("@th", (object)threshold ?? DBNull.Value), P("@vis", visibleToParent));
+            return 1;
+        }
+
+        public DataTable GetAttendanceAlerts(string type, string status, string severity)
+        {
+            const string sql = @"
+SELECT a.AttendanceAlertID, a.AlertType, a.Title, a.Description, a.Severity, a.Status,
+       a.TriggerValue, a.ThresholdValue, a.FirstDetectedAt, a.LastDetectedAt,
+       ISNULL(st.FullName,'') AS StudentName, ISNULL(st.StudentCode,'') AS StudentCode,
+       ISNULL(c.ClassName,'') AS ClassName, ISNULL(sec.SectionName,'') AS SectionName,
+       ISNULL(rv.FullName,'') AS ReviewedByName, a.ReviewedAt, ISNULL(a.ResolutionNotes,'') AS ResolutionNotes
+FROM AttendanceAlerts a
+LEFT JOIN Students st ON st.StudentID=a.StudentID
+LEFT JOIN Classes c ON c.ClassID=a.ClassID
+LEFT JOIN Sections sec ON sec.SectionID=a.SectionID
+LEFT JOIN Users rv ON rv.UserID=a.ReviewedBy
+WHERE (@type='' OR a.AlertType=@type) AND (@status='' OR a.Status=@status) AND (@sev='' OR a.Severity=@sev)
+ORDER BY CASE a.Severity WHEN 'Critical' THEN 0 WHEN 'Warning' THEN 1 ELSE 2 END, a.LastDetectedAt DESC";
+            return ExecuteDataTable(sql, new[] { P("@type", type ?? ""), P("@status", status ?? ""), P("@sev", severity ?? "") });
+        }
+
+        public DataRow GetAttendanceAlert(int id)
+        {
+            DataTable t = ExecuteDataTable("SELECT * FROM AttendanceAlerts WHERE AttendanceAlertID=@id", new[] { P("@id", id) });
+            return t.Rows.Count > 0 ? t.Rows[0] : null;
+        }
+
+        public DataRow GetAttendanceAlertSummary()
+        {
+            const string sql = @"
+SELECT
+  SUM(CASE WHEN Status='New' THEN 1 ELSE 0 END) AS NewCount,
+  SUM(CASE WHEN Status='Reviewed' THEN 1 ELSE 0 END) AS ReviewedCount,
+  SUM(CASE WHEN Status='Resolved' THEN 1 ELSE 0 END) AS ResolvedCount,
+  SUM(CASE WHEN Severity='Critical' AND Status IN ('New','Reviewed') THEN 1 ELSE 0 END) AS CriticalActive,
+  COUNT(*) AS Total
+FROM AttendanceAlerts";
+            return ExecuteDataTable(sql, null).Rows[0];
+        }
+
+        public void UpdateAttendanceAlertStatus(int alertId, string newStatus, int userId, string role)
+        {
+            if (!CanManageAttendance(role)) throw new InvalidOperationException("You are not authorized to change alert status.");
+            if (newStatus != "Reviewed" && newStatus != "Dismissed") throw new InvalidOperationException("Invalid status.");
+            ExecuteNonQuery(@"UPDATE AttendanceAlerts SET Status=@s, ReviewedBy=@u, ReviewedAt=GETDATE(), UpdatedAt=GETDATE() WHERE AttendanceAlertID=@id AND Status IN ('New','Reviewed')",
+                new[] { P("@s", newStatus), P("@u", userId), P("@id", alertId) });
+        }
+
+        public void ResolveAttendanceAlert(int alertId, string notes, int userId, string role)
+        {
+            if (!CanManageAttendance(role)) throw new InvalidOperationException("You are not authorized to resolve alerts.");
+            ExecuteNonQuery(@"UPDATE AttendanceAlerts SET Status='Resolved', ResolvedBy=@u, ResolvedAt=GETDATE(), ResolutionNotes=@n, UpdatedAt=GETDATE() WHERE AttendanceAlertID=@id AND Status IN ('New','Reviewed')",
+                new[] { P("@u", userId), P("@n", (object)notes ?? DBNull.Value), P("@id", alertId) });
+        }
+
+        // ---------- PARENT ACCESS ----------
+        public DataTable GetParentLinkedStudents(int userId)
+        {
+            const string sql = @"
+SELECT DISTINCT st.StudentID, st.FullName, st.StudentCode, st.SectionID, sec.ClassID, ISNULL(c.ClassName,'') AS ClassName,
+       ISNULL(sec.SectionName,'') AS SectionName, ISNULL(y.YearName,'') AS YearName
+FROM Guardians g
+JOIN StudentGuardians sg ON sg.GuardianID=g.GuardianID
+JOIN Students st ON st.StudentID=sg.StudentID
+LEFT JOIN Sections sec ON sec.SectionID=st.SectionID
+LEFT JOIN Classes c ON c.ClassID=sec.ClassID
+LEFT JOIN AcademicYears y ON y.AcademicYearID=st.AcademicYearID
+WHERE g.UserID=@u AND ISNULL(g.IsActive,1)=1
+ORDER BY st.FullName";
+            return ExecuteDataTable(sql, new[] { P("@u", userId) });
+        }
+
+        /// <summary>Server-side ownership: does this parent user link to this student via StudentGuardians?</summary>
+        public bool UserOwnsStudent(int userId, int studentId)
+        {
+            return Convert.ToInt32(ExecuteScalar(
+                "SELECT COUNT(*) FROM Guardians g JOIN StudentGuardians sg ON sg.GuardianID=g.GuardianID WHERE g.UserID=@u AND sg.StudentID=@st AND ISNULL(g.IsActive,1)=1",
+                new[] { P("@u", userId), P("@st", studentId) })) > 0;
+        }
+
+        public DataRow GetParentAttendanceSummary(int studentId)
+        {
+            const string sql = @"
+SELECT
+  SUM(CASE WHEN r.AttendanceStatus='Present' THEN 1 ELSE 0 END) AS P,
+  SUM(CASE WHEN r.AttendanceStatus='Absent'  THEN 1 ELSE 0 END) AS A,
+  SUM(CASE WHEN r.AttendanceStatus='Late'    THEN 1 ELSE 0 END) AS L,
+  SUM(CASE WHEN r.AttendanceStatus='Excused' THEN 1 ELSE 0 END) AS E,
+  COUNT(*) AS Total
+FROM AttendanceRecords r JOIN AttendanceSessions ss ON ss.AttendanceSessionID=r.AttendanceSessionID
+WHERE r.StudentID=@st AND ss.Status IN ('Submitted','Locked')";
+            DataRow row = ExecuteDataTable(sql, new[] { P("@st", studentId) }).Rows[0];
+            int p = N(row["P"]), a = N(row["A"]), l = N(row["L"]), e = N(row["E"]);
+            DataTable outT = new DataTable();
+            foreach (string cn in new[] { "TotalSessions", "Present", "Absent", "Late", "Excused" }) outT.Columns.Add(cn, typeof(int));
+            outT.Columns.Add("Percentage", typeof(decimal));
+            outT.Rows.Add(N(row["Total"]), p, a, l, e, CalculateAttendanceRate(p, a, l, e));
+            return outT.Rows[0];
+        }
+
+        public DataTable GetParentRecentAttendance(int studentId, int top)
+        {
+            string sql = @"
+SELECT TOP (" + (top > 0 ? top : 15) + @") ss.AttendanceDate, c.ClassName, sec.SectionName, ss.SessionType,
+       r.AttendanceStatus, r.CheckInTime, r.LateMinutes
+FROM AttendanceRecords r JOIN AttendanceSessions ss ON ss.AttendanceSessionID=r.AttendanceSessionID
+JOIN Classes c ON c.ClassID=ss.ClassID JOIN Sections sec ON sec.SectionID=ss.SectionID
+WHERE r.StudentID=@st AND ss.Status IN ('Submitted','Locked')
+ORDER BY ss.AttendanceDate DESC";
+            return ExecuteDataTable(sql, new[] { P("@st", studentId) });
+        }
+
+        public DataTable GetParentAttendanceCalendar(int academicYearId, int year, int month, int studentId)
+        {
+            DateTime from = new DateTime(year, month, 1), to = from.AddMonths(1).AddDays(-1);
+            const string sql = @"
+SELECT ss.AttendanceDate,
+  SUM(CASE WHEN r.AttendanceStatus='Present' THEN 1 ELSE 0 END) AS P,
+  SUM(CASE WHEN r.AttendanceStatus='Absent'  THEN 1 ELSE 0 END) AS A,
+  SUM(CASE WHEN r.AttendanceStatus='Late'    THEN 1 ELSE 0 END) AS L,
+  SUM(CASE WHEN r.AttendanceStatus='Excused' THEN 1 ELSE 0 END) AS E, COUNT(*) AS Total
+FROM AttendanceRecords r JOIN AttendanceSessions ss ON ss.AttendanceSessionID=r.AttendanceSessionID
+WHERE r.StudentID=@st AND ss.Status IN ('Submitted','Locked') AND ss.AttendanceDate BETWEEN @from AND @to
+GROUP BY ss.AttendanceDate ORDER BY ss.AttendanceDate";
+            return ExecuteDataTable(sql, new[] { P("@st", studentId), P("@from", from), P("@to", to) });
+        }
+
+        /// <summary>Child-safe alerts only: active (New/Reviewed), parent-visible, with safe fields (no internal notes).</summary>
+        public DataTable GetParentVisibleAlerts(int studentId)
+        {
+            const string sql = @"
+SELECT a.AlertType, a.Title, a.Description, a.Severity, a.LastDetectedAt
+FROM AttendanceAlerts a
+WHERE a.StudentID=@st AND a.IsVisibleToParent=1 AND a.Status IN ('New','Reviewed')
+ORDER BY a.LastDetectedAt DESC";
+            return ExecuteDataTable(sql, new[] { P("@st", studentId) });
+        }
+
+        private DataTable ExecuteInTx(SqlConnection cn, SqlTransaction tx, string sql, params SqlParameter[] ps)
+        {
+            DataTable t = new DataTable();
+            using (SqlCommand cmd = new SqlCommand(sql, cn, tx))
+            {
+                if (ps != null) cmd.Parameters.AddRange(ps);
+                using (SqlDataAdapter da = new SqlDataAdapter(cmd)) da.Fill(t);
+            }
+            return t;
+        }
+
+        // ================================================================
         // ADO.NET HELPERS
         // ================================================================
         private SqlConnection CreateConnection() { return new SqlConnection(_connectionString); }

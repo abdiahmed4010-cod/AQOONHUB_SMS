@@ -106,7 +106,9 @@ namespace AQOONHUB_SMS.MasterPages
 
         private int GetCurrentUserId()
         {
-            if (Session["UserId"] != null && int.TryParse(Session["UserId"].ToString(), out int userId))
+            // Canonical session key set by Login is "UserID" (fallback to legacy "UserId").
+            object v = Session["UserID"] ?? Session["UserId"];
+            if (v != null && int.TryParse(v.ToString(), out int userId))
             {
                 return userId;
             }
@@ -120,7 +122,8 @@ namespace AQOONHUB_SMS.MasterPages
 
         public string GetCurrentUserRole()
         {
-            return Session["UserRole"] as string ?? "guest";
+            // Canonical session key set by Login is "Role" (fallback to legacy "UserRole").
+            return (Session["Role"] as string) ?? (Session["UserRole"] as string) ?? "guest";
         }
 
         public bool IsInRole(string role)
@@ -138,6 +141,44 @@ namespace AQOONHUB_SMS.MasterPages
                     return true;
             }
             return false;
+        }
+
+        /// <summary>Normalized role from the actual login session key (Session["Role"]).</summary>
+        private string NormRole()
+        {
+            string r = Session["Role"] as string ?? "";
+            return r.Trim().Replace(" ", "").Replace("_", "").Replace("-", "").ToLowerInvariant();
+        }
+
+        /// <summary>Parent/guardian users see only their own children's attendance, not management pages.</summary>
+        public bool IsParentRole { get { string r = NormRole(); return r == "parent" || r == "guardian"; } }
+
+        /// <summary>Whether the current user may see the centralized Reports menu (management roles only).</summary>
+        public bool CanAccessReports
+        {
+            get { return AQOONHUB_SMS.Modules.Reports.ReportAuthorization.CanAccessReports(Session["Role"] as string); }
+        }
+
+        /// <summary>Role-filtered Reports category links whose pages already exist (label, url, navkey, icon).</summary>
+        public System.Collections.Generic.List<System.Tuple<string, string, string, string>> ReportsMenu
+        {
+            get
+            {
+                var role = Session["Role"] as string;
+                var list = new System.Collections.Generic.List<System.Tuple<string, string, string, string>>();
+                foreach (string cat in AQOONHUB_SMS.Modules.Reports.ReportAuthorization.AllCategories)
+                {
+                    if (cat == AQOONHUB_SMS.Modules.Reports.ReportAuthorization.Overview) continue;
+                    if (!AQOONHUB_SMS.Modules.Reports.ReportAuthorization.PageExists(cat)) continue;       // only built pages
+                    if (!AQOONHUB_SMS.Modules.Reports.ReportAuthorization.CanViewCategory(role, cat)) continue; // role filter
+                    list.Add(System.Tuple.Create(
+                        AQOONHUB_SMS.Modules.Reports.ReportAuthorization.Label(cat),
+                        AQOONHUB_SMS.Modules.Reports.ReportAuthorization.PageUrl(cat),
+                        "reports-" + cat.ToLowerInvariant(),
+                        AQOONHUB_SMS.Modules.Reports.ReportAuthorization.Icon(cat)));
+                }
+                return list;
+            }
         }
     }
 }

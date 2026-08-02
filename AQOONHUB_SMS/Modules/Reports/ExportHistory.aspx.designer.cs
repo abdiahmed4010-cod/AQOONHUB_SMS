@@ -1,0 +1,1 @@
+namespace AQOONHUB_SMS.Modules.Reports{public partial class ExportHistory{protected global::System.Web.UI.WebControls.Literal litMessage,litTotal,litCsv,litMeta,litExpired,litToday;protected global::System.Web.UI.WebControls.GridView gv;}}

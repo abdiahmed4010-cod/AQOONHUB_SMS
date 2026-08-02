@@ -108,6 +108,8 @@
                         <a href="~/Modules/Attendance/StudentAttendanceReport.aspx" runat="server" class="flex items-center gap-2 text-brand-600 hover:underline"><i data-lucide="user" class="w-4 h-4"></i> Student Report</a>
                         <a href="~/Modules/Attendance/ClassAttendanceReport.aspx" runat="server" class="flex items-center gap-2 text-brand-600 hover:underline"><i data-lucide="users" class="w-4 h-4"></i> Class Report</a>
                         <a href="~/Modules/Attendance/AttendanceCalendar.aspx" runat="server" class="flex items-center gap-2 text-brand-600 hover:underline"><i data-lucide="calendar" class="w-4 h-4"></i> Attendance Calendar</a>
+                        <a href="~/Modules/Attendance/AttendanceAnalytics.aspx" runat="server" class="flex items-center gap-2 text-brand-600 hover:underline"><i data-lucide="bar-chart-3" class="w-4 h-4"></i> View Analytics</a>
+                        <a href="~/Modules/Attendance/AttendanceAlerts.aspx" runat="server" class="flex items-center gap-2 text-brand-600 hover:underline"><i data-lucide="bell" class="w-4 h-4"></i> View Alerts</a>
                         <a href="~/Modules/Attendance/AttendanceSettings.aspx" runat="server" class="flex items-center gap-2 text-brand-600 hover:underline"><i data-lucide="settings" class="w-4 h-4"></i> Attendance Settings</a>
                     </div>
                 </div>
