@@ -166,6 +166,8 @@ namespace AQOONHUB_SMS.MasterPages
 
         public bool CanAdminSystem { get { return AQOONHUB_SMS.Modules.Administration.SystemAuthorization.IsAdministrator(Session["Role"] as string); } }
         public bool CanViewSystemSecurity { get { return AQOONHUB_SMS.Modules.Administration.SystemAuthorization.CanViewSecurity(Session["Role"] as string); } }
+        public bool CanAccessCommunication { get { return AQOONHUB_SMS.Modules.Communication.CommunicationAuthorization.CanView(Session["Role"] as string); } }
+        public bool CanUseOutboundCommunication { get { return AQOONHUB_SMS.Modules.Communication.CommunicationAuthorization.CanUseOutbound(Session["Role"] as string); } }
 
         /// <summary>Role-filtered Reports category links whose pages already exist (label, url, navkey, icon).</summary>
         public System.Collections.Generic.List<System.Tuple<string, string, string, string>> ReportsMenu

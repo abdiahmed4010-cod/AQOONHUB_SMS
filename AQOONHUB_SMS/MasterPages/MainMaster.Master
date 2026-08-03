@@ -361,6 +361,27 @@
                 <%-- Stage 3-5 categories are added here as their pages are built, so no link ever 404s. --%>
                 <% } %>
 
+                <% if (CanAccessCommunication) { %>
+                <p class="nav-section">Communication</p>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Communication/Overview.aspx") %>" data-nav="communication/overview">
+                    <i data-lucide="messages-square" class="w-[18px] h-[18px]" aria-hidden="true"></i><span>Overview</span>
+                </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Communication/Announcements.aspx") %>" data-nav="communication/announcements">
+                    <i data-lucide="megaphone" class="w-[18px] h-[18px]" aria-hidden="true"></i><span>Announcements</span>
+                </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Communication/Messages.aspx") %>" data-nav="communication/messages">
+                    <i data-lucide="mail" class="w-[18px] h-[18px]" aria-hidden="true"></i><span>Messages</span>
+                </a>
+                <% if (CanUseOutboundCommunication) { %>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Communication/SmsEmail.aspx") %>" data-nav="communication/smsemail">
+                    <i data-lucide="send" class="w-[18px] h-[18px]" aria-hidden="true"></i><span>SMS &amp; Email</span>
+                </a>
+                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Communication/DeliveryLogs.aspx") %>" data-nav="communication/deliverylogs">
+                    <i data-lucide="list-checks" class="w-[18px] h-[18px]" aria-hidden="true"></i><span>Delivery Logs</span>
+                </a>
+                <% } %>
+                <% } %>
+
                 <% if (CanAdminSystem || CanViewSystemSecurity) { %><p class="nav-section">System</p>
                 <% if (CanAdminSystem) { %>
                 <a class="nav-item" href="<%= ResolveUrl("~/Modules/Administration/Users.aspx") %>" data-nav="users">

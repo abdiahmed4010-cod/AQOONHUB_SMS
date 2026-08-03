@@ -1199,8 +1199,6 @@
     <Folder Include="Assets\fonts\" />
     <Folder Include="Assets\icons\" />
     <Folder Include="Assets\uploads\" />
-    <Folder Include="Modules\Administration\" />
-    <Folder Include="Modules\Settings\" />
     <Folder Include="Modules\Teachers\" />
   </ItemGroup>
   <ItemGroup>
@@ -1277,6 +1275,15 @@
     <Content Include="Assets\css\system-module.css" />
     <Content Include="Assets\css\system-completion.css" />
     <Content Include="Assets\js\modules\system\system-module.js" />
+    <Content Include="Assets\css\communication-module.css" />
+    <Content Include="Assets\js\modules\communication\communication-module.js" />
+    <Content Include="Database\Migrations\CommunicationModule.sql" />
+    <Content Include="Modules\Communication\Overview.aspx" />
+    <Content Include="Modules\Communication\Announcements.aspx" />
+    <Content Include="Modules\Communication\Messages.aspx" />
+    <Content Include="Modules\Communication\SmsEmail.aspx" />
+    <Content Include="Modules\Communication\DeliveryLogs.aspx" />
+    <Content Include="Modules\Communication\AttachmentDownload.aspx" />
     <Content Include="Modules\Administration\Users.aspx" />
     <Content Include="Modules\Administration\AuditLog.aspx" />
     <Content Include="Modules\Administration\LoginActivity.aspx" />
@@ -1284,13 +1291,80 @@
     <Compile Include="Modules\Administration\SystemAuthorization.cs" />
     <Compile Include="Modules\Administration\SystemRepository.cs" />
     <Compile Include="Modules\Administration\SystemSecurity.cs" />
-    <Compile Include="Modules\Administration\Users.aspx.cs"><DependentUpon>Users.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
-    <Compile Include="Modules\Administration\Users.aspx.designer.cs"><DependentUpon>Users.aspx</DependentUpon></Compile>
-    <Compile Include="Modules\Administration\AuditLog.aspx.cs"><DependentUpon>AuditLog.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
-    <Compile Include="Modules\Administration\AuditLog.aspx.designer.cs"><DependentUpon>AuditLog.aspx</DependentUpon></Compile>
-    <Compile Include="Modules\Administration\LoginActivity.aspx.cs"><DependentUpon>LoginActivity.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
-    <Compile Include="Modules\Administration\LoginActivity.aspx.designer.cs"><DependentUpon>LoginActivity.aspx</DependentUpon></Compile>
-    <Compile Include="Modules\Settings\Settings.aspx.cs"><DependentUpon>Settings.aspx</DependentUpon><SubType>ASPXCodeBehind</SubType></Compile>
-    <Compile Include="Modules\Settings\Settings.aspx.designer.cs"><DependentUpon>Settings.aspx</DependentUpon></Compile>
+    <Compile Include="Modules\Administration\Users.aspx.cs">
+      <DependentUpon>Users.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Administration\Users.aspx.designer.cs">
+      <DependentUpon>Users.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Administration\AuditLog.aspx.cs">
+      <DependentUpon>AuditLog.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Administration\AuditLog.aspx.designer.cs">
+      <DependentUpon>AuditLog.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Administration\LoginActivity.aspx.cs">
+      <DependentUpon>LoginActivity.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Administration\LoginActivity.aspx.designer.cs">
+      <DependentUpon>LoginActivity.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Settings\Settings.aspx.cs">
+      <DependentUpon>Settings.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Settings\Settings.aspx.designer.cs">
+      <DependentUpon>Settings.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Communication\CommunicationAuthorization.cs" />
+    <Compile Include="Modules\Communication\CommunicationRepository.cs" />
+    <Compile Include="Modules\Communication\AttachmentDownload.aspx.cs">
+      <DependentUpon>AttachmentDownload.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Communication\AttachmentDownload.aspx.designer.cs">
+      <DependentUpon>AttachmentDownload.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Communication\CommunicationPageBase.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Communication\Overview.aspx.cs">
+      <DependentUpon>Overview.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Communication\Overview.aspx.designer.cs">
+      <DependentUpon>Overview.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Communication\Announcements.aspx.cs">
+      <DependentUpon>Announcements.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Communication\Announcements.aspx.designer.cs">
+      <DependentUpon>Announcements.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Communication\Messages.aspx.cs">
+      <DependentUpon>Messages.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Communication\Messages.aspx.designer.cs">
+      <DependentUpon>Messages.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Communication\SmsEmail.aspx.cs">
+      <DependentUpon>SmsEmail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Communication\SmsEmail.aspx.designer.cs">
+      <DependentUpon>SmsEmail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Communication\DeliveryLogs.aspx.cs">
+      <DependentUpon>DeliveryLogs.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Communication\DeliveryLogs.aspx.designer.cs">
+      <DependentUpon>DeliveryLogs.aspx</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>
