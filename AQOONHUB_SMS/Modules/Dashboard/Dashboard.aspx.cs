@@ -180,7 +180,7 @@ namespace AQOONHUB_SMS.Modules.Dashboard
                         SELECT 
                             (SELECT COUNT(*) FROM Exams WHERE ExamDate > GETDATE()) AS UpcomingExams,
                             (SELECT COUNT(*) FROM Exams WHERE ExamDate <= GETDATE() AND EndDate >= GETDATE()) AS ActiveExams,
-                            (SELECT COUNT(*) FROM Applications WHERE Status = 'Pending') AS PendingApplications,
+                            (SELECT COUNT(*) FROM Admissions WHERE Status = 'Pending') AS PendingApplications,
                             (SELECT TOP 1 TermName FROM AcademicTerms WHERE StartDate <= GETDATE() AND EndDate >= GETDATE()) AS CurrentTerm,
                             (SELECT TOP 1 StartDate FROM AcademicTerms WHERE StartDate <= GETDATE() AND EndDate >= GETDATE()) AS TermStartDate,
                             (SELECT TOP 1 EndDate FROM AcademicTerms WHERE StartDate <= GETDATE() AND EndDate >= GETDATE()) AS TermEndDate";

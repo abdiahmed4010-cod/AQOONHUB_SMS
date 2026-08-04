@@ -1,310 +1,155 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Login.aspx.cs" 
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Login.aspx.cs"
     Inherits="AQOONHUB_SMS.Modules.Authentication.Login" %>
 
 <!DOCTYPE html>
-<html lang="en" class="">
+<html lang="en">
 <head runat="server">
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sign In — AQOONHUB SMS</title>
     <link rel="icon" type="image/png" href="<%= ResolveUrl("~/Assets/images/logo.png") %>" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            50: '#EFF6FF', 100: '#DBEAFE', 200: '#BFDBFE', 300: '#93C5FD',
-                            400: '#60A5FA', 500: '#3B82F6', 600: '#2563EB', 700: '#1D4ED8',
-                            800: '#1E3A8A', 900: '#1E3A8A'
-                        },
-                        sidebar: '#1E3A8A',
-                        surface: '#F8FAFC'
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'ui-sans-serif', 'system-ui']
-                    },
-                    boxShadow: {
-                        card: '0 1px 2px 0 rgb(0 0 0 / 0.04), 0 1px 3px 0 rgb(0 0 0 / 0.06)',
-                        pop: '0 12px 32px -8px rgb(15 23 42 / 0.18)'
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        html { -webkit-font-smoothing: antialiased; }
-        body { font-family: 'Inter', sans-serif; }
-        .input {
-            width: 100%;
-            border: 1px solid #E5E7EB;
-            border-radius: .6rem;
-            padding: .55rem .8rem;
-            font-size: .85rem;
-            background: #fff;
-            color: #111827;
-            outline: none;
-            transition: border .15s, box-shadow .15s;
-        }
-        .input:focus {
-            border-color: #2563EB;
-            box-shadow: 0 0 0 3px rgba(37,99,235,.12);
-        }
-        .dark .input {
-            background: #0F172A;
-            border-color: #334155;
-            color: #E2E8F0;
-        }
-        .btn-primary {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: .45rem;
-            font-weight: 600;
-            font-size: .82rem;
-            border-radius: .6rem;
-            padding: .55rem 1rem;
-            transition: all .15s;
-            cursor: pointer;
-            border: 1px solid transparent;
-            background: #2563EB;
-            color: #fff;
-        }
-        .btn-primary:hover { background: #1D4ED8; }
-        .btn-primary:disabled {
-            opacity: .6;
-            cursor: not-allowed;
-        }
-        .fadein {
-            animation: fadein .25s ease;
-        }
-        @keyframes fadein {
-            from { opacity: 0; transform: translateY(4px); }
-            to { opacity: 1; transform: none; }
-        }
-        .spinner {
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(255,255,255,.3);
-            border-top-color: #fff;
-            border-radius: 50%;
-            animation: spin .6s linear infinite;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        .error-shake {
-            animation: shake .4s ease;
-        }
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-6px); }
-            75% { transform: translateX(6px); }
-        }
-    </style>
+    <link rel="stylesheet" href="<%= ResolveUrl("~/Assets/css/login-page.css") %>" />
 </head>
-<body class="bg-surface dark:bg-slate-900 text-slate-900 dark:text-slate-100">
-    <form id="form1" runat="server" class="min-h-screen flex">
+<body>
+    <form id="form1" runat="server" class="login-shell">
 
-        <!-- Left Panel -->
-        <div class="hidden lg:flex w-[46%] bg-sidebar text-white flex-col justify-between p-12 relative overflow-hidden">
-            <div class="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-brand-600/30 blur-3xl"></div>
-            <div class="absolute bottom-0 -left-24 w-96 h-96 rounded-full bg-violet-600/30 blur-3xl"></div>
-
-            <div class="relative flex items-center gap-3 z-10">
-                <img src="~/assets/logo.png" class="w-11 h-11 rounded-xl bg-white p-1" alt="AQOONHUB Logo" />
-                <p class="text-xl font-extrabold tracking-tight">AQOON<span class="text-violet-300">HUB</span></p>
+        <%-- ============================================================
+             LEFT — BRANDING PANEL
+             ============================================================ --%>
+        <aside class="brand-panel" aria-hidden="true">
+            <div class="brand-top">
+                <img class="brand-logo" src="<%= ResolveUrl("~/Assets/images/logo.png") %>" width="52" height="52" alt="AQOONHUB School Management System logo" />
+                <div class="brand-word">
+                    <div class="name">AQOON<em>HUB</em></div>
+                    <span class="sub">SCHOOL MANAGEMENT SYSTEM</span>
+                </div>
             </div>
 
-            <div class="relative z-10">
-                <h1 class="text-4xl font-extrabold leading-tight tracking-tight">Run your entire school<br />from one hub.</h1>
-                <p class="text-indigo-200 mt-4 max-w-md text-sm leading-relaxed">
-                    Admissions, academics, attendance, exams, finance, HR and reporting — 
-                    a single enterprise-grade platform for primary &amp; secondary schools.
+            <div class="brand-mid">
+                <h2 class="brand-heading">Smart School.<br /><span class="grad">Stronger Future.</span></h2>
+                <p class="brand-lead">
+                    AQOONHUB SMS empowers schools to manage students, staff, academics,
+                    communication and more in one secure platform.
                 </p>
-                <div class="flex gap-6 mt-10">
-                    <div>
-                        <p class="text-2xl font-extrabold">1,240+</p>
-                        <p class="text-xs text-indigo-300 mt-1">Students</p>
+
+                <div class="feature-grid">
+                    <div class="feature">
+                        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+                        <span class="lbl">Student<br />Management</span>
                     </div>
-                    <div>
-                        <p class="text-2xl font-extrabold">86</p>
-                        <p class="text-xs text-indigo-300 mt-1">Staff</p>
+                    <div class="feature">
+                        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></span>
+                        <span class="lbl">Academic<br />Excellence</span>
                     </div>
-                    <div>
-                        <p class="text-2xl font-extrabold">99.9%</p>
-                        <p class="text-xs text-indigo-300 mt-1">Uptime</p>
+                    <div class="feature">
+                        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg></span>
+                        <span class="lbl">Reports &amp;<br />Analytics</span>
+                    </div>
+                    <div class="feature">
+                        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+                        <span class="lbl">Communication<br />Hub</span>
+                    </div>
+                    <div class="feature">
+                        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></span>
+                        <span class="lbl">Secure &amp;<br />Reliable</span>
+                    </div>
+                    <div class="feature">
+                        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg></span>
+                        <span class="lbl">Anywhere<br />Access</span>
                     </div>
                 </div>
             </div>
 
-            <p class="relative z-10 text-xs text-indigo-300">
-                &copy; 2026 AQOONHUB International School
-            </p>
-        </div>
+            <p class="brand-foot">&copy; <span class="foot-year">2026</span> AQOONHUB SMS. All rights reserved.</p>
+        </aside>
 
-        <!-- Right Panel -->
-        <div class="flex-1 flex items-center justify-center p-6 bg-surface dark:bg-slate-900">
-            <div class="w-full max-w-md fadein">
+        <%-- ============================================================
+             RIGHT — LOGIN AREA
+             ============================================================ --%>
+        <main class="auth-panel">
+            <div class="auth-inner">
 
-                <!-- Mobile Logo -->
-                <div class="lg:hidden text-center mb-6">
-                    <img src="~/assets/logo.png" class="w-14 h-14 rounded-2xl mx-auto mb-3" alt="AQOONHUB Logo" />
-                    <p class="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-                        AQOON<span class="text-brand-600">HUB</span>
-                    </p>
-                    <p class="text-xs text-gray-500 dark:text-slate-400 mt-1">School Management System</p>
+                <div class="mobile-brand">
+                    <img src="<%= ResolveUrl("~/Assets/images/logo.png") %>" width="60" height="60" alt="AQOONHUB School Management System logo" />
+                    <div class="name">AQOON<em>HUB</em></div>
+                    <div class="sub">SCHOOL MANAGEMENT SYSTEM</div>
                 </div>
 
-                <h2 class="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">Welcome back</h2>
-                <p class="text-sm text-gray-500 dark:text-slate-400 mt-1 mb-7">
-                    Sign in to your AQOONHUB account to continue.
-                </p>
-
-                <!-- Error Message -->
-                <asp:Panel ID="pnlError" runat="server" Visible="false" CssClass="mb-4 p-3.5 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 flex items-start gap-2.5 error-shake">
-                    <svg class="w-4 h-4 text-red-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    <asp:Label ID="lblErrorMessage" runat="server" CssClass="text-xs text-red-700 dark:text-red-300 font-medium"></asp:Label>
-                </asp:Panel>
-
-                <!-- Login Form -->
-                <div class="space-y-4">
-
-                    <!-- Email / Username -->
-                    <div>
-                        <label class="text-xs font-semibold text-gray-600 dark:text-slate-300 mb-1.5 block">
-                            Email address <span class="text-red-500">*</span>
-                        </label>
-                        <asp:TextBox ID="txtEmail" runat="server" 
-                            CssClass="input" 
-                            TextMode="Email"
-                            placeholder="you@aqoonhub.edu"
-                            autocomplete="email" />
+                <section class="auth-card" role="region" aria-labelledby="loginHeading">
+                    <div class="card-head">
+                        <div class="head-badge" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        </div>
+                        <h1 id="loginHeading">Welcome Back!</h1>
+                        <p>Sign in to continue to your account</p>
                     </div>
 
-                    <!-- Password -->
-                    <div>
-                        <label class="text-xs font-semibold text-gray-600 dark:text-slate-300 mb-1.5 block">
-                            Password <span class="text-red-500">*</span>
-                        </label>
-                        <div class="relative">
-                            <asp:TextBox ID="txtPassword" runat="server" 
-                                CssClass="input !pr-10" 
-                                TextMode="Password"
-                                placeholder="Enter your password"
-                                autocomplete="current-password" />
-                            <button type="button" 
-                                id="btnTogglePassword"
-                                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-slate-300 transition-colors"
-                                onclick="togglePasswordVisibility()"
-                                title="Show / Hide password">
-                                <svg id="eyeIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                </svg>
-                                <svg id="eyeOffIcon" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                        d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a10.05 10.05 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.542 7a10.058 10.058 0 01-3.7 4.79m0 0L21 21"></path>
-                                </svg>
+                    <div class="divider">Sign in with your credentials</div>
+
+                    <asp:Panel ID="pnlError" runat="server" Visible="false" CssClass="alert" role="alert" aria-live="assertive">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        <asp:Label ID="lblErrorMessage" runat="server" CssClass="msg"></asp:Label>
+                    </asp:Panel>
+
+                    <div class="field">
+                        <label for="<%= txtEmail.ClientID %>">Email address <span class="req">*</span></label>
+                        <div class="control">
+                            <svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            <asp:TextBox ID="txtEmail" runat="server" TextMode="Email" placeholder="Enter your email" autocomplete="username email" />
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="<%= txtPassword.ClientID %>">Password <span class="req">*</span></label>
+                        <div class="control has-toggle">
+                            <svg class="lead-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            <asp:TextBox ID="txtPassword" runat="server" TextMode="Password" placeholder="Enter your password" autocomplete="current-password" />
+                            <button type="button" id="btnTogglePassword" class="toggle-pw" aria-label="Show password" aria-pressed="false">
+                                <svg class="eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+                                <svg class="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c6.5 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.53 13.53 0 0 0 2 12s3.5 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><path d="M14.12 14.12A3 3 0 1 1 9.88 9.88"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
                             </button>
                         </div>
                     </div>
 
-                    <!-- Remember Me & Forgot Password -->
-                    <div class="flex items-center justify-between text-xs">
-                        <label class="flex items-center gap-2 text-gray-600 dark:text-slate-300 cursor-pointer">
-                            <asp:CheckBox ID="chkRememberMe" runat="server" CssClass="accent-brand-600 w-3.5 h-3.5" />
+                    <div class="options">
+                        <label class="remember" for="<%= chkRememberMe.ClientID %>">
+                            <asp:CheckBox ID="chkRememberMe" runat="server" />
                             <span>Remember me</span>
                         </label>
-                        <a href="ForgotPassword.aspx" class="font-semibold text-brand-600 hover:underline transition-colors">
-                            Forgot password?
-                        </a>
                     </div>
 
-                    <!-- Login Button -->
-                    <asp:Button ID="btnLogin" runat="server" 
-                        Text="Sign in" 
-                        CssClass="btn-primary w-full !py-2.5"
-                        OnClick="btnLogin_Click"
-                        OnClientClick="return showLoading();" />
+                    <div class="signin-wrap" id="signinWrap">
+                        <asp:Button ID="btnLogin" runat="server" Text="Sign In" CssClass="btn-signin"
+                            data-label="Sign In" OnClick="btnLogin_Click" OnClientClick="return aqoonLoginSubmit();" />
+                        <span class="spinner" aria-hidden="true"></span>
+                    </div>
 
-                    <!-- Loading Button (Hidden by default) -->
-                    <button type="button" 
-                        id="btnLoading" 
-                        disabled 
-                        class="btn-primary w-full !py-2.5 hidden">
-                        <span class="spinner"></span>
-                        <span>Signing in...</span>
-                    </button>
+                    <p class="help-text">Need help? Contact your system administrator.</p>
+                </section>
 
+                <div class="security-row">
+                    <div class="security-item"><span class="s-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></span><span>Secure<br />Connection</span></div>
+                    <div class="security-item"><span class="s-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 11l-3 3-1.5-1.5"/></svg></span><span>Role Based<br />Access</span></div>
+                    <div class="security-item"><span class="s-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><span>Data<br />Protection</span></div>
+                    <div class="security-item"><span class="s-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15l2 2 4-4"/></svg></span><span>Audit<br />Trail</span></div>
                 </div>
 
-                <!-- Security Note -->
-                <p class="text-[11px] text-gray-400 dark:text-slate-500 mt-6 text-center flex items-center justify-center gap-1.5">
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                    </svg>
-                    Protected by password policy, session timeout &amp; audit logging
-                </p>
+                <p class="auth-footer">&copy; <span class="foot-year">2026</span> AQOONHUB SMS. All rights reserved.</p>
 
             </div>
-        </div>
-
+        </main>
     </form>
 
     <script>
-        // Toggle password visibility
-        function togglePasswordVisibility() {
-            var txtPassword = document.getElementById('<%= txtPassword.ClientID %>');
-            var eyeIcon = document.getElementById('eyeIcon');
-            var eyeOffIcon = document.getElementById('eyeOffIcon');
-
-            if (txtPassword.type === 'password') {
-                txtPassword.type = 'text';
-                eyeIcon.classList.add('hidden');
-                eyeOffIcon.classList.remove('hidden');
-            } else {
-                txtPassword.type = 'password';
-                eyeIcon.classList.remove('hidden');
-                eyeOffIcon.classList.add('hidden');
-            }
-        }
-
-        // Show loading state
-        function showLoading() {
-            var btnLogin = document.getElementById('<%= btnLogin.ClientID %>');
-            var btnLoading = document.getElementById('btnLoading');
-            var txtEmail = document.getElementById('<%= txtEmail.ClientID %>');
-            var txtPassword = document.getElementById('<%= txtPassword.ClientID %>');
-
-            // Basic client-side validation
-            if (!txtEmail.value.trim() || !txtPassword.value.trim()) {
-                return true; // Let server handle validation
-            }
-
-            btnLogin.classList.add('hidden');
-            btnLoading.classList.remove('hidden');
-            return true;
-        }
-
-        // Dark mode detection
-        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            document.documentElement.classList.add('dark');
-        }
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
-            if (event.matches) {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
-        });
+        window.AqoonLogin = {
+            emailId: '<%= txtEmail.ClientID %>',
+            passwordId: '<%= txtPassword.ClientID %>',
+            loginId: '<%= btnLogin.ClientID %>'
+        };
     </script>
+    <script src="<%= ResolveUrl("~/Assets/js/modules/authentication/login-page.js") %>"></script>
 </body>
 </html>

@@ -108,8 +108,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="About.aspx" />
+    <Content Include="Assets\images\campus.png" />
     <Content Include="Assets\js\modules\dashboard\dashboard.js" />
     <Content Include="Assets\js\modules\attendance\attendance.js" />
+    <Content Include="Assets\js\modules\authentication\login-page.js" />
+    <Content Include="Assets\js\modules\authentication\change-password.js" />
+    <Content Include="Assets\js\layout\sidebar-navigation.js" />
     <Content Include="Assets\js\core\app.js" />
     <Content Include="Assets\js\core\dropdown.js" />
     <Content Include="Assets\js\core\layout.js" />
@@ -167,6 +171,7 @@
     <Content Include="Modules\Admission\AdmissionReview.aspx" />
     <Content Include="Modules\Admission\Admissions.aspx" />
     <Content Include="Modules\Authentication\Login.aspx" />
+    <Content Include="Modules\Authentication\ChangePassword.aspx" />
     <Content Include="Modules\Dashboard\Dashboard.aspx" />
     <Content Include="Modules\Finance\AddFeeStructure.aspx" />
     <Content Include="Modules\Finance\AddInvoice.aspx" />
@@ -174,6 +179,7 @@
     <Content Include="Modules\Finance\EditFeeStructure.aspx" />
     <Content Include="Modules\Finance\FeeStructures.aspx" />
     <Content Include="Modules\Finance\FeeManagement.aspx" />
+    <Content Include="Modules\Finance\PendingFinanceSetup.aspx" />
     <Content Include="Modules\Finance\FeeCategories.aspx" />
     <Content Include="Modules\Finance\CreateInvoice.aspx" />
     <Content Include="Modules\Finance\RecordPayment.aspx" />
@@ -233,6 +239,8 @@
     <Content Include="Modules\Reports\ExportHistory.aspx" />
     <Content Include="Modules\Reports\ReportAuditLog.aspx" />
     <Content Include="Assets\css\reports-stage5.css" />
+    <Content Include="Assets\css\login-page.css" />
+    <Content Include="Assets\css\sidebar-navigation.css" />
     <Content Include="Database\Scripts\ReportsStage5.sql" />
     <Content Include="Modules\Academic\Academics.aspx" />
     <Content Include="Modules\Academic\AcademicYears.aspx" />
@@ -538,6 +546,13 @@
     <Compile Include="Modules\Authentication\Login.aspx.designer.cs">
       <DependentUpon>Login.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Modules\Authentication\ChangePassword.aspx.cs">
+      <DependentUpon>ChangePassword.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Authentication\ChangePassword.aspx.designer.cs">
+      <DependentUpon>ChangePassword.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Modules\Dashboard\Dashboard.aspx.cs">
       <DependentUpon>Dashboard.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -584,6 +599,13 @@
     </Compile>
     <Compile Include="Modules\Finance\FeeManagement.aspx.designer.cs">
       <DependentUpon>FeeManagement.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Finance\PendingFinanceSetup.aspx.cs">
+      <DependentUpon>PendingFinanceSetup.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Finance\PendingFinanceSetup.aspx.designer.cs">
+      <DependentUpon>PendingFinanceSetup.aspx</DependentUpon>
     </Compile>
     <Compile Include="Modules\Finance\FeeCategories.aspx.cs">
       <DependentUpon>FeeCategories.aspx</DependentUpon>
@@ -708,6 +730,7 @@
       <DependentUpon>Parents.aspx</DependentUpon>
     </Compile>
     <Compile Include="Modules\Parents\ParentsRepository.cs" />
+    <Compile Include="Modules\Parents\ParentAccountService.cs" />
     <Compile Include="Modules\Payroll\Payroll.aspx.cs">
       <DependentUpon>Payroll.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

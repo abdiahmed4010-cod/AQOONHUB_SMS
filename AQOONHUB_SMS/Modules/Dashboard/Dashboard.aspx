@@ -548,7 +548,7 @@
                         </div>
                         <div class="mini-stat">
                             <div class="value" style="color: var(--warning);"><asp:Label ID="lblPendingApplications" runat="server" Text="0" /></div>
-                            <div class="label">Pending Apps</div>
+                            <div class="label">Pending Admissions</div>
                         </div>
                         <div class="mini-stat">
                             <div class="value" style="color: var(--success);"><asp:Label ID="lblCurrentTerm" runat="server" Text="-" /></div>

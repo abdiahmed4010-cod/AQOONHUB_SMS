@@ -10,6 +10,16 @@ namespace AQOONHUB_SMS.MasterPages
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            // Forced password change gate: a user flagged MustChangePassword may not browse any
+            // master-based module. Only the standalone Change Password page (no master) and Login
+            // are reachable, so there is no redirect loop.
+            if (Session["MustChangePassword"] is bool && (bool)Session["MustChangePassword"])
+            {
+                Response.Redirect("~/Modules/Authentication/ChangePassword.aspx", false);
+                Context.ApplicationInstance.CompleteRequest();
+                return;
+            }
+
             if (!IsPostBack)
             {
                 var contentTitle = Page.Title;
@@ -168,6 +178,121 @@ namespace AQOONHUB_SMS.MasterPages
         public bool CanViewSystemSecurity { get { return AQOONHUB_SMS.Modules.Administration.SystemAuthorization.CanViewSecurity(Session["Role"] as string); } }
         public bool CanAccessCommunication { get { return AQOONHUB_SMS.Modules.Communication.CommunicationAuthorization.CanView(Session["Role"] as string); } }
         public bool CanUseOutboundCommunication { get { return AQOONHUB_SMS.Modules.Communication.CommunicationAuthorization.CanUseOutbound(Session["Role"] as string); } }
+
+        // ============================================================
+        // Sidebar navigation — role-group visibility (view filtering only;
+        // each target page still enforces its own server-side authorization).
+        // ============================================================
+        private string RoleN { get { return NormRole(); } }
+
+        /// <summary>Student Management group: student/guardian/admission administration.</summary>
+        public bool CanAccessStudentMgmt { get { string r = RoleN; return r == "superadmin" || r == "admin" || r == "registrar"; } }
+
+        /// <summary>Teachers &amp; Staff directory (HR) — hidden from teachers.</summary>
+        public bool CanAccessStaff { get { string r = RoleN; return r == "superadmin" || r == "admin" || r == "academic" || r == "registrar"; } }
+
+        /// <summary>Academic Management group (academics, classes, attendance, examinations).</summary>
+        public bool CanAccessAcademicMgmt { get { string r = RoleN; return r == "superadmin" || r == "admin" || r == "academic" || r == "registrar" || r == "teacher" || r == "examofficer"; } }
+
+        /// <summary>Finance Management group (fees + payroll).</summary>
+        public bool CanAccessFinanceMgmt { get { string r = RoleN; return r == "superadmin" || r == "admin" || r == "accountant"; } }
+
+        /// <summary>Server-computed active navigation key (longest route-prefix match, query string ignored).</summary>
+        private string _activeKey;
+        public string ActiveKey { get { if (_activeKey == null) _activeKey = ComputeActiveKey(); return _activeKey; } }
+
+        private string ComputeActiveKey()
+        {
+            string p = (Request.AppRelativeCurrentExecutionFilePath ?? "").ToLowerInvariant(); // e.g. ~/modules/students/students.aspx
+            var map = new[]
+            {
+                new[] {"~/modules/academic/classessections","classes"},
+                new[] {"~/modules/academic/","academics"},
+                new[] {"~/modules/attendance/parentattendance","myattendance"},
+                new[] {"~/modules/attendance/","attendance"},
+                new[] {"~/modules/students/","students"},
+                new[] {"~/modules/parents/","guardians"},
+                new[] {"~/modules/admission/","admissions"},
+                new[] {"~/modules/staff/","staff"},
+                new[] {"~/modules/examinations/","examinations"},
+                new[] {"~/modules/finance/pendingfinancesetup","finance-setup"},
+                new[] {"~/modules/finance/","finance"},
+                new[] {"~/modules/payroll/","payroll"},
+                new[] {"~/modules/reports/","reports"},
+                new[] {"~/modules/communication/overview","comm-overview"},
+                new[] {"~/modules/communication/announcements","comm-announcements"},
+                new[] {"~/modules/communication/messages","comm-messages"},
+                new[] {"~/modules/communication/smsemail","comm-sms"},
+                new[] {"~/modules/communication/deliverylogs","comm-logs"},
+                new[] {"~/modules/administration/users","users"},
+                new[] {"~/modules/administration/auditlog","auditlog"},
+                new[] {"~/modules/administration/loginactivity","loginactivity"},
+                new[] {"~/modules/settings/","settings"},
+                new[] {"~/modules/dashboard/","dashboard"},
+            };
+            string best = "dashboard"; int bestLen = -1;
+            foreach (var m in map)
+            {
+                if (p.StartsWith(m[0], StringComparison.Ordinal) && m[0].Length > bestLen) { best = m[1]; bestLen = m[0].Length; }
+            }
+            return best;
+        }
+
+        /// <summary>Group id owning a child key (used to auto-expand the active parent).</summary>
+        public string GroupOf(string key)
+        {
+            switch (key)
+            {
+                case "students": case "guardians": case "admissions": return "student";
+                case "staff": case "academics": case "classes": case "attendance": case "myattendance": case "examinations": return "academic";
+                case "finance": case "finance-setup": case "payroll": return "finance";
+                case "reports": return "reports";
+                case "comm-overview": case "comm-announcements": case "comm-messages": case "comm-sms": case "comm-logs": return "comm";
+                case "users": case "auditlog": case "loginactivity": case "settings": return "system";
+                default: return "";
+            }
+        }
+
+        /// <summary>True when the given dropdown group contains the active route.</summary>
+        public bool IsGroupOpen(string groupId) { return GroupOf(ActiveKey) == groupId; }
+
+        /// <summary>CSS class for a child link (adds 'active' on the current route).</summary>
+        public string ChildClass(string key) { return key == ActiveKey ? "nav-item active" : "nav-item"; }
+
+        /// <summary>Renders aria-current="page" only on the active child.</summary>
+        public string AriaCurrent(string key) { return key == ActiveKey ? "page" : null; }
+
+        /// <summary>Safe initials from the authenticated user's name (no hard-coded values).</summary>
+        public string GetUserInitials()
+        {
+            string name = (GetCurrentUserName() ?? "").Trim();
+            if (string.IsNullOrEmpty(name) || name == "Guest") return "U";
+            var parts = name.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            string ini = "";
+            for (int i = 0; i < parts.Length && ini.Length < 2; i++)
+            {
+                if (!string.IsNullOrEmpty(parts[i])) ini += char.ToUpperInvariant(parts[i][0]);
+            }
+            return string.IsNullOrEmpty(ini) ? "U" : ini;
+        }
+
+        /// <summary>Friendly display label for the authenticated user's role.</summary>
+        public string GetRoleDisplay()
+        {
+            switch (RoleN)
+            {
+                case "superadmin": return "Super Admin";
+                case "admin": return "Administrator";
+                case "academic": return "Academic";
+                case "registrar": return "Registrar";
+                case "accountant": return "Accountant";
+                case "teacher": return "Teacher";
+                case "parent": case "guardian": return "Parent";
+                case "security": return "Security";
+                case "examofficer": return "Exam Officer";
+                default: return "User";
+            }
+        }
 
         /// <summary>Role-filtered Reports category links whose pages already exist (label, url, navkey, icon).</summary>
         public System.Collections.Generic.List<System.Tuple<string, string, string, string>> ReportsMenu

@@ -390,48 +390,157 @@ namespace AQOONHUB_SMS.Modules.Students
             if (int.TryParse(ddlGuardian.SelectedValue, out parsedGuardianId) && parsedGuardianId > 0)
                 guardianId = parsedGuardianId;
 
-            string query = @"
-                UPDATE Students SET
-                    FirstName = @FirstName, LastName = @LastName, Gender = @Gender,
-                    Status = @Status, DateOfBirth = @DateOfBirth, EnrollmentDate = @EnrollmentDate,
-                    AcademicYearID = @AcademicYearID, SectionID = @SectionID, GuardianID = @GuardianID,
-                    Address = @Address, MedicalNotes = @MedicalNotes, PhotoPath = @PhotoPath,
-                    Shift = @Shift, UpdatedAt = GETDATE()
-                WHERE StudentID = @StudentID";
+            int newSectionId = int.Parse(ddlSection.SelectedValue);
+            int newYearId = int.Parse(ddlAcademicYear.SelectedValue);
+            string newShift = string.IsNullOrEmpty(ddlShift.SelectedValue) ? null : ddlShift.SelectedValue;
 
-            SqlParameter[] parameters =
+            string saveError;
+            if (!SaveStudentWithPlacementHistory(newPhotoPath, guardianId, newSectionId, newYearId, newShift, out saveError))
             {
-                new SqlParameter("@FirstName", txtFirstName.Text.Trim()),
-                new SqlParameter("@LastName", txtLastName.Text.Trim()),
-                new SqlParameter("@Gender", ddlGender.SelectedValue),
-                new SqlParameter("@Status", ddlStatus.SelectedValue),
-                new SqlParameter("@DateOfBirth", DateTime.Parse(txtDateOfBirth.Text)),
-                new SqlParameter("@EnrollmentDate", DateTime.Parse(txtEnrollmentDate.Text)),
-                new SqlParameter("@AcademicYearID", int.Parse(ddlAcademicYear.SelectedValue)),
-                new SqlParameter("@SectionID", int.Parse(ddlSection.SelectedValue)),
-                new SqlParameter("@GuardianID", (object)guardianId ?? DBNull.Value),
-                new SqlParameter("@Address", string.IsNullOrEmpty(txtAddress.Text.Trim()) ? (object)DBNull.Value : txtAddress.Text.Trim()),
-                new SqlParameter("@MedicalNotes", string.IsNullOrEmpty(txtMedicalNotes.Text.Trim()) ? (object)DBNull.Value : txtMedicalNotes.Text.Trim()),
-                new SqlParameter("@PhotoPath", (object)newPhotoPath ?? DBNull.Value),
-                new SqlParameter("@Shift", string.IsNullOrEmpty(ddlShift.SelectedValue) ? (object)DBNull.Value : ddlShift.SelectedValue),
-                new SqlParameter("@StudentID", StudentId)
-            };
+                ShowError(saveError);
+                return;
+            }
 
-            try
-            {
-                ExecuteNonQuery(query, parameters);
-                CurrentPhotoPath = newPhotoPath;
-                Response.Redirect("~/Modules/Students/StudentDetails.aspx?id=" + StudentId, true);
-            }
-            catch (Exception)
-            {
-                ShowError("The student could not be updated due to a system error. Please try again.");
-            }
+            CurrentPhotoPath = newPhotoPath;
+            Response.Redirect("~/Modules/Students/StudentDetails.aspx?id=" + StudentId, true);
         }
 
         protected void btnCancel_Click(object sender, EventArgs e)
         {
             Response.Redirect("~/Modules/Students/StudentDetails.aspx?id=" + StudentId, true);
+        }
+
+        /// <summary>
+        /// Saves the student in ONE transaction. When Section or Academic Year changes,
+        /// a StudentPromotions history row is written (old + new placement preserved) and
+        /// the destination Section's capacity and Shift are enforced BEFORE the Students
+        /// row is mutated. Any failure rolls back the whole operation, so placement history
+        /// can never be silently destroyed and old Attendance/Exam/Finance rows are untouched.
+        /// </summary>
+        private bool SaveStudentWithPlacementHistory(string photoPath, int? guardianId, int newSectionId, int newYearId, string newShift, out string error)
+        {
+            error = null;
+            int actorId;
+            int.TryParse(Convert.ToString(Session["UserID"]), out actorId);
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+                using (SqlTransaction tx = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        int curSection, curYear;
+                        using (SqlCommand cmd = new SqlCommand(
+                            "SELECT SectionID, AcademicYearID FROM Students WITH (UPDLOCK, HOLDLOCK) WHERE StudentID=@id", conn, tx))
+                        {
+                            cmd.Parameters.AddWithValue("@id", StudentId);
+                            using (SqlDataReader r = cmd.ExecuteReader())
+                            {
+                                if (!r.Read()) { tx.Rollback(); error = "Student not found."; return false; }
+                                curSection = Convert.ToInt32(r["SectionID"]);
+                                curYear = Convert.ToInt32(r["AcademicYearID"]);
+                            }
+                        }
+
+                        bool sectionChanged = newSectionId != curSection;
+                        bool placementChanged = sectionChanged || newYearId != curYear;
+
+                        // Shift compatibility: only enforced when the destination section
+                        // has an assigned shift and the student has a shift (Stage 4).
+                        if (!string.IsNullOrEmpty(newShift))
+                        {
+                            object secShiftObj;
+                            using (SqlCommand cmd = new SqlCommand("SELECT Shift FROM Sections WHERE SectionID=@s", conn, tx))
+                            { cmd.Parameters.AddWithValue("@s", newSectionId); secShiftObj = cmd.ExecuteScalar(); }
+                            string secShift = (secShiftObj == null || secShiftObj == DBNull.Value) ? null : Convert.ToString(secShiftObj);
+                            if (!string.IsNullOrEmpty(secShift) && !string.Equals(secShift, newShift, StringComparison.OrdinalIgnoreCase))
+                            {
+                                tx.Rollback();
+                                error = "Shift mismatch: the selected section is a " + secShift + " section but the student's shift is " + newShift + ". Choose a matching section or shift.";
+                                return false;
+                            }
+                        }
+
+                        // Capacity: only when moving INTO a different section (Stage 5),
+                        // under UPDLOCK to prevent two edits racing into the last seat.
+                        if (sectionChanged)
+                        {
+                            int capacity;
+                            using (SqlCommand cmd = new SqlCommand(
+                                "SELECT ISNULL(Capacity,0) FROM Sections WITH (UPDLOCK, HOLDLOCK) WHERE SectionID=@s", conn, tx))
+                            { cmd.Parameters.AddWithValue("@s", newSectionId); object c = cmd.ExecuteScalar(); capacity = (c == null || c == DBNull.Value) ? 0 : Convert.ToInt32(c); }
+
+                            int active;
+                            using (SqlCommand cmd = new SqlCommand(
+                                "SELECT COUNT(*) FROM Students WHERE SectionID=@s AND Status='Active' AND StudentID<>@id", conn, tx))
+                            { cmd.Parameters.AddWithValue("@s", newSectionId); cmd.Parameters.AddWithValue("@id", StudentId); active = Convert.ToInt32(cmd.ExecuteScalar()); }
+
+                            if (capacity > 0 && active >= capacity)
+                            {
+                                tx.Rollback();
+                                error = "The selected section is full (" + active + "/" + capacity + " active students). Choose another section.";
+                                return false;
+                            }
+                        }
+
+                        // Placement history is written BEFORE the current placement is changed.
+                        if (placementChanged)
+                        {
+                            using (SqlCommand cmd = new SqlCommand(@"
+                                INSERT INTO StudentPromotions
+                                    (StudentID, FromAcademicYearID, ToAcademicYearID, FromSectionID, ToSectionID, Status, ActionDate, PromotedBy, Notes, CreatedAt)
+                                VALUES
+                                    (@sid, @fromYear, @toYear, @fromSec, @toSec, 'Completed', GETDATE(), @by, @notes, GETDATE())", conn, tx))
+                            {
+                                cmd.Parameters.AddWithValue("@sid", StudentId);
+                                cmd.Parameters.AddWithValue("@fromYear", curYear);
+                                cmd.Parameters.AddWithValue("@toYear", newYearId);
+                                cmd.Parameters.AddWithValue("@fromSec", curSection);
+                                cmd.Parameters.AddWithValue("@toSec", newSectionId);
+                                cmd.Parameters.AddWithValue("@by", actorId > 0 ? (object)actorId : DBNull.Value);
+                                cmd.Parameters.AddWithValue("@notes", "Placement change via Edit Student");
+                                cmd.ExecuteNonQuery();
+                            }
+                        }
+
+                        using (SqlCommand cmd = new SqlCommand(@"
+                            UPDATE Students SET
+                                FirstName=@FirstName, LastName=@LastName, Gender=@Gender, Status=@Status,
+                                DateOfBirth=@DateOfBirth, EnrollmentDate=@EnrollmentDate,
+                                AcademicYearID=@AcademicYearID, SectionID=@SectionID, GuardianID=@GuardianID,
+                                Address=@Address, MedicalNotes=@MedicalNotes, PhotoPath=@PhotoPath,
+                                Shift=@Shift, UpdatedAt=GETDATE()
+                            WHERE StudentID=@StudentID", conn, tx))
+                        {
+                            cmd.Parameters.AddWithValue("@FirstName", txtFirstName.Text.Trim());
+                            cmd.Parameters.AddWithValue("@LastName", txtLastName.Text.Trim());
+                            cmd.Parameters.AddWithValue("@Gender", ddlGender.SelectedValue);
+                            cmd.Parameters.AddWithValue("@Status", ddlStatus.SelectedValue);
+                            cmd.Parameters.AddWithValue("@DateOfBirth", DateTime.Parse(txtDateOfBirth.Text));
+                            cmd.Parameters.AddWithValue("@EnrollmentDate", DateTime.Parse(txtEnrollmentDate.Text));
+                            cmd.Parameters.AddWithValue("@AcademicYearID", newYearId);
+                            cmd.Parameters.AddWithValue("@SectionID", newSectionId);
+                            cmd.Parameters.AddWithValue("@GuardianID", (object)guardianId ?? DBNull.Value);
+                            cmd.Parameters.AddWithValue("@Address", string.IsNullOrEmpty(txtAddress.Text.Trim()) ? (object)DBNull.Value : txtAddress.Text.Trim());
+                            cmd.Parameters.AddWithValue("@MedicalNotes", string.IsNullOrEmpty(txtMedicalNotes.Text.Trim()) ? (object)DBNull.Value : txtMedicalNotes.Text.Trim());
+                            cmd.Parameters.AddWithValue("@PhotoPath", (object)photoPath ?? DBNull.Value);
+                            cmd.Parameters.AddWithValue("@Shift", string.IsNullOrEmpty(newShift) ? (object)DBNull.Value : newShift);
+                            cmd.Parameters.AddWithValue("@StudentID", StudentId);
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        tx.Commit();
+                        return true;
+                    }
+                    catch (Exception)
+                    {
+                        try { tx.Rollback(); } catch { }
+                        error = "The student could not be updated due to a system error. Please try again.";
+                        return false;
+                    }
+                }
+            }
         }
 
         #endregion

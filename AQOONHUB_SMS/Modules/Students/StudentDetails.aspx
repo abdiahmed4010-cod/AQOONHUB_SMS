@@ -115,6 +115,33 @@
                     <div class="detail-row"><span class="k">Guardian</span><span class="v"><asp:Label ID="lblDetailGuardian" runat="server" /></span></div>
                     <div class="detail-row"><span class="k">Enrollment Date</span><span class="v"><asp:Label ID="lblDetailEnrolled" runat="server" /></span></div>
                 </div>
+
+                <div class="card p-6 md:col-span-2">
+                    <h3 class="font-bold mb-3 text-sm">Parent Login Account</h3>
+                    <div class="detail-row"><span class="k">Guardian</span><span class="v"><asp:Label ID="lblPAName" runat="server" /></span></div>
+                    <div class="detail-row"><span class="k">Email</span><span class="v"><asp:Label ID="lblPAEmail" runat="server" /></span></div>
+                    <div class="detail-row"><span class="k">Phone</span><span class="v"><asp:Label ID="lblPAPhone" runat="server" /></span></div>
+                    <div class="detail-row"><span class="k">Account Status</span><span class="v"><asp:Label ID="lblPABadge" runat="server" CssClass="badge" /></span></div>
+                    <div class="detail-row"><span class="k">Linked User</span><span class="v"><asp:Label ID="lblPALinkedEmail" runat="server" /></span></div>
+
+                    <asp:Panel ID="pnlPAError" runat="server" Visible="false" role="alert" aria-live="assertive"
+                        CssClass="mt-3 p-3 rounded-lg text-xs" style="background:#FEF2F2;color:#B91C1C;border:1px solid #FECACA;">
+                        <asp:Label ID="lblPAError" runat="server" />
+                    </asp:Panel>
+
+                    <asp:Panel ID="pnlPASuccess" runat="server" Visible="false" role="status" aria-live="polite"
+                        CssClass="mt-3 p-3 rounded-lg text-xs" style="background:#ECFDF5;color:#065F46;border:1px solid #A7F3D0;">
+                        <p class="font-semibold mb-2"><asp:Label ID="lblPASuccessMsg" runat="server" /></p>
+                        <div class="flex items-center gap-2" id="pnlTempWrap" runat="server" visible="false">
+                            <span class="k">Temporary password</span>
+                            <code style="font-size:.85rem;background:#fff;border:1px solid #A7F3D0;border-radius:.4rem;padding:.25rem .6rem;letter-spacing:.02em;"><asp:Label ID="lblPATempPassword" runat="server" /></code>
+                        </div>
+                    </asp:Panel>
+
+                    <asp:Button ID="btnCreateParentAccount" runat="server" Visible="false" CssClass="btn btn-primary mt-3"
+                        Text="Create Parent Account" OnClick="btnCreateParentAccount_Click"
+                        OnClientClick="return confirm('Create a Parent login account for this guardian? A one-time temporary password will be shown once.');" />
+                </div>
             </div>
         </asp:Panel>
     </div>

@@ -206,6 +206,7 @@ namespace AQOONHUB_SMS.Modules.Admission
                 }
             }
 
+            RenderParentAccount();
             return true;
         }
 
@@ -467,6 +468,41 @@ namespace AQOONHUB_SMS.Modules.Admission
                             return;
                         }
 
+                        // --- Shift compatibility (Stage 4): reject Morning->Afternoon etc.
+                        //     only when the destination section carries an assigned shift. ---
+                        string admShift = (app.Table.Columns.Contains("Shift") && app["Shift"] != DBNull.Value)
+                            ? app["Shift"].ToString() : null;
+                        if (!string.IsNullOrEmpty(admShift))
+                        {
+                            object secShiftObj = ExecuteScalar(conn, tx,
+                                "SELECT Shift FROM Sections WHERE SectionID = @s",
+                                new[] { new SqlParameter("@s", sectionId) });
+                            string secShift = (secShiftObj == null || secShiftObj == DBNull.Value) ? null : Convert.ToString(secShiftObj);
+                            if (!string.IsNullOrEmpty(secShift) && !string.Equals(secShift, admShift, StringComparison.OrdinalIgnoreCase))
+                            {
+                                tx.Rollback();
+                                ShowError("Shift mismatch: the selected section is a " + secShift + " section but this applicant's shift is " + admShift + ". Choose a matching section or shift.");
+                                return;
+                            }
+                        }
+
+                        // --- Section capacity (Stage 5): block enrolment into a full section,
+                        //     under UPDLOCK so two reviewers cannot take the last seat at once. ---
+                        object capObj = ExecuteScalar(conn, tx,
+                            "SELECT ISNULL(Capacity,0) FROM Sections WITH (UPDLOCK, HOLDLOCK) WHERE SectionID = @s",
+                            new[] { new SqlParameter("@s", sectionId) });
+                        int capacity = (capObj == null || capObj == DBNull.Value) ? 0 : Convert.ToInt32(capObj);
+                        object activeObj = ExecuteScalar(conn, tx,
+                            "SELECT COUNT(*) FROM Students WHERE SectionID = @s AND Status = 'Active'",
+                            new[] { new SqlParameter("@s", sectionId) });
+                        int active = Convert.ToInt32(activeObj);
+                        if (capacity > 0 && active >= capacity)
+                        {
+                            tx.Rollback();
+                            ShowError("The selected section is full (" + active + "/" + capacity + " active students). Assign a different section before enrolling.");
+                            return;
+                        }
+
                         string studentCode = GenerateUniqueStudentCode(conn, tx);
                         string admissionNo = GenerateUniqueAdmissionNumber(conn, tx);
 
@@ -577,6 +613,88 @@ namespace AQOONHUB_SMS.Modules.Admission
                 if (Convert.ToInt32(exists) == 0) return candidate;
             }
             throw new InvalidOperationException("Could not generate a unique Admission Number after several attempts.");
+        }
+
+        #endregion
+
+        #region Parent Account Provisioning
+
+        /// <summary>Renders guardian-account status; shows Create only for managers when a linked
+        /// guardian with a valid email has no account. Before a guardian exists, shows guidance.</summary>
+        private void RenderParentAccount()
+        {
+            pnlParentAccount.Visible = true;
+
+            if (CurrentGuardianId <= 0)
+            {
+                pnlPANeedsGuardian.Visible = true;
+                pnlPAStatus.Visible = false;
+                btnCreateParentAccountAdm.Visible = false;
+                return;
+            }
+
+            var st = AQOONHUB_SMS.Modules.Parents.ParentAccountService.GetStatus(CurrentGuardianId);
+            if (st == null) { pnlParentAccount.Visible = false; return; }
+
+            pnlPANeedsGuardian.Visible = false;
+            pnlPAStatus.Visible = true;
+
+            lblPAName.Text = Server.HtmlEncode(st.Name ?? "—");
+            lblPAEmail.Text = Server.HtmlEncode(string.IsNullOrEmpty(st.Email) ? "— (no email on file)" : st.Email);
+            lblPAPhone.Text = Server.HtmlEncode(string.IsNullOrEmpty(st.Phone) ? "—" : st.Phone);
+            lblPALinkedEmail.Text = string.IsNullOrEmpty(st.LinkedUserEmail) ? "—" : Server.HtmlEncode(st.LinkedUserEmail);
+
+            lblPABadge.Text = st.AccountStatus;
+            switch (st.AccountStatus)
+            {
+                case "Linked Account": lblPABadge.Style["background"] = "#DCFCE7"; lblPABadge.Style["color"] = "#15803D"; break;
+                case "Inactive Account": lblPABadge.Style["background"] = "#FEF3C7"; lblPABadge.Style["color"] = "#B45309"; break;
+                default: lblPABadge.Style["background"] = "#F1F5F9"; lblPABadge.Style["color"] = "#64748B"; break;
+            }
+
+            btnCreateParentAccountAdm.Visible = CanManageAdmissions() && st.CanProvision;
+        }
+
+        protected void btnCreateParentAccountAdm_Click(object sender, EventArgs e)
+        {
+            if (!CanManageAdmissions())
+            {
+                Response.StatusCode = 403;
+                Response.Redirect("~/Modules/Dashboard/Dashboard.aspx?denied=admission", true);
+                return;
+            }
+
+            int actor;
+            int.TryParse(Convert.ToString(Session["UserID"]), out actor);
+
+            string tempPassword, message;
+            var outcome = AQOONHUB_SMS.Modules.Parents.ParentAccountService.Provision(
+                CurrentGuardianId, actor > 0 ? actor : (int?)null, Request.UserHostAddress, out tempPassword, out message);
+
+            bool ok = outcome == AQOONHUB_SMS.Modules.Parents.ParentAccountService.Outcome.CreatedNew
+                   || outcome == AQOONHUB_SMS.Modules.Parents.ParentAccountService.Outcome.LinkedExisting;
+
+            if (ok)
+            {
+                pnlPAError.Visible = false;
+                pnlPASuccess.Visible = true;
+                lblPASuccessMsg.Text = (outcome == AQOONHUB_SMS.Modules.Parents.ParentAccountService.Outcome.CreatedNew)
+                    ? "Parent account created successfully. Copy this temporary password now. It will not be shown again."
+                    : Server.HtmlEncode(message);
+                if (outcome == AQOONHUB_SMS.Modules.Parents.ParentAccountService.Outcome.CreatedNew && !string.IsNullOrEmpty(tempPassword))
+                {
+                    pnlPATempWrap.Visible = true;
+                    lblPATempPassword.Text = Server.HtmlEncode(tempPassword);
+                }
+            }
+            else
+            {
+                pnlPASuccess.Visible = false;
+                pnlPAError.Visible = true;
+                lblPAError.Text = Server.HtmlEncode(message ?? "The parent account could not be created.");
+            }
+
+            LoadApplication(); // refresh status badge (button hides once linked)
         }
 
         #endregion

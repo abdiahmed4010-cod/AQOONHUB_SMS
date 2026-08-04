@@ -578,6 +578,40 @@ namespace AQOONHUB_SMS.Modules.Students
                         if (int.TryParse(ddlGuardian.SelectedValue, out parsedGuardianId) && parsedGuardianId > 0)
                             guardianId = parsedGuardianId;
 
+                        int destSectionId = int.Parse(ddlSection.SelectedValue);
+                        string newShift = string.IsNullOrEmpty(ddlShift.SelectedValue) ? null : ddlShift.SelectedValue;
+
+                        // --- Shift compatibility (Stage 4) ---
+                        if (!string.IsNullOrEmpty(newShift))
+                        {
+                            object secShiftObj;
+                            using (SqlCommand cmd = new SqlCommand("SELECT Shift FROM Sections WHERE SectionID=@s", conn, tx))
+                            { cmd.Parameters.AddWithValue("@s", destSectionId); secShiftObj = cmd.ExecuteScalar(); }
+                            string secShift = (secShiftObj == null || secShiftObj == DBNull.Value) ? null : Convert.ToString(secShiftObj);
+                            if (!string.IsNullOrEmpty(secShift) && !string.Equals(secShift, newShift, StringComparison.OrdinalIgnoreCase))
+                            {
+                                tx.Rollback();
+                                DeleteUploadedPhotoIfExists(photoRelativePath);
+                                ShowErrorMessage("Shift mismatch: the selected section is a " + secShift + " section but the student's shift is " + newShift + ". Choose a matching section or shift.");
+                                return null;
+                            }
+                        }
+
+                        // --- Section capacity (Stage 5), UPDLOCK against last-seat races ---
+                        int capacity;
+                        using (SqlCommand cmd = new SqlCommand("SELECT ISNULL(Capacity,0) FROM Sections WITH (UPDLOCK, HOLDLOCK) WHERE SectionID=@s", conn, tx))
+                        { cmd.Parameters.AddWithValue("@s", destSectionId); object c = cmd.ExecuteScalar(); capacity = (c == null || c == DBNull.Value) ? 0 : Convert.ToInt32(c); }
+                        int activeInSection;
+                        using (SqlCommand cmd = new SqlCommand("SELECT COUNT(*) FROM Students WHERE SectionID=@s AND Status='Active'", conn, tx))
+                        { cmd.Parameters.AddWithValue("@s", destSectionId); activeInSection = Convert.ToInt32(cmd.ExecuteScalar()); }
+                        if (capacity > 0 && activeInSection >= capacity)
+                        {
+                            tx.Rollback();
+                            DeleteUploadedPhotoIfExists(photoRelativePath);
+                            ShowErrorMessage("The selected section is full (" + activeInSection + "/" + capacity + " active students). Choose another section.");
+                            return null;
+                        }
+
                         string insertQuery = @"
                             INSERT INTO Students
                                 (StudentCode, AdmissionNo, FirstName, LastName, Gender, DateOfBirth,

@@ -43,6 +43,12 @@ namespace AQOONHUB_SMS.Modules.Students
             set { ViewState["StudentId"] = value; }
         }
 
+        private int GuardianId
+        {
+            get { return ViewState["GuardianId"] == null ? 0 : (int)ViewState["GuardianId"]; }
+            set { ViewState["GuardianId"] = value; }
+        }
+
         #region Authorization (same normalized-role pattern as Students.aspx / AddStudent.aspx)
 
         private string NormalizeRole(string role)
@@ -111,6 +117,7 @@ namespace AQOONHUB_SMS.Modules.Students
                     s.StudentID, s.StudentCode, s.AdmissionNo, s.FirstName, s.LastName,
                     LTRIM(RTRIM(ISNULL(s.FirstName,'') + ' ' + ISNULL(s.LastName,''))) AS FullName,
                     s.Gender, s.DateOfBirth, s.Status, s.PhotoPath, s.MedicalNotes, s.Address, s.EnrollmentDate,
+                    s.GuardianID,
                     g.FullName AS GuardianName, g.Phone AS GuardianPhone,
                     sec.SectionName, c.ClassName, ay.YearName AS AcademicYearName
                 FROM Students s
@@ -182,6 +189,9 @@ namespace AQOONHUB_SMS.Modules.Students
             lblDetailAcademicYear.Text = row["AcademicYearName"] == DBNull.Value ? "—" : row["AcademicYearName"].ToString();
             lblDetailGuardian.Text = row["GuardianName"] + " (" + row["GuardianPhone"] + ")";
             lblDetailEnrolled.Text = Convert.ToDateTime(row["EnrollmentDate"]).ToString("MMM dd, yyyy");
+
+            GuardianId = row["GuardianID"] == DBNull.Value ? 0 : Convert.ToInt32(row["GuardianID"]);
+            RenderParentAccount();
 
             lblToggleActiveText.Text = status == "Active" ? "Deactivate" : "Activate";
             lnkEdit.NavigateUrl = ResolveUrl("~/Modules/Students/EditStudent.aspx?id=" + StudentId);
@@ -345,5 +355,74 @@ namespace AQOONHUB_SMS.Modules.Students
             pnlError.Visible = true;
             pnlSuccess.Visible = false;
         }
+
+        #region Parent Account Provisioning
+
+        /// <summary>Renders guardian-account status and shows the create button only when the
+        /// current user may manage students AND the guardian has no account with a valid email.</summary>
+        private void RenderParentAccount()
+        {
+            var st = AQOONHUB_SMS.Modules.Parents.ParentAccountService.GetStatus(GuardianId);
+            if (st == null) return;
+
+            lblPAName.Text = Server.HtmlEncode(st.Name ?? "—");
+            lblPAEmail.Text = Server.HtmlEncode(string.IsNullOrEmpty(st.Email) ? "— (no email on file)" : st.Email);
+            lblPAPhone.Text = Server.HtmlEncode(string.IsNullOrEmpty(st.Phone) ? "—" : st.Phone);
+            lblPALinkedEmail.Text = string.IsNullOrEmpty(st.LinkedUserEmail) ? "—" : Server.HtmlEncode(st.LinkedUserEmail);
+
+            lblPABadge.Text = st.AccountStatus;
+            switch (st.AccountStatus)
+            {
+                case "Linked Account": lblPABadge.Style["background"] = "#DCFCE7"; lblPABadge.Style["color"] = "#15803D"; break;
+                case "Inactive Account": lblPABadge.Style["background"] = "#FEF3C7"; lblPABadge.Style["color"] = "#B45309"; break;
+                default: lblPABadge.Style["background"] = "#F1F5F9"; lblPABadge.Style["color"] = "#64748B"; break;
+            }
+
+            // Server-side gate: only managers, only when provisioning is genuinely possible.
+            btnCreateParentAccount.Visible = CanManageStudent() && st.CanProvision;
+        }
+
+        protected void btnCreateParentAccount_Click(object sender, EventArgs e)
+        {
+            // Authoritative server-side authorization (not just button hiding).
+            if (!CanManageStudent())
+            {
+                Response.StatusCode = 403;
+                Response.Redirect("~/Modules/Dashboard/Dashboard.aspx?denied=students", true);
+                return;
+            }
+
+            int actor;
+            int.TryParse(Convert.ToString(Session["UserID"]), out actor);
+
+            string tempPassword, message;
+            var outcome = AQOONHUB_SMS.Modules.Parents.ParentAccountService.Provision(
+                GuardianId, actor > 0 ? actor : (int?)null, Request.UserHostAddress, out tempPassword, out message);
+
+            if (outcome == AQOONHUB_SMS.Modules.Parents.ParentAccountService.Outcome.CreatedNew
+                || outcome == AQOONHUB_SMS.Modules.Parents.ParentAccountService.Outcome.LinkedExisting)
+            {
+                pnlPAError.Visible = false;
+                pnlPASuccess.Visible = true;
+                lblPASuccessMsg.Text = (outcome == AQOONHUB_SMS.Modules.Parents.ParentAccountService.Outcome.CreatedNew)
+                    ? "Parent account created successfully. Copy this temporary password now. It will not be shown again."
+                    : Server.HtmlEncode(message);
+                if (outcome == AQOONHUB_SMS.Modules.Parents.ParentAccountService.Outcome.CreatedNew && !string.IsNullOrEmpty(tempPassword))
+                {
+                    pnlTempWrap.Visible = true;
+                    lblPATempPassword.Text = Server.HtmlEncode(tempPassword);
+                }
+                LoadStudent();          // refresh status badge (now Linked); button hides
+            }
+            else
+            {
+                pnlPASuccess.Visible = false;
+                pnlPAError.Visible = true;
+                lblPAError.Text = Server.HtmlEncode(message ?? "The parent account could not be created.");
+                LoadStudent();
+            }
+        }
+
+        #endregion
     }
 }

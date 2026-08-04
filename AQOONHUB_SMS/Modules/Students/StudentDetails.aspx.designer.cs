@@ -7,6 +7,20 @@
         protected global::System.Web.UI.WebControls.Panel pnlError;
         protected global::System.Web.UI.WebControls.Label lblError;
 
+        // Parent Account Provisioning
+        protected global::System.Web.UI.WebControls.Label lblPAName;
+        protected global::System.Web.UI.WebControls.Label lblPAEmail;
+        protected global::System.Web.UI.WebControls.Label lblPAPhone;
+        protected global::System.Web.UI.WebControls.Label lblPABadge;
+        protected global::System.Web.UI.WebControls.Label lblPALinkedEmail;
+        protected global::System.Web.UI.WebControls.Panel pnlPAError;
+        protected global::System.Web.UI.WebControls.Label lblPAError;
+        protected global::System.Web.UI.WebControls.Panel pnlPASuccess;
+        protected global::System.Web.UI.WebControls.Label lblPASuccessMsg;
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl pnlTempWrap;
+        protected global::System.Web.UI.WebControls.Label lblPATempPassword;
+        protected global::System.Web.UI.WebControls.Button btnCreateParentAccount;
+
         protected global::System.Web.UI.WebControls.Panel pnlNotFound;
         protected global::System.Web.UI.WebControls.Panel pnlBody;
 

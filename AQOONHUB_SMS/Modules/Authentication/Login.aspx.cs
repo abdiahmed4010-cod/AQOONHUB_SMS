@@ -26,7 +26,8 @@ namespace AQOONHUB_SMS.Modules.Authentication
 
                 if (User.Identity.IsAuthenticated && Session["IsAuthenticated"] != null)
                 {
-                    Response.Redirect("~/Modules/Dashboard/Dashboard.aspx", false);
+                    bool mustChange = Session["MustChangePassword"] is bool && (bool)Session["MustChangePassword"];
+                    Response.Redirect(mustChange ? "~/Modules/Authentication/ChangePassword.aspx" : "~/Modules/Dashboard/Dashboard.aspx", false);
                     Context.ApplicationInstance.CompleteRequest();
                     return;
                 }
@@ -91,6 +92,9 @@ namespace AQOONHUB_SMS.Modules.Authentication
             Session["Role"] = authResult.Role;
             Session["IsAuthenticated"] = true;
             Session["LoginTime"] = DateTime.Now;
+            // Provisioned Parent accounts are flagged to change their temporary password.
+            // The flag is surfaced for the Change Password flow; existing users are unaffected (0).
+            Session["MustChangePassword"] = authResult.MustChangePassword;
 
             if (createPersistentCookie)
             {
@@ -106,6 +110,15 @@ namespace AQOONHUB_SMS.Modules.Authentication
             catch (Exception ex)
             {
                 Debug.WriteLine("[Login] Audit logging failed (non-critical): " + ex.ToString());
+            }
+
+            // A provisioned Parent account must change its temporary password before anything
+            // else — this takes precedence over any ReturnUrl or Dashboard destination.
+            if (authResult.MustChangePassword)
+            {
+                Response.Redirect("~/Modules/Authentication/ChangePassword.aspx", false);
+                Context.ApplicationInstance.CompleteRequest();
+                return;
             }
 
             string returnUrl = ViewState["ReturnUrl"] as string;
@@ -133,13 +146,14 @@ namespace AQOONHUB_SMS.Modules.Authentication
                     conn.Open();
 
                     string query = @"
-                        SELECT 
+                        SELECT
                             UserID,
                             FullName,
                             Email,
                             PasswordHash,
                             Role,
-                            IsActive
+                            IsActive,
+                            MustChangePassword
                         FROM dbo.Users
                         WHERE Email = @Email";
 
@@ -162,6 +176,7 @@ namespace AQOONHUB_SMS.Modules.Authentication
                             string storedPassword = reader["PasswordHash"] != DBNull.Value ? reader["PasswordHash"].ToString() : string.Empty;
                             result.Role = reader["Role"] != DBNull.Value ? reader["Role"].ToString() : string.Empty;
                             result.IsActive = reader["IsActive"] != DBNull.Value && Convert.ToBoolean(reader["IsActive"]);
+                            result.MustChangePassword = reader["MustChangePassword"] != DBNull.Value && Convert.ToBoolean(reader["MustChangePassword"]);
 
                             bool passwordValid = VerifyPassword(password, storedPassword);
 
@@ -342,6 +357,7 @@ namespace AQOONHUB_SMS.Modules.Authentication
     {
         public bool IsAuthenticated { get; set; }
         public bool IsActive { get; set; }
+        public bool MustChangePassword { get; set; }
         public int UserID { get; set; }
         public string FullName { get; set; }
         public string Email { get; set; }

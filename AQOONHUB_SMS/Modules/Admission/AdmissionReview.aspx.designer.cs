@@ -13,6 +13,22 @@ namespace AQOONHUB_SMS.Modules.Admission
 
     public partial class AdmissionReview
     {
+        // Parent Account Provisioning
+        protected global::System.Web.UI.WebControls.Panel pnlParentAccount;
+        protected global::System.Web.UI.WebControls.Panel pnlPANeedsGuardian;
+        protected global::System.Web.UI.WebControls.Panel pnlPAStatus;
+        protected global::System.Web.UI.WebControls.Label lblPAName;
+        protected global::System.Web.UI.WebControls.Label lblPAEmail;
+        protected global::System.Web.UI.WebControls.Label lblPAPhone;
+        protected global::System.Web.UI.WebControls.Label lblPABadge;
+        protected global::System.Web.UI.WebControls.Label lblPALinkedEmail;
+        protected global::System.Web.UI.WebControls.Panel pnlPAError;
+        protected global::System.Web.UI.WebControls.Label lblPAError;
+        protected global::System.Web.UI.WebControls.Panel pnlPASuccess;
+        protected global::System.Web.UI.WebControls.Label lblPASuccessMsg;
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl pnlPATempWrap;
+        protected global::System.Web.UI.WebControls.Label lblPATempPassword;
+        protected global::System.Web.UI.WebControls.LinkButton btnCreateParentAccountAdm;
 
         /// <summary>
         /// pnlSuccess control.

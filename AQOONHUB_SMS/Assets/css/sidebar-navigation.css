@@ -1,0 +1,115 @@
+/* ============================================================
+   AQOONHUB SMS — Sidebar Navigation (collapsible dropdown groups)
+   Loaded once via MainMaster. Complements the master's base styles.
+   Navy #0F2D6B · Royal #2563EB · Purple #7C3AED · Sky #1DA1F2
+   ============================================================ */
+
+/* Group wrapper */
+.nav-group { margin: 1px 0; }
+
+/* Parent (dropdown) button */
+.nav-parent {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    width: 100%;
+    min-height: 44px;
+    padding: 0.5rem 0.7rem;
+    border: none;
+    background: transparent;
+    color: #C7D2FE;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: 0.6rem;
+    cursor: pointer;
+    text-align: left;
+    transition: background .15s, color .15s;
+}
+
+.nav-parent:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
+.nav-parent:focus-visible { outline: 2px solid #93C5FD; outline-offset: 2px; }
+
+.nav-parent .nav-parent-label {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.nav-parent .nav-p-ico { width: 18px; height: 18px; flex-shrink: 0; }
+
+.nav-chevron {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    color: #93A9E0;
+    transition: transform .2s ease;
+}
+
+/* Open state: expanded group */
+.nav-group.open > .nav-parent { color: #fff; background: rgba(255, 255, 255, 0.06); }
+.nav-group.open > .nav-parent .nav-chevron { transform: rotate(180deg); }
+
+/* Parent that holds the active route — stronger cue */
+.nav-group.has-active > .nav-parent { color: #fff; }
+.nav-group.has-active > .nav-parent .nav-p-ico { color: #93C5FD; }
+
+/* Submenu — animated collapse, no page jump */
+.nav-submenu {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height .22s ease;
+    padding-left: 0.4rem;
+    margin-left: 0.55rem;
+    border-left: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.nav-group.open .nav-submenu { max-height: 460px; }
+
+/* Child links inside a submenu */
+.nav-submenu .nav-item {
+    min-height: 40px;
+    padding: 0.45rem 0.7rem;
+    font-size: 0.82rem;
+    font-weight: 500;
+}
+
+.nav-submenu .nav-item span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Standalone top-level items (Dashboard, parent My-Attendance) already use .nav-item */
+.nav-item { min-height: 44px; }
+
+/* Section labels keep master styling (.nav-section). Reduce top gap between groups. */
+
+/* Mobile close button (inside sidebar header) */
+.sidebar-close {
+    display: none;
+    margin-left: auto;
+    padding: 0.4rem;
+    border: none;
+    background: transparent;
+    color: #C7D2FE;
+    border-radius: 0.5rem;
+    cursor: pointer;
+}
+.sidebar-close:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
+.sidebar-close:focus-visible { outline: 2px solid #93C5FD; outline-offset: 2px; }
+
+@media (max-width: 1023px) {
+    .sidebar-close { display: inline-flex; }
+}
+
+/* Body scroll lock while the mobile drawer is open */
+html.sidebar-open, html.sidebar-open body { overflow: hidden; }
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .nav-submenu { transition: none; }
+    .nav-chevron { transition: none; }
+}

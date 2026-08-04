@@ -107,6 +107,44 @@
                 </span>
             </asp:Panel>
 
+            <asp:Panel ID="pnlParentAccount" runat="server" Visible="false">
+                <div class="card overflow-hidden mb-5">
+                    <div class="card-head"><h3>Parent Login Account</h3></div>
+                    <div class="p-5">
+                        <asp:Panel ID="pnlPANeedsGuardian" runat="server" Visible="false" CssClass="alert alert-warning">
+                            <i data-lucide="info" class="w-4 h-4 mt-0.5"></i>
+                            <span>Link or create a Guardian for this application first. A parent login account can be created once the guardian is linked.</span>
+                        </asp:Panel>
+
+                        <asp:Panel ID="pnlPAStatus" runat="server">
+                            <div class="detail-row"><span class="k">Guardian</span><span class="v"><asp:Label ID="lblPAName" runat="server" /></span></div>
+                            <div class="detail-row"><span class="k">Email</span><span class="v"><asp:Label ID="lblPAEmail" runat="server" /></span></div>
+                            <div class="detail-row"><span class="k">Phone</span><span class="v"><asp:Label ID="lblPAPhone" runat="server" /></span></div>
+                            <div class="detail-row"><span class="k">Account Status</span><span class="v"><asp:Label ID="lblPABadge" runat="server" CssClass="badge" /></span></div>
+                            <div class="detail-row"><span class="k">Linked User</span><span class="v"><asp:Label ID="lblPALinkedEmail" runat="server" /></span></div>
+
+                            <asp:Panel ID="pnlPAError" runat="server" Visible="false" CssClass="alert alert-danger mt-3" role="alert" aria-live="assertive">
+                                <asp:Label ID="lblPAError" runat="server" />
+                            </asp:Panel>
+
+                            <asp:Panel ID="pnlPASuccess" runat="server" Visible="false" CssClass="alert alert-success mt-3" role="status" aria-live="polite">
+                                <span>
+                                    <asp:Label ID="lblPASuccessMsg" runat="server" CssClass="font-semibold" />
+                                    <span id="pnlPATempWrap" runat="server" visible="false" class="flex items-center gap-2 mt-2">
+                                        <span class="k">Temporary password</span>
+                                        <code style="font-size:.85rem;background:#fff;border:1px solid #A7F3D0;border-radius:.4rem;padding:.25rem .6rem;"><asp:Label ID="lblPATempPassword" runat="server" /></code>
+                                    </span>
+                                </span>
+                            </asp:Panel>
+
+                            <asp:LinkButton ID="btnCreateParentAccountAdm" runat="server" Visible="false" CssClass="btn btn-primary !py-1.5 !text-xs mt-3" CausesValidation="false"
+                                OnClick="btnCreateParentAccountAdm_Click"
+                                OnClientClick="return confirm('Create a Parent login account for this guardian? A one-time temporary password will be shown once.');">Create Parent Account</asp:LinkButton>
+                        </asp:Panel>
+                    </div>
+                </div>
+            </asp:Panel>
+
             <asp:Panel ID="pnlActionForm" runat="server">
                 <div class="card overflow-hidden mb-5">
                     <div class="card-head">

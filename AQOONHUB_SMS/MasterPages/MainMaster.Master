@@ -142,6 +142,8 @@
         }
     </style>
     
+    <link rel="stylesheet" href="<%= ResolveUrl("~/Assets/css/sidebar-navigation.css") %>" />
+
     <asp:ContentPlaceHolder ID="head" runat="server"></asp:ContentPlaceHolder>
 </head>
 <body class="bg-surface dark:bg-slate-900 text-slate-900 dark:text-slate-100">
@@ -164,250 +166,190 @@
         <!-- SIDEBAR                                      -->
         <!-- ============================================ -->
         <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-sidebar text-white flex flex-col transition-transform duration-200 -translate-x-full lg:translate-x-0" role="navigation" aria-label="Main navigation">
-            <a href="<%= ResolveUrl("~/Modules/Dashboard/Dashboard.aspx") %>" class="flex items-center gap-3 px-5 h-16 border-b border-white/10 shrink-0" aria-label="AQOONHUB Home">
-                <img src="<%= ResolveUrl("~/Assets/images/logo.png") %>" alt="AQOONHUB Logo" class="w-9 h-9 rounded-lg bg-white p-0.5 object-contain" width="36" height="36" />
-                <div>
-                    <p class="font-extrabold tracking-tight leading-none">AQOON<span class="text-violet-300">HUB</span></p>
-                    <p class="text-[10px] text-indigo-300 mt-0.5">School Management System</p>
-                </div>
-            </a>
+            <div class="flex items-center h-16 border-b border-white/10 shrink-0 pl-5 pr-2">
+                <a href="<%= ResolveUrl("~/Modules/Dashboard/Dashboard.aspx") %>" class="flex items-center gap-3 flex-1 min-w-0" aria-label="AQOONHUB Home">
+                    <img src="<%= ResolveUrl("~/Assets/images/logo.png") %>" alt="AQOONHUB Logo" class="w-9 h-9 rounded-lg bg-white p-0.5 object-contain" width="36" height="36" />
+                    <div class="min-w-0">
+                        <p class="font-extrabold tracking-tight leading-none">AQOON<span class="text-violet-300">HUB</span></p>
+                        <p class="text-[10px] text-indigo-300 mt-0.5">School Management System</p>
+                    </div>
+                </a>
+                <button type="button" class="sidebar-close" onclick="toggleSidebar(false)" aria-label="Close navigation menu">
+                    <i data-lucide="x" class="w-5 h-5" aria-hidden="true"></i>
+                </button>
+            </div>
             
-            <nav class="flex-1 overflow-y-auto px-3 pb-6 pt-2" aria-label="Sidebar navigation">
-                <p class="nav-section">Main</p>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Dashboard/Dashboard.aspx") %>" data-nav="dashboard">
+            <nav class="flex-1 overflow-y-auto px-3 pb-6 pt-3" aria-label="Sidebar navigation">
+
+                <%-- Dashboard --%>
+                <a class="<%= ChildClass("dashboard") %>" href="<%= ResolveUrl("~/Modules/Dashboard/Dashboard.aspx") %>" <%= ActiveKey=="dashboard" ? "aria-current=\"page\"" : "" %>>
                     <i data-lucide="layout-dashboard" class="w-[18px] h-[18px]" aria-hidden="true"></i>
                     <span>Dashboard</span>
                 </a>
-                
-                <p class="nav-section">People</p>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Admission/Admissions.aspx") %>" data-nav="admissions">
-                    <i data-lucide="clipboard-list" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Admissions</span>
-                </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Students/Students.aspx") %>" data-nav="students">
-                    <i data-lucide="graduation-cap" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Students</span>
-                </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Parents/Parents.aspx") %>" data-nav="parents">
-                    <i data-lucide="users" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Parents</span>
-                </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Staff/Staff.aspx") %>" data-nav="staff">
-                    <i data-lucide="briefcase" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Staff &amp; HR</span>
-                </a>
-                
-                <p class="nav-section">Academics</p>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Academic/Academics.aspx") %>" data-nav="academics">
-                    <i data-lucide="layout-dashboard" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Overview</span>
-                </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Academic/AcademicYears.aspx") %>" data-nav="academicyears">
-                    <i data-lucide="calendar-range" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Academic Years &amp; Terms</span>
-                </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Academic/ClassesSections.aspx") %>" data-nav="classes">
-                    <i data-lucide="school" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Classes &amp; Sections</span>
-                </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Academic/Subjects.aspx") %>" data-nav="subjects">
-                    <i data-lucide="book-open" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Subjects</span>
-                </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Academic/TeacherAssignments.aspx") %>" data-nav="teacherassignments">
-                    <i data-lucide="user-cog" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Teacher Assignments</span>
-                </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Academic/Timetable.aspx") %>" data-nav="timetable">
-                    <i data-lucide="calendar-clock" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Timetable</span>
-                </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Academic/Promotions.aspx") %>" data-nav="promotions">
-                    <i data-lucide="trending-up" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Promotions</span>
-                </a>
+
+                <%-- Parent-facing: My Children's Attendance (parents only) --%>
                 <% if (IsParentRole) { %>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Attendance/ParentAttendance.aspx") %>" data-nav="parentattendance">
+                <a class="<%= ChildClass("myattendance") %>" href="<%= ResolveUrl("~/Modules/Attendance/ParentAttendance.aspx") %>" <%= ActiveKey=="myattendance" ? "aria-current=\"page\"" : "" %>>
                     <i data-lucide="user-check" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>My Children Attendance</span>
+                    <span>My Children's Attendance</span>
                 </a>
                 <% } %>
-                <% if (!IsParentRole) { %>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Attendance/Attendance.aspx") %>" data-nav="attendance">
-                    <i data-lucide="user-check" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Attendance</span>
-                </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Attendance/MarkAttendance.aspx") %>" data-nav="markattendance">
-                    <i data-lucide="clipboard-check" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Mark Attendance</span>
-                </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Attendance/AttendanceByDate.aspx") %>" data-nav="attendancebydate">
-                    <i data-lucide="calendar-days" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Attendance by Date</span>
-                </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Attendance/StudentAttendanceReport.aspx") %>" data-nav="studentattendancereport">
-                    <i data-lucide="user" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Student Report</span>
-                </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Attendance/ClassAttendanceReport.aspx") %>" data-nav="classattendancereport">
-                    <i data-lucide="users" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Class Report</span>
-                </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Attendance/AttendanceCalendar.aspx") %>" data-nav="attendancecalendar">
-                    <i data-lucide="calendar" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Calendar</span>
-                </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Attendance/ImportAttendance.aspx") %>" data-nav="importattendance">
-                    <i data-lucide="upload" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Import Attendance</span>
-                </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Attendance/AttendanceAnalytics.aspx") %>" data-nav="attendanceanalytics">
-                    <i data-lucide="bar-chart-3" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Analytics</span>
-                </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Attendance/AttendanceAlerts.aspx") %>" data-nav="attendancealerts">
-                    <i data-lucide="bell" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Alerts</span>
-                </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Attendance/AttendanceSettings.aspx") %>" data-nav="attendancesettings">
-                    <i data-lucide="settings" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Attendance Settings</span>
-                </a>
+
+                <%-- 2. STUDENT MANAGEMENT --%>
+                <% if (CanAccessStudentMgmt) { %>
+                <div class="nav-group <%= IsGroupOpen("student") ? "open" : "" %>" data-group="student">
+                    <button type="button" class="nav-parent" aria-expanded="<%= IsGroupOpen("student") ? "true" : "false" %>" aria-controls="grp-student">
+                        <i data-lucide="users-round" class="nav-p-ico" aria-hidden="true"></i>
+                        <span class="nav-parent-label">Student Management</span>
+                        <i data-lucide="chevron-down" class="nav-chevron" aria-hidden="true"></i>
+                    </button>
+                    <div class="nav-submenu" id="grp-student" role="group" aria-label="Student Management">
+                        <a class="<%= ChildClass("students") %>" href="<%= ResolveUrl("~/Modules/Students/Students.aspx") %>" <%= ActiveKey=="students" ? "aria-current=\"page\"" : "" %>>
+                            <i data-lucide="graduation-cap" class="w-[18px] h-[18px]" aria-hidden="true"></i><span>Students</span>
+                        </a>
+                        <a class="<%= ChildClass("guardians") %>" href="<%= ResolveUrl("~/Modules/Parents/Parents.aspx") %>" <%= ActiveKey=="guardians" ? "aria-current=\"page\"" : "" %>>
+                            <i data-lucide="users" class="w-[18px] h-[18px]" aria-hidden="true"></i><span>Guardians</span>
+                        </a>
+                        <a class="<%= ChildClass("admissions") %>" href="<%= ResolveUrl("~/Modules/Admission/Admissions.aspx") %>" <%= ActiveKey=="admissions" ? "aria-current=\"page\"" : "" %>>
+                            <i data-lucide="clipboard-list" class="w-[18px] h-[18px]" aria-hidden="true"></i><span>Admissions</span>
+                        </a>
+                    </div>
+                </div>
                 <% } %>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Examinations/Examinations.aspx") %>" data-nav="examinations">
-                    <i data-lucide="file-edit" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Examinations</span>
-                </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Examinations/CreateExamination.aspx") %>" data-nav="createexamination">
-                    <i data-lucide="plus-circle" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Create Examination</span>
-                </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Examinations/ExamSchedule.aspx") %>" data-nav="examschedule">
-                    <i data-lucide="calendar-clock" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Exam Schedule</span>
-                </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Examinations/MarksEntry.aspx") %>" data-nav="marksentry">
-                    <i data-lucide="pencil-ruler" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Marks Entry</span>
-                </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Examinations/Results.aspx") %>" data-nav="results">
-                    <i data-lucide="award" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Results</span>
-                </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Examinations/ReportCards.aspx") %>" data-nav="reportcards">
-                    <i data-lucide="file-text" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Report Cards</span>
-                </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Examinations/ExamRooms.aspx") %>" data-nav="examrooms">
-                    <i data-lucide="building" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Invigilators &amp; Rooms</span>
-                </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Examinations/GradingScales.aspx") %>" data-nav="gradingscales">
-                    <i data-lucide="award" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Grading Scales</span>
-                </a>
-                <%-- Marks Entry, Results, Report Cards are added in later stages. --%>
-                
-                <p class="nav-section">Finance</p>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Finance/FeeManagement.aspx") %>" data-nav="finance/feemanagement">
-                    <i data-lucide="wallet" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Fee Management</span>
-                </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Finance/FeeCategories.aspx") %>" data-nav="finance/feecategories">
-                    <i data-lucide="tags" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Fee Categories</span>
-                </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Finance/FeeStructures.aspx") %>" data-nav="finance/feestructures">
-                    <i data-lucide="layers" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Fee Structures</span>
-                </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Finance/CreateInvoice.aspx") %>" data-nav="finance/createinvoice">
-                    <i data-lucide="file-plus" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Fee Collection</span>
-                </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Finance/Invoices.aspx") %>" data-nav="finance/invoices">
-                    <i data-lucide="file-text" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Invoices</span>
-                </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Finance/Payments.aspx") %>" data-nav="finance/payments">
-                    <i data-lucide="credit-card" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Payments</span>
-                </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Finance/BalanceTracking.aspx") %>" data-nav="finance/balancetracking">
-                    <i data-lucide="scale" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Balance Tracking</span>
-                </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Finance/FeeReports.aspx") %>" data-nav="finance/feereports">
-                    <i data-lucide="bar-chart-3" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Fee Reports</span>
-                </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Payroll/Payroll.aspx") %>" data-nav="payroll">
-                    <i data-lucide="banknote" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Payroll</span>
-                </a>
-                
+
+                <%-- 3. ACADEMIC MANAGEMENT --%>
+                <% if (CanAccessAcademicMgmt) { %>
+                <div class="nav-group <%= IsGroupOpen("academic") ? "open" : "" %>" data-group="academic">
+                    <button type="button" class="nav-parent" aria-expanded="<%= IsGroupOpen("academic") ? "true" : "false" %>" aria-controls="grp-academic">
+                        <i data-lucide="book-open" class="nav-p-ico" aria-hidden="true"></i>
+                        <span class="nav-parent-label">Academic Management</span>
+                        <i data-lucide="chevron-down" class="nav-chevron" aria-hidden="true"></i>
+                    </button>
+                    <div class="nav-submenu" id="grp-academic" role="group" aria-label="Academic Management">
+                        <% if (CanAccessStaff) { %>
+                        <a class="<%= ChildClass("staff") %>" href="<%= ResolveUrl("~/Modules/Staff/Staff.aspx") %>" <%= ActiveKey=="staff" ? "aria-current=\"page\"" : "" %>>
+                            <i data-lucide="briefcase" class="w-[18px] h-[18px]" aria-hidden="true"></i><span>Teachers &amp; Staff</span>
+                        </a>
+                        <% } %>
+                        <a class="<%= ChildClass("academics") %>" href="<%= ResolveUrl("~/Modules/Academic/Academics.aspx") %>" <%= ActiveKey=="academics" ? "aria-current=\"page\"" : "" %>>
+                            <i data-lucide="layout-grid" class="w-[18px] h-[18px]" aria-hidden="true"></i><span>Academics</span>
+                        </a>
+                        <a class="<%= ChildClass("classes") %>" href="<%= ResolveUrl("~/Modules/Academic/ClassesSections.aspx") %>" <%= ActiveKey=="classes" ? "aria-current=\"page\"" : "" %>>
+                            <i data-lucide="school" class="w-[18px] h-[18px]" aria-hidden="true"></i><span>Classes &amp; Sections</span>
+                        </a>
+                        <a class="<%= ChildClass("attendance") %>" href="<%= ResolveUrl("~/Modules/Attendance/Attendance.aspx") %>" <%= ActiveKey=="attendance" ? "aria-current=\"page\"" : "" %>>
+                            <i data-lucide="user-check" class="w-[18px] h-[18px]" aria-hidden="true"></i><span>Attendance</span>
+                        </a>
+                        <a class="<%= ChildClass("examinations") %>" href="<%= ResolveUrl("~/Modules/Examinations/Examinations.aspx") %>" <%= ActiveKey=="examinations" ? "aria-current=\"page\"" : "" %>>
+                            <i data-lucide="file-edit" class="w-[18px] h-[18px]" aria-hidden="true"></i><span>Examinations</span>
+                        </a>
+                    </div>
+                </div>
+                <% } %>
+
+                <%-- 4. FINANCE MANAGEMENT --%>
+                <% if (CanAccessFinanceMgmt) { %>
+                <div class="nav-group <%= IsGroupOpen("finance") ? "open" : "" %>" data-group="finance">
+                    <button type="button" class="nav-parent" aria-expanded="<%= IsGroupOpen("finance") ? "true" : "false" %>" aria-controls="grp-finance">
+                        <i data-lucide="wallet" class="nav-p-ico" aria-hidden="true"></i>
+                        <span class="nav-parent-label">Finance Management</span>
+                        <i data-lucide="chevron-down" class="nav-chevron" aria-hidden="true"></i>
+                    </button>
+                    <div class="nav-submenu" id="grp-finance" role="group" aria-label="Finance Management">
+                        <a class="<%= ChildClass("finance") %>" href="<%= ResolveUrl("~/Modules/Finance/FeeManagement.aspx") %>" <%= ActiveKey=="finance" ? "aria-current=\"page\"" : "" %>>
+                            <i data-lucide="receipt" class="w-[18px] h-[18px]" aria-hidden="true"></i><span>Finance &amp; Fees</span>
+                        </a>
+                        <a class="<%= ChildClass("finance-setup") %>" href="<%= ResolveUrl("~/Modules/Finance/PendingFinanceSetup.aspx") %>" <%= ActiveKey=="finance-setup" ? "aria-current=\"page\"" : "" %>>
+                            <i data-lucide="clipboard-list" class="w-[18px] h-[18px]" aria-hidden="true"></i><span>Finance Setup</span>
+                        </a>
+                        <a class="<%= ChildClass("payroll") %>" href="<%= ResolveUrl("~/Modules/Payroll/Payroll.aspx") %>" <%= ActiveKey=="payroll" ? "aria-current=\"page\"" : "" %>>
+                            <i data-lucide="banknote" class="w-[18px] h-[18px]" aria-hidden="true"></i><span>Payroll</span>
+                        </a>
+                    </div>
+                </div>
+                <% } %>
+
+                <%-- 5. REPORTS (central page owns the report categories) --%>
                 <% if (!IsParentRole && CanAccessReports) { %>
-                <p class="nav-section">Reports</p>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Reports/Reports.aspx") %>" data-nav="reports">
-                    <i data-lucide="bar-chart-3" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Overview</span>
-                </a>
-                <% foreach (var rc in ReportsMenu) { %>
-                <a class="nav-item" href="<%= ResolveUrl(rc.Item2) %>" data-nav="<%= rc.Item3 %>">
-                    <i data-lucide="<%= rc.Item4 %>" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span><%= rc.Item1 %></span>
-                </a>
-                <% } %>
-                <%-- Stage 3-5 categories are added here as their pages are built, so no link ever 404s. --%>
+                <div class="nav-group <%= IsGroupOpen("reports") ? "open" : "" %>" data-group="reports">
+                    <button type="button" class="nav-parent" aria-expanded="<%= IsGroupOpen("reports") ? "true" : "false" %>" aria-controls="grp-reports">
+                        <i data-lucide="bar-chart-3" class="nav-p-ico" aria-hidden="true"></i>
+                        <span class="nav-parent-label">Reports</span>
+                        <i data-lucide="chevron-down" class="nav-chevron" aria-hidden="true"></i>
+                    </button>
+                    <div class="nav-submenu" id="grp-reports" role="group" aria-label="Reports">
+                        <a class="<%= ChildClass("reports") %>" href="<%= ResolveUrl("~/Modules/Reports/Reports.aspx") %>" <%= ActiveKey=="reports" ? "aria-current=\"page\"" : "" %>>
+                            <i data-lucide="pie-chart" class="w-[18px] h-[18px]" aria-hidden="true"></i><span>Reports Overview</span>
+                        </a>
+                    </div>
+                </div>
                 <% } %>
 
+                <%-- 6. COMMUNICATION --%>
                 <% if (CanAccessCommunication) { %>
-                <p class="nav-section">Communication</p>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Communication/Overview.aspx") %>" data-nav="communication/overview">
-                    <i data-lucide="messages-square" class="w-[18px] h-[18px]" aria-hidden="true"></i><span>Overview</span>
-                </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Communication/Announcements.aspx") %>" data-nav="communication/announcements">
-                    <i data-lucide="megaphone" class="w-[18px] h-[18px]" aria-hidden="true"></i><span>Announcements</span>
-                </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Communication/Messages.aspx") %>" data-nav="communication/messages">
-                    <i data-lucide="mail" class="w-[18px] h-[18px]" aria-hidden="true"></i><span>Messages</span>
-                </a>
-                <% if (CanUseOutboundCommunication) { %>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Communication/SmsEmail.aspx") %>" data-nav="communication/smsemail">
-                    <i data-lucide="send" class="w-[18px] h-[18px]" aria-hidden="true"></i><span>SMS &amp; Email</span>
-                </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Communication/DeliveryLogs.aspx") %>" data-nav="communication/deliverylogs">
-                    <i data-lucide="list-checks" class="w-[18px] h-[18px]" aria-hidden="true"></i><span>Delivery Logs</span>
-                </a>
-                <% } %>
+                <div class="nav-group <%= IsGroupOpen("comm") ? "open" : "" %>" data-group="comm">
+                    <button type="button" class="nav-parent" aria-expanded="<%= IsGroupOpen("comm") ? "true" : "false" %>" aria-controls="grp-comm">
+                        <i data-lucide="messages-square" class="nav-p-ico" aria-hidden="true"></i>
+                        <span class="nav-parent-label">Communication</span>
+                        <i data-lucide="chevron-down" class="nav-chevron" aria-hidden="true"></i>
+                    </button>
+                    <div class="nav-submenu" id="grp-comm" role="group" aria-label="Communication">
+                        <a class="<%= ChildClass("comm-overview") %>" href="<%= ResolveUrl("~/Modules/Communication/Overview.aspx") %>" <%= ActiveKey=="comm-overview" ? "aria-current=\"page\"" : "" %>>
+                            <i data-lucide="messages-square" class="w-[18px] h-[18px]" aria-hidden="true"></i><span>Overview</span>
+                        </a>
+                        <a class="<%= ChildClass("comm-announcements") %>" href="<%= ResolveUrl("~/Modules/Communication/Announcements.aspx") %>" <%= ActiveKey=="comm-announcements" ? "aria-current=\"page\"" : "" %>>
+                            <i data-lucide="megaphone" class="w-[18px] h-[18px]" aria-hidden="true"></i><span>Announcements</span>
+                        </a>
+                        <a class="<%= ChildClass("comm-messages") %>" href="<%= ResolveUrl("~/Modules/Communication/Messages.aspx") %>" <%= ActiveKey=="comm-messages" ? "aria-current=\"page\"" : "" %>>
+                            <i data-lucide="mail" class="w-[18px] h-[18px]" aria-hidden="true"></i><span>Messages</span>
+                        </a>
+                        <% if (CanUseOutboundCommunication) { %>
+                        <a class="<%= ChildClass("comm-sms") %>" href="<%= ResolveUrl("~/Modules/Communication/SmsEmail.aspx") %>" <%= ActiveKey=="comm-sms" ? "aria-current=\"page\"" : "" %>>
+                            <i data-lucide="send" class="w-[18px] h-[18px]" aria-hidden="true"></i><span>SMS &amp; Email</span>
+                        </a>
+                        <a class="<%= ChildClass("comm-logs") %>" href="<%= ResolveUrl("~/Modules/Communication/DeliveryLogs.aspx") %>" <%= ActiveKey=="comm-logs" ? "aria-current=\"page\"" : "" %>>
+                            <i data-lucide="list-checks" class="w-[18px] h-[18px]" aria-hidden="true"></i><span>Delivery Logs</span>
+                        </a>
+                        <% } %>
+                    </div>
+                </div>
                 <% } %>
 
-                <% if (CanAdminSystem || CanViewSystemSecurity) { %><p class="nav-section">System</p>
-                <% if (CanAdminSystem) { %>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Administration/Users.aspx") %>" data-nav="users">
-                    <i data-lucide="shield" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Users &amp; Roles</span>
-                </a>
-                <% } %><% if (CanViewSystemSecurity) { %>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Administration/AuditLog.aspx") %>" data-nav="auditlog">
-                    <i data-lucide="history" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Audit Log</span>
-                </a>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Administration/LoginActivity.aspx") %>" data-nav="loginactivity">
-                    <i data-lucide="key-round" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Login Activity</span>
-                </a>
-                <% } %><% if (CanAdminSystem) { %>
-                <a class="nav-item" href="<%= ResolveUrl("~/Modules/Settings/Settings.aspx") %>" data-nav="settings">
-                    <i data-lucide="settings" class="w-[18px] h-[18px]" aria-hidden="true"></i>
-                    <span>Settings</span>
-                </a>
-                <% } %><% } %>
+                <%-- 7. SYSTEM --%>
+                <% if (CanAdminSystem || CanViewSystemSecurity) { %>
+                <div class="nav-group <%= IsGroupOpen("system") ? "open" : "" %>" data-group="system">
+                    <button type="button" class="nav-parent" aria-expanded="<%= IsGroupOpen("system") ? "true" : "false" %>" aria-controls="grp-system">
+                        <i data-lucide="shield" class="nav-p-ico" aria-hidden="true"></i>
+                        <span class="nav-parent-label">System</span>
+                        <i data-lucide="chevron-down" class="nav-chevron" aria-hidden="true"></i>
+                    </button>
+                    <div class="nav-submenu" id="grp-system" role="group" aria-label="System">
+                        <% if (CanAdminSystem) { %>
+                        <a class="<%= ChildClass("users") %>" href="<%= ResolveUrl("~/Modules/Administration/Users.aspx") %>" <%= ActiveKey=="users" ? "aria-current=\"page\"" : "" %>>
+                            <i data-lucide="user-cog" class="w-[18px] h-[18px]" aria-hidden="true"></i><span>Users &amp; Roles</span>
+                        </a>
+                        <% } %>
+                        <% if (CanViewSystemSecurity) { %>
+                        <a class="<%= ChildClass("auditlog") %>" href="<%= ResolveUrl("~/Modules/Administration/AuditLog.aspx") %>" <%= ActiveKey=="auditlog" ? "aria-current=\"page\"" : "" %>>
+                            <i data-lucide="history" class="w-[18px] h-[18px]" aria-hidden="true"></i><span>Audit Log</span>
+                        </a>
+                        <a class="<%= ChildClass("loginactivity") %>" href="<%= ResolveUrl("~/Modules/Administration/LoginActivity.aspx") %>" <%= ActiveKey=="loginactivity" ? "aria-current=\"page\"" : "" %>>
+                            <i data-lucide="key-round" class="w-[18px] h-[18px]" aria-hidden="true"></i><span>Login Activity</span>
+                        </a>
+                        <% } %>
+                        <% if (CanAdminSystem) { %>
+                        <a class="<%= ChildClass("settings") %>" href="<%= ResolveUrl("~/Modules/Settings/Settings.aspx") %>" <%= ActiveKey=="settings" ? "aria-current=\"page\"" : "" %>>
+                            <i data-lucide="settings" class="w-[18px] h-[18px]" aria-hidden="true"></i><span>Settings</span>
+                        </a>
+                        <% } %>
+                    </div>
+                </div>
+                <% } %>
             </nav>
             
             <div class="p-4 border-t border-white/10 shrink-0">
                 <div class="rounded-xl bg-white/5 p-3 flex items-center gap-3">
-                    <span class="avatar" style="width:36px;height:36px;font-size:13.5px;background:#7C3AED" aria-hidden="true">AY</span>
+                    <span class="avatar" style="width:36px;height:36px;font-size:13.5px;background:#7C3AED" aria-hidden="true"><%= Server.HtmlEncode(GetUserInitials()) %></span>
                     <div class="min-w-0">
                         <p class="text-xs font-bold truncate" id="sidebar-user-name"><%= Server.HtmlEncode(GetCurrentUserName()) %></p>
                         <p class="text-[10px] text-indigo-300"><%= Server.HtmlEncode(GetCurrentUserRole()) %></p>
@@ -445,7 +387,7 @@
                 </button>
                 
                 <div class="ml-auto flex items-center gap-1.5">
-                    <span class="hidden md:inline-flex badge mr-1" style="background:#7C3AED18;color:#7C3AED">Super Admin view</span>
+                    <span class="hidden md:inline-flex badge mr-1" style="background:#7C3AED18;color:#7C3AED"><%= Server.HtmlEncode(GetRoleDisplay()) %></span>
                     
                     <!-- Theme Toggle -->
                     <button type="button" class="btn-ghost btn !p-2" onclick="toggleTheme()" title="Toggle dark mode" aria-label="Toggle dark mode">
@@ -455,7 +397,7 @@
                     <!-- User Dropdown -->
                     <div class="relative">
                         <button type="button" class="flex items-center gap-2 pl-1 pr-2 py-1 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors" onclick="toggleDropdown('dd-user')" aria-label="User menu" aria-haspopup="true" aria-expanded="false">
-                            <span class="avatar" style="width:32px;height:32px;font-size:12px;background:#7C3AED" aria-hidden="true">AY</span>
+                            <span class="avatar" style="width:32px;height:32px;font-size:12px;background:#7C3AED" aria-hidden="true"><%= Server.HtmlEncode(GetUserInitials()) %></span>
                             <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400" aria-hidden="true"></i>
                         </button>
                         <div id="dd-user" class="hidden absolute right-0 mt-2 w-64 card shadow-pop p-2 z-50" role="menu" aria-label="User menu">
@@ -737,32 +679,9 @@
                 showToast('All notifications marked as read', 'success');
             };
 
-            /* ---------------- Active Navigation Highlighting ---------------- */
-            function highlightActiveNav() {
-                var currentPath = window.location.pathname.toLowerCase();
-                var navItems = $$('.nav-item[data-nav]');
-                var bestMatch = null;
-                var bestMatchLength = 0;
-
-                navItems.forEach(function (item) {
-                    item.classList.remove('active');
-                    var navKey = item.getAttribute('data-nav');
-                    if (!navKey) return;
-                    if (currentPath.indexOf(navKey.toLowerCase()) !== -1) {
-                        if (navKey.length > bestMatchLength) {
-                            bestMatchLength = navKey.length;
-                            bestMatch = item;
-                        }
-                    }
-                });
-
-                if (bestMatch) {
-                    bestMatch.classList.add('active');
-                } else if (currentPath.indexOf('dashboard') !== -1 || currentPath === '/' || currentPath === '/default.aspx') {
-                    var dashboardNav = $('.nav-item[data-nav="dashboard"]');
-                    if (dashboardNav) dashboardNav.classList.add('active');
-                }
-            }
+            /* Active navigation state is rendered server-side (MainMaster.ChildClass /
+               ActiveKey) and the parent group is auto-expanded there, so no client-side
+               path matching is needed. sidebar-navigation.js handles dropdown/drawer UX. */
 
             /* ---------------- Keyboard Shortcuts ---------------- */
             document.addEventListener('keydown', function (e) {
@@ -779,13 +698,11 @@
             /* ---------------- Initialization ---------------- */
             document.addEventListener('DOMContentLoaded', function () {
                 applyTheme();
-                highlightActiveNav();
                 refreshIcons();
 
                 if (typeof Sys !== 'undefined' && Sys.WebForms && Sys.WebForms.PageRequestManager) {
                     Sys.WebForms.PageRequestManager.getInstance().add_endRequest(function () {
                         refreshIcons();
-                        highlightActiveNav();
                     });
                 }
             });
@@ -802,6 +719,8 @@
         })(window, document);
     </script>
     
+    <script src="<%= ResolveUrl("~/Assets/js/layout/sidebar-navigation.js") %>"></script>
+
     <asp:ContentPlaceHolder ID="scripts" runat="server"></asp:ContentPlaceHolder>
 </body>
 </html>

@@ -386,5 +386,260 @@ namespace AQOONHUB_SMS.Modules.Finance
                 INNER JOIN Students s ON s.StudentID=p.StudentID INNER JOIN Users u ON u.UserID=p.ReceivedBy
                 WHERE p.PaymentID=@ID", new SqlParameter("@ID", id));
         }
+
+        // ============================================================
+        // Finance Setup Queue — New Admissions Pending Finance Setup.
+        // Reuses the canonical FeeInvoices model, the INV-{year} numbering,
+        // and the same applicable-ClassFeeStructures resolution as
+        // GetApplicableStructures / CreateInvoice. No new invoice architecture.
+        // ============================================================
+
+        // Per-active-student computed columns shared by summary + queue.
+        private const string PendingBaseSql = @"
+            FROM Students s
+            INNER JOIN Sections sec ON sec.SectionID = s.SectionID
+            INNER JOIN Classes c ON c.ClassID = sec.ClassID
+            LEFT JOIN AcademicYears ay ON ay.AcademicYearID = s.AcademicYearID
+            LEFT JOIN Guardians g ON g.GuardianID = s.GuardianID
+            CROSS APPLY (SELECT
+                CASE WHEN s.EnrollmentDate IS NULL THEN 1 ELSE 0 END AS MissingData,
+                CASE WHEN EXISTS(SELECT 1 FROM FeeInvoices fi WHERE fi.StudentID=s.StudentID AND fi.AcademicYearID=s.AcademicYearID AND fi.Status<>'Cancelled') THEN 1 ELSE 0 END AS HasInvoice,
+                (SELECT COUNT(*) FROM (
+                    SELECT fs.FeeCategoryID
+                    FROM ClassFeeStructures fs
+                    INNER JOIN FeeCategories fc ON fc.FeeCategoryID=fs.FeeCategoryID AND fc.IsActive=1
+                    WHERE fs.IsActive=1 AND fs.AcademicYearID=s.AcademicYearID AND fs.ClassID=sec.ClassID
+                      AND (fs.SectionID=s.SectionID OR fs.SectionID IS NULL)
+                      AND (fs.SectionID=s.SectionID OR NOT EXISTS(
+                            SELECT 1 FROM ClassFeeStructures sp WHERE sp.AcademicYearID=fs.AcademicYearID AND sp.ClassID=fs.ClassID
+                              AND sp.SectionID=s.SectionID AND sp.FeeCategoryID=fs.FeeCategoryID AND sp.IsActive=1))
+                    GROUP BY fs.FeeCategoryID) z) AS AppCount,
+                CASE WHEN EXISTS(
+                    SELECT fs.FeeCategoryID
+                    FROM ClassFeeStructures fs
+                    WHERE fs.IsActive=1 AND fs.AcademicYearID=s.AcademicYearID AND fs.ClassID=sec.ClassID
+                      AND (fs.SectionID=s.SectionID OR fs.SectionID IS NULL)
+                      AND (fs.SectionID=s.SectionID OR NOT EXISTS(
+                            SELECT 1 FROM ClassFeeStructures sp WHERE sp.AcademicYearID=fs.AcademicYearID AND sp.ClassID=fs.ClassID
+                              AND sp.SectionID=s.SectionID AND sp.FeeCategoryID=fs.FeeCategoryID AND sp.IsActive=1))
+                    GROUP BY fs.FeeCategoryID HAVING COUNT(*)>1) THEN 1 ELSE 0 END AS DupFlag
+            ) calc
+            WHERE s.Status='Active'";
+
+        private const string StatusExpr = @"
+            CASE WHEN calc.MissingData=1 THEN 'Missing Required Data'
+                 WHEN calc.HasInvoice=1 THEN 'Invoice Already Exists'
+                 WHEN calc.AppCount=0 THEN 'No Matching Fee Structure'
+                 WHEN calc.DupFlag=1 THEN 'Multiple Fee Structures'
+                 ELSE 'Ready' END";
+
+        /// <summary>Student placement details for the confirmation modal.</summary>
+        public DataTable GetStudentPlacement(int studentId)
+        {
+            return Query(@"SELECT s.StudentID, s.StudentCode,
+                    LTRIM(RTRIM(s.FirstName+' '+ISNULL(s.LastName,''))) AS StudentName,
+                    ISNULL(ay.YearName,'—') AS AcademicYear, c.ClassName, sec.SectionName, ISNULL(s.Shift,'—') AS Shift
+                FROM Students s
+                INNER JOIN Sections sec ON sec.SectionID=s.SectionID
+                INNER JOIN Classes c ON c.ClassID=sec.ClassID
+                LEFT JOIN AcademicYears ay ON ay.AcademicYearID=s.AcademicYearID
+                WHERE s.StudentID=@id AND s.Status='Active'", new SqlParameter("@id", studentId));
+        }
+
+        /// <summary>Summary counts for the queue cards (all DB-derived).</summary>
+        public DataTable PendingSetupSummary()
+        {
+            return Query(@"
+                SELECT
+                  (SELECT COUNT(*) " + PendingBaseSql + @" AND calc.HasInvoice=0) AS Pending,
+                  (SELECT COUNT(*) " + PendingBaseSql + @" AND calc.HasInvoice=0 AND calc.MissingData=0 AND calc.AppCount>=1 AND calc.DupFlag=0) AS Ready,
+                  (SELECT COUNT(*) " + PendingBaseSql + @" AND calc.HasInvoice=0 AND calc.MissingData=0 AND calc.AppCount=0) AS MissingStructure,
+                  (SELECT COUNT(*) FROM FeeInvoices WHERE InvoiceType='Initial' AND CAST(CreatedAt AS date)=CAST(GETDATE() AS date)) AS CompletedToday");
+        }
+
+        /// <summary>Filtered, paginated queue. Default (empty status) hides already-invoiced students.</summary>
+        public DataTable PendingSetupQueue(string search, int? yearId, int? classId, int? sectionId, string shift, string status, int page, int pageSize, out int total)
+        {
+            var filters = new System.Collections.Generic.List<SqlParameter>
+            {
+                new SqlParameter("@Search", (object)(search ?? "")),
+                new SqlParameter("@Year", (object)yearId ?? DBNull.Value),
+                new SqlParameter("@Class", (object)classId ?? DBNull.Value),
+                new SqlParameter("@Section", (object)sectionId ?? DBNull.Value),
+                new SqlParameter("@Shift", (object)(string.IsNullOrEmpty(shift) ? null : shift) ?? DBNull.Value),
+                new SqlParameter("@Status", (object)(string.IsNullOrEmpty(status) ? null : status) ?? DBNull.Value)
+            };
+
+            string whereExtra = @"
+                AND (@Search='' OR s.StudentCode LIKE '%'+@Search+'%' OR s.AdmissionNo LIKE '%'+@Search+'%'
+                     OR LTRIM(RTRIM(s.FirstName+' '+ISNULL(s.LastName,''))) LIKE '%'+@Search+'%')
+                AND (@Year IS NULL OR s.AcademicYearID=@Year)
+                AND (@Class IS NULL OR sec.ClassID=@Class)
+                AND (@Section IS NULL OR s.SectionID=@Section)
+                AND (@Shift IS NULL OR s.Shift=@Shift)
+                AND (( @Status IS NULL AND calc.HasInvoice=0 ) OR ( @Status IS NOT NULL AND (" + StatusExpr + @")=@Status ))";
+
+            var countParams = filters.ToArray();
+            total = Convert.ToInt32(Query("SELECT COUNT(*) " + PendingBaseSql + whereExtra, countParams).Rows[0][0]);
+
+            var pageParams = new System.Collections.Generic.List<SqlParameter>(filters)
+            {
+                new SqlParameter("@Skip", (page - 1) * pageSize),
+                new SqlParameter("@Take", pageSize)
+            };
+
+            string sql = @"
+                SELECT s.StudentID, s.StudentCode, s.AdmissionNo,
+                       LTRIM(RTRIM(s.FirstName+' '+ISNULL(s.LastName,''))) AS StudentName,
+                       s.EnrollmentDate, ISNULL(ay.YearName,'—') AS AcademicYear, c.ClassName, sec.SectionName,
+                       ISNULL(s.Shift,'—') AS Shift, ISNULL(g.FullName,'—') AS Guardian,
+                       calc.AppCount, " + StatusExpr + @" AS FinanceStatus
+                " + PendingBaseSql + whereExtra + @"
+                ORDER BY s.EnrollmentDate DESC, s.StudentID DESC
+                OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY";
+            return Query(sql, pageParams.ToArray());
+        }
+
+        /// <summary>
+        /// Creates the student's initial invoice in ONE transaction with every guard:
+        /// locks the student, confirms Active, re-checks no year-invoice exists, loads the
+        /// applicable ClassFeeStructures items, generates the canonical number, inserts header
+        /// + items, audits. Returns false with a safe message on any guard failure.
+        /// </summary>
+        public bool CreateInitialInvoice(int studentId, DateTime invoiceDate, DateTime dueDate, int createdBy, string ip,
+            out int invoiceId, out string invoiceNumber, out decimal total, out string message)
+        {
+            invoiceId = 0; invoiceNumber = null; total = 0; message = null;
+
+            using (var conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                using (var tx = conn.BeginTransaction(IsolationLevel.Serializable))
+                {
+                    try
+                    {
+                        int yearId, sectionId, classId;
+                        using (var cmd = new SqlCommand("SELECT s.Status, s.AcademicYearID, s.SectionID, sec.ClassID FROM Students s WITH (UPDLOCK, HOLDLOCK) JOIN Sections sec ON sec.SectionID=s.SectionID WHERE s.StudentID=@id", conn, tx))
+                        {
+                            cmd.Parameters.AddWithValue("@id", studentId);
+                            using (var r = cmd.ExecuteReader())
+                            {
+                                if (!r.Read()) { tx.Rollback(); message = "Student not found."; return false; }
+                                if (Convert.ToString(r["Status"]) != "Active") { tx.Rollback(); message = "The student is not active. Invoice not created."; return false; }
+                                yearId = Convert.ToInt32(r["AcademicYearID"]);
+                                sectionId = Convert.ToInt32(r["SectionID"]);
+                                classId = Convert.ToInt32(r["ClassID"]);
+                            }
+                        }
+
+                        using (var cmd = new SqlCommand("SELECT COUNT(*) FROM FeeInvoices WITH (UPDLOCK, HOLDLOCK) WHERE StudentID=@s AND AcademicYearID=@y AND Status<>'Cancelled'", conn, tx))
+                        {
+                            cmd.Parameters.AddWithValue("@s", studentId);
+                            cmd.Parameters.AddWithValue("@y", yearId);
+                            if (Convert.ToInt32(cmd.ExecuteScalar()) > 0) { tx.Rollback(); message = "An invoice already exists for this student and academic year."; return false; }
+                        }
+
+                        var items = new DataTable();
+                        using (var cmd = new SqlCommand(@"
+                            SELECT fs.FeeCategoryID, fc.CategoryName,
+                                   COALESCE(fs.[Description],fc.[Description]) AS [Description],
+                                   fs.Amount,
+                                   CASE fs.DiscountType WHEN 'Percentage' THEN ROUND(fs.Amount*fs.DiscountAmount/100,2)
+                                        WHEN 'Fixed Amount' THEN fs.DiscountAmount ELSE 0 END AS DiscountAmount
+                            FROM ClassFeeStructures fs
+                            INNER JOIN FeeCategories fc ON fc.FeeCategoryID=fs.FeeCategoryID AND fc.IsActive=1
+                            WHERE fs.IsActive=1 AND fs.AcademicYearID=@y AND fs.ClassID=@c
+                              AND (fs.SectionID=@sec OR fs.SectionID IS NULL)
+                              AND (fs.SectionID=@sec OR NOT EXISTS(
+                                    SELECT 1 FROM ClassFeeStructures sp WHERE sp.AcademicYearID=fs.AcademicYearID AND sp.ClassID=fs.ClassID
+                                      AND sp.SectionID=@sec AND sp.FeeCategoryID=fs.FeeCategoryID AND sp.IsActive=1))
+                            ORDER BY fc.CategoryName", conn, tx))
+                        {
+                            cmd.Parameters.AddWithValue("@y", yearId);
+                            cmd.Parameters.AddWithValue("@c", classId);
+                            cmd.Parameters.AddWithValue("@sec", sectionId);
+                            using (var a = new SqlDataAdapter(cmd)) a.Fill(items);
+                        }
+
+                        if (items.Rows.Count == 0) { tx.Rollback(); message = "No matching fee structure exists for this student. Set one up in Fee Structures first."; return false; }
+
+                        // True duplicate category (two rows resolved to the same level) — do not guess.
+                        var seen = new System.Collections.Generic.HashSet<int>();
+                        foreach (DataRow row in items.Rows)
+                            if (!seen.Add(Convert.ToInt32(row["FeeCategoryID"])))
+                            { tx.Rollback(); message = "Multiple conflicting fee structures match this student. Resolve them in Fee Structures before invoicing."; return false; }
+
+                        decimal subtotal = 0;
+                        foreach (DataRow row in items.Rows)
+                        {
+                            decimal amount = Convert.ToDecimal(row["Amount"]);
+                            decimal disc = Convert.ToDecimal(row["DiscountAmount"]);
+                            subtotal += Math.Max(0, amount - disc);
+                        }
+                        total = subtotal;
+
+                        using (var cmd = new SqlCommand(@"SELECT 'INV-'+CONVERT(char(4),YEAR(@Date))+'-'+
+                            RIGHT('000000'+CONVERT(varchar(6),ISNULL(MAX(TRY_CONVERT(int,RIGHT(InvoiceNumber,6))),0)+1),6)
+                            FROM FeeInvoices WITH(UPDLOCK,HOLDLOCK) WHERE InvoiceNumber LIKE 'INV-'+CONVERT(char(4),YEAR(@Date))+'-%'", conn, tx))
+                        {
+                            cmd.Parameters.AddWithValue("@Date", invoiceDate);
+                            invoiceNumber = Convert.ToString(cmd.ExecuteScalar());
+                        }
+
+                        using (var cmd = new SqlCommand(@"INSERT FeeInvoices(InvoiceNumber,StudentID,AcademicYearID,InvoiceDate,DueDate,InvoiceType,Subtotal,DiscountAmount,TotalAmount,PaidAmount,[Status],CreatedBy)
+                            VALUES(@Number,@Student,@Year,@InvoiceDate,@DueDate,'Initial',@Subtotal,0,@Total,0,'Unpaid',@User);
+                            SELECT CONVERT(int,SCOPE_IDENTITY());", conn, tx))
+                        {
+                            cmd.Parameters.AddWithValue("@Number", invoiceNumber);
+                            cmd.Parameters.AddWithValue("@Student", studentId);
+                            cmd.Parameters.AddWithValue("@Year", yearId);
+                            cmd.Parameters.AddWithValue("@InvoiceDate", invoiceDate.Date);
+                            cmd.Parameters.AddWithValue("@DueDate", dueDate.Date);
+                            cmd.Parameters.AddWithValue("@Subtotal", subtotal);
+                            cmd.Parameters.AddWithValue("@Total", total);
+                            cmd.Parameters.AddWithValue("@User", createdBy);
+                            invoiceId = Convert.ToInt32(cmd.ExecuteScalar());
+                        }
+
+                        foreach (DataRow row in items.Rows)
+                        {
+                            decimal amount = Convert.ToDecimal(row["Amount"]);
+                            decimal disc = Convert.ToDecimal(row["DiscountAmount"]);
+                            using (var cmd = new SqlCommand(@"INSERT FeeInvoiceItems(InvoiceID,FeeCategoryID,FeeCategoryName,[Description],Amount,DiscountAmount,TotalAmount)
+                                VALUES(@Invoice,@Category,@Name,@Description,@Amount,@Discount,@Total)", conn, tx))
+                            {
+                                cmd.Parameters.AddWithValue("@Invoice", invoiceId);
+                                cmd.Parameters.AddWithValue("@Category", row["FeeCategoryID"]);
+                                cmd.Parameters.AddWithValue("@Name", row["CategoryName"]);
+                                cmd.Parameters.AddWithValue("@Description", row["Description"] == DBNull.Value ? (object)DBNull.Value : row["Description"]);
+                                cmd.Parameters.AddWithValue("@Amount", amount);
+                                cmd.Parameters.AddWithValue("@Discount", disc);
+                                cmd.Parameters.AddWithValue("@Total", Math.Max(0, amount - disc));
+                                cmd.ExecuteNonQuery();
+                            }
+                        }
+
+                        using (var cmd = new SqlCommand("INSERT dbo.AuditLog(UserID,Action,Module,Detail,IPAddress,ActionTime) VALUES(@u,'FINANCE_INITIAL_INVOICE','Finance',@d,@ip,GETDATE())", conn, tx))
+                        {
+                            cmd.Parameters.AddWithValue("@u", createdBy);
+                            cmd.Parameters.AddWithValue("@d", "Student #" + studentId + " Invoice #" + invoiceId + " (" + invoiceNumber + ") Year #" + yearId);
+                            cmd.Parameters.AddWithValue("@ip", (object)(ip ?? "Unavailable"));
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        tx.Commit();
+                        message = "Initial invoice " + invoiceNumber + " created.";
+                        return true;
+                    }
+                    catch
+                    {
+                        try { tx.Rollback(); } catch { }
+                        invoiceId = 0; invoiceNumber = null; total = 0;
+                        message = "The invoice could not be created due to a system error. Please try again.";
+                        return false;
+                    }
+                }
+            }
+        }
     }
 }
