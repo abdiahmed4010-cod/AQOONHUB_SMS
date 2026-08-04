@@ -62,6 +62,16 @@ namespace AQOONHUB_SMS.Modules.Students
             set { ViewState["CurrentPhotoPath"] = value; }
         }
 
+        // ---- Placement baseline (captured when the form loads) — the authoritative "original"
+        //      used for change detection and concurrency comparison. Never trusted from the client. ----
+        private int OrigYearId { get { return ViewState["OrigYear"] == null ? 0 : (int)ViewState["OrigYear"]; } set { ViewState["OrigYear"] = value; } }
+        private int OrigSectionId { get { return ViewState["OrigSection"] == null ? 0 : (int)ViewState["OrigSection"]; } set { ViewState["OrigSection"] = value; } }
+        private int OrigClassId { get { return ViewState["OrigClass"] == null ? 0 : (int)ViewState["OrigClass"]; } set { ViewState["OrigClass"] = value; } }
+        private string OrigShift { get { return ViewState["OrigShift"] as string ?? ""; } set { ViewState["OrigShift"] = value ?? ""; } }
+        private DateTime OrigEnrollmentDate { get { return ViewState["OrigEnroll"] == null ? DateTime.MinValue : (DateTime)ViewState["OrigEnroll"]; } set { ViewState["OrigEnroll"] = value; } }
+        private string PendingPhotoPath { get { return ViewState["PendingPhoto"] as string; } set { ViewState["PendingPhoto"] = value; } }
+        private string ConfirmToken { get { return ViewState["ConfirmToken"] as string; } set { ViewState["ConfirmToken"] = value; } }
+
         #region Authorization
 
         private string NormalizeRole(string role)
@@ -276,6 +286,13 @@ namespace AQOONHUB_SMS.Modules.Students
             int curSectionId = Convert.ToInt32(row["SectionID"]);
             LoadSections(classId, shiftVal, curSectionId, keepSelected: true);
 
+            // Capture the authoritative placement baseline for change-detection + concurrency.
+            OrigYearId = academicYearId;
+            OrigClassId = classId;
+            OrigSectionId = curSectionId;
+            OrigShift = shiftVal ?? "";
+            OrigEnrollmentDate = Convert.ToDateTime(row["EnrollmentDate"]).Date;
+
             // Warn when the student's current section has no assigned shift (mixed/unassigned):
             // do not auto-change Student.Shift; a new conflicting placement is blocked on save.
             object curSecShift = ExecuteScalar("SELECT Shift FROM Sections WHERE SectionID=@s", new[] { new SqlParameter("@s", curSectionId) });
@@ -403,17 +420,32 @@ namespace AQOONHUB_SMS.Modules.Students
 
         #region Save
 
+        private int? SelectedGuardianId()
+        {
+            int g;
+            return int.TryParse(ddlGuardian.SelectedValue, out g) && g > 0 ? g : (int?)null;
+        }
+
+        private bool PlacementChanged()
+        {
+            int newSection, newYear, newClass;
+            int.TryParse(ddlSection.SelectedValue, out newSection);
+            int.TryParse(ddlAcademicYear.SelectedValue, out newYear);
+            int.TryParse(ddlClass.SelectedValue, out newClass);
+            string newShift = ddlShift.SelectedValue ?? "";
+            return newSection != OrigSectionId || newYear != OrigYearId || newClass != OrigClassId
+                || !string.Equals(newShift, OrigShift ?? "", StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>Step 1: validate; save demographics immediately, or open the placement
+        /// confirmation modal when Academic Year / Class / Shift / Section changed.</summary>
         protected void btnSave_Click(object sender, EventArgs e)
         {
             if (!CanEditStudent()) { ShowError("You do not have permission to edit students."); return; }
             if (!Page.IsValid) return;
 
             string validationError;
-            if (!ValidateStudent(out validationError))
-            {
-                ShowError(validationError);
-                return;
-            }
+            if (!ValidateStudent(out validationError)) { ShowError(validationError); return; }
 
             string newPhotoPath = CurrentPhotoPath;
             try
@@ -421,30 +453,102 @@ namespace AQOONHUB_SMS.Modules.Students
                 string uploaded = SaveUploadedPhoto();
                 if (!string.IsNullOrEmpty(uploaded)) newPhotoPath = uploaded;
             }
-            catch (Exception)
+            catch (Exception) { ShowError("The photo could not be saved. Please try a different file."); return; }
+
+            if (!PlacementChanged())
             {
-                ShowError("The photo could not be saved. Please try a different file.");
+                // Demographic-only save: never touches placement, never writes history.
+                string demoError;
+                if (!SaveDemographicsOnly(newPhotoPath, SelectedGuardianId(), out demoError)) { ShowError(demoError); return; }
+                CurrentPhotoPath = newPhotoPath;
+                Response.Redirect("~/Modules/Students/StudentDetails.aspx?id=" + StudentId, true);
                 return;
             }
 
-            int? guardianId = null;
-            int parsedGuardianId;
-            if (int.TryParse(ddlGuardian.SelectedValue, out parsedGuardianId) && parsedGuardianId > 0)
-                guardianId = parsedGuardianId;
+            // Placement changed → do NOT save yet; open the confirmation modal.
+            PendingPhotoPath = newPhotoPath;
+            ConfirmToken = Guid.NewGuid().ToString("N");
+            BuildPlacementSummary();
+            if (string.IsNullOrEmpty(txtEffectiveDate.Text)) txtEffectiveDate.Text = DateTime.Today.ToString("yyyy-MM-dd");
+            pnlPlacementConfirm.Visible = true;
+        }
+
+        private void BuildPlacementSummary()
+        {
+            hfConfirmToken.Value = ConfirmToken ?? "";
+            lblPcCode.Text = Server.HtmlEncode(lblStudentCode.Text);
+            lblPcName.Text = Server.HtmlEncode((txtFirstName.Text.Trim() + " " + txtLastName.Text.Trim()).Trim());
+
+            lblPcCurYear.Text = Server.HtmlEncode(YearName(OrigYearId));
+            lblPcCurClass.Text = Server.HtmlEncode(ClassName(OrigClassId));
+            lblPcCurShift.Text = Server.HtmlEncode(string.IsNullOrEmpty(OrigShift) ? "—" : OrigShift);
+            lblPcCurSection.Text = Server.HtmlEncode(SectionName(OrigSectionId));
+
+            int newYear, newClass, newSection;
+            int.TryParse(ddlAcademicYear.SelectedValue, out newYear);
+            int.TryParse(ddlClass.SelectedValue, out newClass);
+            int.TryParse(ddlSection.SelectedValue, out newSection);
+            lblPcNewYear.Text = Server.HtmlEncode(YearName(newYear));
+            lblPcNewClass.Text = Server.HtmlEncode(ClassName(newClass));
+            lblPcNewShift.Text = Server.HtmlEncode(string.IsNullOrEmpty(ddlShift.SelectedValue) ? "—" : ddlShift.SelectedValue);
+            lblPcNewSection.Text = Server.HtmlEncode(SectionName(newSection));
+        }
+
+        private string YearName(int id) { object o = ExecuteScalar("SELECT YearName FROM AcademicYears WHERE AcademicYearID=@id", new[] { new SqlParameter("@id", id) }); return o == null || o == DBNull.Value ? "—" : Convert.ToString(o); }
+        private string ClassName(int id) { object o = ExecuteScalar("SELECT ClassName FROM Classes WHERE ClassID=@id", new[] { new SqlParameter("@id", id) }); return o == null || o == DBNull.Value ? "—" : Convert.ToString(o); }
+        private string SectionName(int id) { object o = ExecuteScalar("SELECT SectionName FROM Sections WHERE SectionID=@id", new[] { new SqlParameter("@id", id) }); return o == null || o == DBNull.Value ? "—" : Convert.ToString(o); }
+
+        /// <summary>Step 2: user confirmed the placement change.</summary>
+        protected void btnConfirmPlacement_Click(object sender, EventArgs e)
+        {
+            if (!CanEditStudent()) { Response.StatusCode = 403; Response.Redirect("~/Modules/Dashboard/Dashboard.aspx?denied=students", true); return; }
+
+            // Double-submit / replay guard: a valid confirmation token must exist; consume it.
+            if (string.IsNullOrEmpty(ConfirmToken) || !string.Equals(ConfirmToken, hfConfirmToken.Value, StringComparison.Ordinal))
+            {
+                pnlPlacementConfirm.Visible = false;
+                ShowError("This confirmation is no longer valid. Please review the changes and try again.");
+                return;
+            }
+
+            // Reason (required, trimmed, safe length, no HTML stored).
+            string reason = (ddlReason.SelectedValue == "Other")
+                ? (txtReasonOther.Text ?? "").Trim()
+                : (ddlReason.SelectedValue ?? "").Trim();
+            if (string.IsNullOrWhiteSpace(reason)) { BuildPlacementSummary(); pnlPlacementConfirm.Visible = true; ShowConfirmError("A placement change reason is required."); return; }
+            if (reason.Length > 300) reason = reason.Substring(0, 300);
+
+            // Effective date (required, valid, not before enrollment).
+            DateTime effective;
+            if (!DateTime.TryParse(txtEffectiveDate.Text, out effective)) { BuildPlacementSummary(); pnlPlacementConfirm.Visible = true; ShowConfirmError("Please provide a valid effective date."); return; }
+            if (effective.Date < OrigEnrollmentDate.Date) { BuildPlacementSummary(); pnlPlacementConfirm.Visible = true; ShowConfirmError("The effective date cannot be before the student's enrollment date (" + OrigEnrollmentDate.ToString("yyyy-MM-dd") + ")."); return; }
 
             int newSectionId = int.Parse(ddlSection.SelectedValue);
             int newYearId = int.Parse(ddlAcademicYear.SelectedValue);
             string newShift = string.IsNullOrEmpty(ddlShift.SelectedValue) ? null : ddlShift.SelectedValue;
+            string photo = PendingPhotoPath ?? CurrentPhotoPath;
 
             string saveError;
-            if (!SaveStudentWithPlacementHistory(newPhotoPath, guardianId, newSectionId, newYearId, newShift, out saveError))
+            if (!SaveStudentWithPlacementHistory(photo, SelectedGuardianId(), newSectionId, newYearId, newShift, reason, effective, out saveError))
             {
-                ShowError(saveError);
+                BuildPlacementSummary(); pnlPlacementConfirm.Visible = true;
+                ShowConfirmError(saveError);
                 return;
             }
 
-            CurrentPhotoPath = newPhotoPath;
+            ConfirmToken = null;              // consume token → replay/double-click writes nothing more
+            CurrentPhotoPath = photo;
             Response.Redirect("~/Modules/Students/StudentDetails.aspx?id=" + StudentId, true);
+        }
+
+        protected void btnCancelPlacement_Click(object sender, EventArgs e)
+        {
+            // No database changes. Discard a photo that was uploaded only for this pending change.
+            if (!string.IsNullOrEmpty(PendingPhotoPath) && PendingPhotoPath != CurrentPhotoPath)
+                DeletePhotoIfExists(PendingPhotoPath);
+            PendingPhotoPath = null;
+            ConfirmToken = null;
+            pnlPlacementConfirm.Visible = false;
         }
 
         protected void btnCancel_Click(object sender, EventArgs e)
@@ -459,7 +563,7 @@ namespace AQOONHUB_SMS.Modules.Students
         /// row is mutated. Any failure rolls back the whole operation, so placement history
         /// can never be silently destroyed and old Attendance/Exam/Finance rows are untouched.
         /// </summary>
-        private bool SaveStudentWithPlacementHistory(string photoPath, int? guardianId, int newSectionId, int newYearId, string newShift, out string error)
+        private bool SaveStudentWithPlacementHistory(string photoPath, int? guardianId, int newSectionId, int newYearId, string newShift, string reason, DateTime effectiveDate, out string error)
         {
             error = null;
             int actorId;
@@ -483,6 +587,15 @@ namespace AQOONHUB_SMS.Modules.Students
                                 curSection = Convert.ToInt32(r["SectionID"]);
                                 curYear = Convert.ToInt32(r["AcademicYearID"]);
                             }
+                        }
+
+                        // Concurrency: the live placement must still equal the baseline the user confirmed
+                        // against. If another user moved the student meanwhile, stop — never overwrite silently.
+                        if (curSection != OrigSectionId || curYear != OrigYearId)
+                        {
+                            tx.Rollback();
+                            error = "The student's placement was changed by another user. Reload the latest record before continuing.";
+                            return false;
                         }
 
                         bool sectionChanged = newSectionId != curSection;
@@ -541,15 +654,16 @@ namespace AQOONHUB_SMS.Modules.Students
                                 INSERT INTO StudentPromotions
                                     (StudentID, FromAcademicYearID, ToAcademicYearID, FromSectionID, ToSectionID, Status, ActionDate, PromotedBy, Notes, CreatedAt)
                                 VALUES
-                                    (@sid, @fromYear, @toYear, @fromSec, @toSec, 'Completed', GETDATE(), @by, @notes, GETDATE())", conn, tx))
+                                    (@sid, @fromYear, @toYear, @fromSec, @toSec, 'Completed', @actionDate, @by, @notes, GETDATE())", conn, tx))
                             {
                                 cmd.Parameters.AddWithValue("@sid", StudentId);
                                 cmd.Parameters.AddWithValue("@fromYear", curYear);
                                 cmd.Parameters.AddWithValue("@toYear", newYearId);
                                 cmd.Parameters.AddWithValue("@fromSec", curSection);
                                 cmd.Parameters.AddWithValue("@toSec", newSectionId);
+                                cmd.Parameters.AddWithValue("@actionDate", effectiveDate.Date);
                                 cmd.Parameters.AddWithValue("@by", actorId > 0 ? (object)actorId : DBNull.Value);
-                                cmd.Parameters.AddWithValue("@notes", "Placement change via Edit Student");
+                                cmd.Parameters.AddWithValue("@notes", string.IsNullOrWhiteSpace(reason) ? (object)DBNull.Value : reason.Trim());
                                 cmd.ExecuteNonQuery();
                             }
                         }
@@ -583,6 +697,15 @@ namespace AQOONHUB_SMS.Modules.Students
                         tx.Commit();
                         return true;
                     }
+                    catch (SqlException sx) when (sx.Number == 2601 || sx.Number == 2627)
+                    {
+                        // Pre-existing unique index UX_Promotion_Student_ToYear (StudentID, ToAcademicYearID):
+                        // a placement change into the same academic year is already recorded. Surfaced as a
+                        // clear message rather than a raw error — the history transaction itself is unchanged.
+                        try { tx.Rollback(); } catch { }
+                        error = "A placement change into the selected academic year is already recorded for this student. Only one placement change per academic year is supported.";
+                        return false;
+                    }
                     catch (Exception)
                     {
                         try { tx.Rollback(); } catch { }
@@ -593,7 +716,63 @@ namespace AQOONHUB_SMS.Modules.Students
             }
         }
 
+        /// <summary>
+        /// Updates ONLY demographic fields — never AcademicYearID / SectionID / Shift — so a
+        /// demographic-only edit can never rewrite placement (and can't revert a concurrent move).
+        /// No StudentPromotions row is ever written here.
+        /// </summary>
+        private bool SaveDemographicsOnly(string photoPath, int? guardianId, out string error)
+        {
+            error = null;
+            try
+            {
+                ExecuteNonQuery(@"
+                    UPDATE Students SET
+                        FirstName=@FirstName, LastName=@LastName, Gender=@Gender, Status=@Status,
+                        DateOfBirth=@DateOfBirth, EnrollmentDate=@EnrollmentDate, GuardianID=@GuardianID,
+                        Address=@Address, MedicalNotes=@MedicalNotes, PhotoPath=@PhotoPath, UpdatedAt=GETDATE()
+                    WHERE StudentID=@StudentID",
+                    new[]
+                    {
+                        new SqlParameter("@FirstName", txtFirstName.Text.Trim()),
+                        new SqlParameter("@LastName", txtLastName.Text.Trim()),
+                        new SqlParameter("@Gender", ddlGender.SelectedValue),
+                        new SqlParameter("@Status", ddlStatus.SelectedValue),
+                        new SqlParameter("@DateOfBirth", DateTime.Parse(txtDateOfBirth.Text)),
+                        new SqlParameter("@EnrollmentDate", DateTime.Parse(txtEnrollmentDate.Text)),
+                        new SqlParameter("@GuardianID", (object)guardianId ?? DBNull.Value),
+                        new SqlParameter("@Address", string.IsNullOrEmpty(txtAddress.Text.Trim()) ? (object)DBNull.Value : txtAddress.Text.Trim()),
+                        new SqlParameter("@MedicalNotes", string.IsNullOrEmpty(txtMedicalNotes.Text.Trim()) ? (object)DBNull.Value : txtMedicalNotes.Text.Trim()),
+                        new SqlParameter("@PhotoPath", (object)photoPath ?? DBNull.Value),
+                        new SqlParameter("@StudentID", StudentId)
+                    });
+                return true;
+            }
+            catch (Exception)
+            {
+                error = "The student could not be updated due to a system error. Please try again.";
+                return false;
+            }
+        }
+
+        private void DeletePhotoIfExists(string relativePath)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(relativePath)) return;
+                string physical = Server.MapPath("~/" + relativePath.TrimStart('/', '~'));
+                if (System.IO.File.Exists(physical)) System.IO.File.Delete(physical);
+            }
+            catch { /* non-critical cleanup */ }
+        }
+
         #endregion
+
+        private void ShowConfirmError(string message)
+        {
+            lblPcError.Text = Server.HtmlEncode(message);
+            pnlPcError.Visible = true;
+        }
 
         private void ShowSuccess(string message)
         {

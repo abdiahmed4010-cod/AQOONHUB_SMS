@@ -31,6 +31,27 @@
         protected global::System.Web.UI.WebControls.DropDownList ddlShift;
         protected global::System.Web.UI.WebControls.Panel pnlShiftWarn;
 
+        // Placement change confirmation
+        protected global::System.Web.UI.WebControls.Panel pnlPlacementConfirm;
+        protected global::System.Web.UI.WebControls.Panel pnlPcError;
+        protected global::System.Web.UI.WebControls.Label lblPcError;
+        protected global::System.Web.UI.WebControls.Label lblPcCode;
+        protected global::System.Web.UI.WebControls.Label lblPcName;
+        protected global::System.Web.UI.WebControls.Label lblPcCurYear;
+        protected global::System.Web.UI.WebControls.Label lblPcCurClass;
+        protected global::System.Web.UI.WebControls.Label lblPcCurShift;
+        protected global::System.Web.UI.WebControls.Label lblPcCurSection;
+        protected global::System.Web.UI.WebControls.Label lblPcNewYear;
+        protected global::System.Web.UI.WebControls.Label lblPcNewClass;
+        protected global::System.Web.UI.WebControls.Label lblPcNewShift;
+        protected global::System.Web.UI.WebControls.Label lblPcNewSection;
+        protected global::System.Web.UI.WebControls.DropDownList ddlReason;
+        protected global::System.Web.UI.WebControls.TextBox txtEffectiveDate;
+        protected global::System.Web.UI.WebControls.TextBox txtReasonOther;
+        protected global::System.Web.UI.WebControls.HiddenField hfConfirmToken;
+        protected global::System.Web.UI.WebControls.LinkButton btnCancelPlacement;
+        protected global::System.Web.UI.WebControls.LinkButton btnConfirmPlacement;
+
         protected global::System.Web.UI.WebControls.Panel pnlGuardianField;
         protected global::System.Web.UI.WebControls.DropDownList ddlGuardian;
         protected global::System.Web.UI.WebControls.Panel pnlNoGuardians;

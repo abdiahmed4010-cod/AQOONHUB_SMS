@@ -24,6 +24,33 @@
         .form-actions { display:flex; gap:.6rem; flex-wrap:wrap; justify-content:flex-end; padding-top:1rem; border-top:1px solid #E5E7EB; margin-top:.5rem; }
         .dark .form-actions { border-color:#334155; }
         @media (max-width:768px){ .form-wrap{padding:.875rem;} .form-actions{justify-content:stretch;} .form-actions .btn{flex:1;justify-content:center;} }
+
+        /* Placement confirmation modal */
+        .pc-backdrop { position:fixed; inset:0; background:rgba(15,23,42,.55); z-index:80; display:flex; align-items:center; justify-content:center; padding:1rem; }
+        .pc-modal { background:#fff; border-radius:1rem; width:100%; max-width:620px; max-height:90vh; overflow-y:auto; padding:1.5rem; box-shadow:0 20px 50px -12px rgba(15,23,42,.4); }
+        .dark .pc-modal { background:#1E293B; color:#E2E8F0; }
+        .pc-head { display:flex; align-items:center; gap:.5rem; }
+        .pc-head h3 { font-size:1.05rem; font-weight:800; margin:0; }
+        .pc-sub { font-size:.78rem; color:#6B7280; margin:.35rem 0 1rem; }
+        .dark .pc-sub { color:#94A3B8; }
+        .pc-student { display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; margin-bottom:.9rem; }
+        .pc-compare { display:grid; grid-template-columns:1fr auto 1fr; gap:.75rem; align-items:center; }
+        @media (max-width:560px){ .pc-compare { grid-template-columns:1fr; } .pc-arrow { transform:rotate(90deg); justify-self:center; } }
+        .pc-col { border:1px solid #E5E7EB; border-radius:.7rem; padding:.75rem .9rem; }
+        .dark .pc-col { border-color:#334155; }
+        .pc-col-new { border-color:#2563EB; background:#EFF6FF; }
+        .dark .pc-col-new { background:#1E293B; border-color:#3B82F6; }
+        .pc-col h4 { font-size:.68rem; font-weight:800; text-transform:uppercase; letter-spacing:.04em; color:#64748B; margin:0 0 .5rem; }
+        .pc-col dl { margin:0; display:grid; grid-template-columns:auto 1fr; gap:.25rem .6rem; }
+        .pc-col dt { font-size:.72rem; color:#6B7280; }
+        .dark .pc-col dt { color:#94A3B8; }
+        .pc-col dd { font-size:.82rem; font-weight:600; margin:0; text-align:right; }
+        .pc-arrow { color:#94A3B8; }
+        .pc-note { font-size:.76rem; color:#475569; background:#F8FAFC; border-radius:.6rem; padding:.6rem .8rem; margin:1rem 0 .5rem; }
+        .dark .pc-note { color:#CBD5E1; background:#0F172A; }
+        .pc-actions { display:flex; gap:.6rem; justify-content:flex-end; margin-top:1rem; }
+        @media (max-width:560px){ .pc-actions { flex-direction:column-reverse; } .pc-actions .btn { width:100%; justify-content:center; } }
+        @media (prefers-reduced-motion: reduce) { * { scroll-behavior:auto; } }
     </style>
 </asp:Content>
 
@@ -116,7 +143,8 @@
             </div>
 
             <div class="form-section">
-                <h2><i data-lucide="school" class="w-4 h-4 text-brand-600"></i> Academic Information</h2>
+                <h2><i data-lucide="school" class="w-4 h-4 text-brand-600"></i> Academic Placement</h2>
+                <p class="sub"><i data-lucide="info" class="w-3.5 h-3.5 inline-block align-[-2px]"></i> Changes to Academic Year, Class, Shift, or Section are recorded in the student's placement history.</p>
                 <div class="form-grid two-col">
                     <div class="field">
                         <asp:Label runat="server" AssociatedControlID="ddlAcademicYear" Text="Academic Year *" />
@@ -204,5 +232,106 @@
             </div>
         </div>
         </asp:Panel>
+
+        <%-- ===================== Placement change confirmation ===================== --%>
+        <asp:Panel ID="pnlPlacementConfirm" runat="server" Visible="false" CssClass="pc-backdrop">
+            <div class="pc-modal" role="dialog" aria-modal="true" aria-labelledby="pcTitle" aria-describedby="pcDesc" id="pcModal">
+                <div class="pc-head">
+                    <i data-lucide="git-branch" class="w-5 h-5 text-brand-600"></i>
+                    <h3 id="pcTitle">Confirm Placement Change</h3>
+                </div>
+                <p id="pcDesc" class="pc-sub">Review the current and new academic placement, provide a reason and effective date, then confirm.</p>
+
+                <asp:Panel ID="pnlPcError" runat="server" Visible="false" CssClass="alert alert-danger" role="alert" aria-live="assertive">
+                    <i data-lucide="alert-triangle" class="w-4 h-4 mt-0.5"></i>
+                    <asp:Label ID="lblPcError" runat="server" />
+                </asp:Panel>
+
+                <div class="pc-student">
+                    <span class="readonly-pill"><asp:Label ID="lblPcCode" runat="server" /></span>
+                    <span class="font-bold"><asp:Label ID="lblPcName" runat="server" /></span>
+                </div>
+
+                <div class="pc-compare">
+                    <div class="pc-col">
+                        <h4>Current placement</h4>
+                        <dl>
+                            <dt>Academic Year</dt><dd><asp:Label ID="lblPcCurYear" runat="server" /></dd>
+                            <dt>Class</dt><dd><asp:Label ID="lblPcCurClass" runat="server" /></dd>
+                            <dt>Shift</dt><dd><asp:Label ID="lblPcCurShift" runat="server" /></dd>
+                            <dt>Section</dt><dd><asp:Label ID="lblPcCurSection" runat="server" /></dd>
+                        </dl>
+                    </div>
+                    <div class="pc-arrow" aria-hidden="true"><i data-lucide="arrow-right" class="w-5 h-5"></i></div>
+                    <div class="pc-col pc-col-new">
+                        <h4>New placement</h4>
+                        <dl>
+                            <dt>Academic Year</dt><dd><asp:Label ID="lblPcNewYear" runat="server" /></dd>
+                            <dt>Class</dt><dd><asp:Label ID="lblPcNewClass" runat="server" /></dd>
+                            <dt>Shift</dt><dd><asp:Label ID="lblPcNewShift" runat="server" /></dd>
+                            <dt>Section</dt><dd><asp:Label ID="lblPcNewSection" runat="server" /></dd>
+                        </dl>
+                    </div>
+                </div>
+
+                <p class="pc-note"><i data-lucide="shield-check" class="w-4 h-4 inline-block align-[-3px] text-emerald-600"></i>
+                    This change will create a placement history record. Existing attendance, examination, finance, and report history will not be rewritten.</p>
+
+                <div class="form-grid two-col" style="margin-top:.5rem;">
+                    <div class="field">
+                        <asp:Label runat="server" AssociatedControlID="ddlReason" Text="Placement Change Reason *" />
+                        <asp:DropDownList ID="ddlReason" runat="server" CssClass="input">
+                            <asp:ListItem Text="Select a reason" Value="" />
+                            <asp:ListItem Text="Class Transfer" Value="Class Transfer" />
+                            <asp:ListItem Text="Section Transfer" Value="Section Transfer" />
+                            <asp:ListItem Text="Shift Change" Value="Shift Change" />
+                            <asp:ListItem Text="Academic Promotion" Value="Academic Promotion" />
+                            <asp:ListItem Text="Placement Correction" Value="Placement Correction" />
+                            <asp:ListItem Text="Administrative Adjustment" Value="Administrative Adjustment" />
+                            <asp:ListItem Text="Other" Value="Other" />
+                        </asp:DropDownList>
+                        <asp:RequiredFieldValidator runat="server" ControlToValidate="ddlReason" CssClass="field-error" Display="Dynamic" ValidationGroup="Confirm" InitialValue="" ErrorMessage="Please select a reason." Text="Please select a reason." />
+                    </div>
+                    <div class="field">
+                        <asp:Label runat="server" AssociatedControlID="txtEffectiveDate" Text="Effective Date *" />
+                        <asp:TextBox ID="txtEffectiveDate" runat="server" CssClass="input" TextMode="Date" />
+                        <asp:RequiredFieldValidator runat="server" ControlToValidate="txtEffectiveDate" CssClass="field-error" Display="Dynamic" ValidationGroup="Confirm" ErrorMessage="Please provide an effective date." Text="Please provide an effective date." />
+                    </div>
+                </div>
+                <div class="field">
+                    <asp:Label runat="server" AssociatedControlID="txtReasonOther" Text="Additional explanation (required when reason is Other)" />
+                    <asp:TextBox ID="txtReasonOther" runat="server" CssClass="input" TextMode="MultiLine" Rows="2" MaxLength="300" />
+                </div>
+
+                <asp:HiddenField ID="hfConfirmToken" runat="server" />
+                <div class="pc-actions">
+                    <asp:LinkButton ID="btnCancelPlacement" runat="server" CssClass="btn btn-secondary" CausesValidation="false" OnClick="btnCancelPlacement_Click">Cancel</asp:LinkButton>
+                    <asp:LinkButton ID="btnConfirmPlacement" runat="server" CssClass="btn btn-primary" ValidationGroup="Confirm" OnClick="btnConfirmPlacement_Click" OnClientClick="return aqoonPcConfirm(this);">
+                        <i data-lucide="check" class="w-4 h-4"></i> Confirm Placement Change
+                    </asp:LinkButton>
+                </div>
+            </div>
+        </asp:Panel>
     </div>
+
+    <script>
+        // Double-submit guard for the confirm button (server also enforces via token + concurrency).
+        window.aqoonPcConfirm = function (btn) {
+            if (typeof Page_ClientValidate === 'function' && !Page_ClientValidate('Confirm')) return false;
+            if (btn.getAttribute('data-busy') === '1') return false;
+            btn.setAttribute('data-busy', '1');
+            btn.classList.add('opacity-60', 'pointer-events-none');
+            return true;
+        };
+        // Focus management + Escape close for the placement modal.
+        (function () {
+            var modal = document.getElementById('pcModal');
+            if (!modal) return;
+            var focusable = modal.querySelector('select, input, textarea, a, button');
+            if (focusable) { try { focusable.focus(); } catch (e) {} }
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') { var c = document.getElementById('<%= btnCancelPlacement.ClientID %>'); if (c) c.click(); }
+            });
+        })();
+    </script>
 </asp:Content>
