@@ -338,20 +338,44 @@ namespace AQOONHUB_SMS.Modules.Students
             LoadReturnSections(0);
         }
 
+        private bool IsAdminLevel() { string r = NormalizeRole(Session["Role"] as string); return r == "superadmin" || r == "admin"; }
+
+        /// <summary>Destination sections filtered by Class + selected Shift + Active. Admins also
+        /// see NULL-shift sections labelled "Shift Not Assigned"; the save still blocks them.</summary>
         private void LoadReturnSections(int classId)
         {
             ddlReturnSection.Items.Clear();
             ddlReturnSection.Items.Add(new ListItem("Select Section", "0"));
             if (classId <= 0) return;
 
-            DataTable dt = ExecuteQuery(
-                "SELECT SectionID, SectionName FROM Sections WHERE ClassID = @ClassID ORDER BY SectionName",
-                new[] { new SqlParameter("@ClassID", classId) });
-            foreach (DataRow row in dt.Rows)
-                ddlReturnSection.Items.Add(new ListItem(row["SectionName"].ToString(), row["SectionID"].ToString()));
+            string shift = ddlReturnShift.SelectedValue;
+            if (shift == "Morning" || shift == "Afternoon")
+            {
+                DataTable dt = ExecuteQuery(
+                    "SELECT SectionID, SectionName FROM Sections WHERE ClassID=@ClassID AND Status='Active' AND Shift=@Shift ORDER BY SectionName",
+                    new[] { new SqlParameter("@ClassID", classId), new SqlParameter("@Shift", shift) });
+                foreach (DataRow row in dt.Rows)
+                    ddlReturnSection.Items.Add(new ListItem(row["SectionName"].ToString(), row["SectionID"].ToString()));
+            }
+
+            if (IsAdminLevel())
+            {
+                DataTable un = ExecuteQuery(
+                    "SELECT SectionID, SectionName FROM Sections WHERE ClassID=@ClassID AND Status='Active' AND Shift IS NULL ORDER BY SectionName",
+                    new[] { new SqlParameter("@ClassID", classId) });
+                foreach (DataRow row in un.Rows)
+                {
+                    var li = new ListItem(row["SectionName"] + " — Shift Not Assigned", row["SectionID"].ToString());
+                    li.Attributes["data-unassigned"] = "1";
+                    ddlReturnSection.Items.Add(li);
+                }
+            }
         }
 
-        protected void ddlReturnClass_SelectedIndexChanged(object sender, EventArgs e)
+        protected void ddlReturnClass_SelectedIndexChanged(object sender, EventArgs e) { ReloadReturnSections(); }
+        protected void ddlReturnShift_Changed(object sender, EventArgs e) { ReloadReturnSections(); }
+
+        private void ReloadReturnSections()
         {
             int classId;
             int.TryParse(ddlReturnClass.SelectedValue, out classId);
@@ -549,10 +573,23 @@ namespace AQOONHUB_SMS.Modules.Students
             { ShowError("Please select a section."); return; }
 
             object sectionCheck = ExecuteScalar(
-                "SELECT COUNT(1) FROM Sections WHERE SectionID = @SectionID AND ClassID = @ClassID",
+                "SELECT COUNT(1) FROM Sections WHERE SectionID = @SectionID AND ClassID = @ClassID AND Status = 'Active'",
                 new[] { new SqlParameter("@SectionID", sectionId), new SqlParameter("@ClassID", classId) });
             if (Convert.ToInt32(sectionCheck) == 0)
-            { ShowError("The selected section does not belong to the selected class."); return; }
+            { ShowError("The selected section does not belong to the selected class, or is not active."); return; }
+
+            // Shift-aware validation (server-side authoritative): the destination section must
+            // carry an assigned shift that matches the selected return shift. NULL is never valid.
+            string returnShift = ddlReturnShift.SelectedValue;
+            if (returnShift != "Morning" && returnShift != "Afternoon")
+            { ShowError("Select a valid shift."); return; }
+            object destShiftObj = ExecuteScalar("SELECT Shift FROM Sections WHERE SectionID = @s",
+                new[] { new SqlParameter("@s", sectionId) });
+            string destShift = (destShiftObj == null || destShiftObj == DBNull.Value) ? null : Convert.ToString(destShiftObj);
+            if (string.IsNullOrEmpty(destShift))
+            { ShowError("The selected section has no assigned shift. Assign the section's shift first (Classes & Sections)."); return; }
+            if (!string.Equals(destShift, returnShift, StringComparison.OrdinalIgnoreCase))
+            { ShowError("The selected section belongs to the " + destShift + " shift. Choose a matching section or shift."); return; }
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             {

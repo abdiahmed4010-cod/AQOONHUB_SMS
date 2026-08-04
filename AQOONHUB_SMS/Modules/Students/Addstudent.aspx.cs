@@ -61,7 +61,7 @@ namespace AQOONHUB_SMS.Modules.Students
             {
                 LoadAcademicYears();
                 LoadClasses();
-                LoadSections(0);
+                LoadSections(0, "");
                 LoadGuardians();
                 GenerateAndDisplayStudentCode();
                 GenerateAndDisplayAdmissionNumber();
@@ -166,26 +166,56 @@ namespace AQOONHUB_SMS.Modules.Students
                 ddlClass.Items.Add(new ListItem(row["ClassName"].ToString(), row["ClassID"].ToString()));
         }
 
-        private void LoadSections(int classId)
+        /// <summary>Only superadmin/admin may see (but not save to) unassigned-shift sections.</summary>
+        private bool IsAdminLevel() { string r = NormalizeRole(Session["Role"] as string); return r == "superadmin" || r == "admin"; }
+
+        /// <summary>
+        /// Binds Sections filtered by Class + selected Shift + Active. Sections whose Shift is NULL
+        /// are shown only to admins, clearly labelled "Shift Not Assigned" (server-side save still
+        /// blocks them). NULL is never treated as Morning/Afternoon.
+        /// </summary>
+        private void LoadSections(int classId, string shift, int selectSectionId = 0)
         {
             ddlSection.Items.Clear();
             ddlSection.Items.Add(new ListItem("Select Section", "0"));
-
             if (classId <= 0) return;
 
-            string query = "SELECT SectionID, SectionName FROM Sections WHERE ClassID = @ClassID ORDER BY SectionName";
-            SqlParameter[] parameters = { new SqlParameter("@ClassID", classId) };
-            DataTable dt = ExecuteQuery(query, parameters);
-            foreach (DataRow row in dt.Rows)
-                ddlSection.Items.Add(new ListItem(row["SectionName"].ToString(), row["SectionID"].ToString()));
+            if (shift == "Morning" || shift == "Afternoon")
+            {
+                DataTable dt = ExecuteQuery("SELECT SectionID, SectionName FROM Sections WHERE ClassID=@ClassID AND Status='Active' AND Shift=@Shift ORDER BY SectionName",
+                    new[] { new SqlParameter("@ClassID", classId), new SqlParameter("@Shift", shift) });
+                foreach (DataRow row in dt.Rows)
+                    ddlSection.Items.Add(new ListItem(row["SectionName"].ToString(), row["SectionID"].ToString()));
+            }
+
+            if (IsAdminLevel())
+            {
+                DataTable un = ExecuteQuery("SELECT SectionID, SectionName FROM Sections WHERE ClassID=@ClassID AND Status='Active' AND Shift IS NULL ORDER BY SectionName",
+                    new[] { new SqlParameter("@ClassID", classId) });
+                foreach (DataRow row in un.Rows)
+                {
+                    var li = new ListItem(row["SectionName"] + " — Shift Not Assigned", row["SectionID"].ToString());
+                    li.Attributes["data-unassigned"] = "1";
+                    ddlSection.Items.Add(li);
+                }
+            }
+
+            if (selectSectionId > 0)
+            {
+                ListItem it = ddlSection.Items.FindByValue(selectSectionId.ToString());
+                if (it != null) { ddlSection.ClearSelection(); it.Selected = true; }
+            }
         }
 
-        protected void ddlClass_SelectedIndexChanged(object sender, EventArgs e)
+        private void ReloadSections()
         {
             int classId;
             int.TryParse(ddlClass.SelectedValue, out classId);
-            LoadSections(classId);
+            LoadSections(classId, ddlShift.SelectedValue);
         }
+
+        protected void ddlClass_SelectedIndexChanged(object sender, EventArgs e) { ReloadSections(); }
+        protected void ddlShift_Changed(object sender, EventArgs e) { ReloadSections(); }
 
         private void LoadGuardians()
         {
@@ -588,11 +618,18 @@ namespace AQOONHUB_SMS.Modules.Students
                             using (SqlCommand cmd = new SqlCommand("SELECT Shift FROM Sections WHERE SectionID=@s", conn, tx))
                             { cmd.Parameters.AddWithValue("@s", destSectionId); secShiftObj = cmd.ExecuteScalar(); }
                             string secShift = (secShiftObj == null || secShiftObj == DBNull.Value) ? null : Convert.ToString(secShiftObj);
-                            if (!string.IsNullOrEmpty(secShift) && !string.Equals(secShift, newShift, StringComparison.OrdinalIgnoreCase))
+                            if (string.IsNullOrEmpty(secShift))
                             {
                                 tx.Rollback();
                                 DeleteUploadedPhotoIfExists(photoRelativePath);
-                                ShowErrorMessage("Shift mismatch: the selected section is a " + secShift + " section but the student's shift is " + newShift + ". Choose a matching section or shift.");
+                                ShowErrorMessage("The selected section has no assigned shift. Assign the section's shift first (Classes & Sections) before enrolling a student.");
+                                return null;
+                            }
+                            if (!string.Equals(secShift, newShift, StringComparison.OrdinalIgnoreCase))
+                            {
+                                tx.Rollback();
+                                DeleteUploadedPhotoIfExists(photoRelativePath);
+                                ShowErrorMessage("The selected section belongs to the " + secShift + " shift. Choose a matching section or shift.");
                                 return null;
                             }
                         }
@@ -724,7 +761,8 @@ namespace AQOONHUB_SMS.Modules.Students
             txtDateOfBirth.Text = "";
             txtEnrollmentDate.Text = DateTime.Now.ToString("yyyy-MM-dd");
             ddlClass.SelectedIndex = 0;
-            LoadSections(0);
+            ddlShift.SelectedIndex = 0;
+            LoadSections(0, "");
             if (ddlGuardian.Items.Count > 0) ddlGuardian.SelectedIndex = 0;
             txtAddress.Text = "";
             txtMedicalNotes.Text = "";

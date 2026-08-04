@@ -137,10 +137,11 @@
                         <asp:Label runat="server" AssociatedControlID="ddlSection" Text="Section *" />
                         <asp:DropDownList ID="ddlSection" runat="server" CssClass="input" />
                         <asp:RequiredFieldValidator runat="server" ControlToValidate="ddlSection" CssClass="field-error" Display="Dynamic" ValidationGroup="Save" ErrorMessage="Please select a section." Text="Please select a section." InitialValue="0" />
+                        <p class="text-[11px] text-gray-500 dark:text-slate-400 mt-1">Sections are filtered by the selected shift. Sections marked <em>“Shift Not Assigned”</em> cannot receive students until configured in <a class="text-brand-600 hover:underline" href="<%= ResolveUrl("~/Modules/Academic/ClassesSections.aspx") %>">Classes &amp; Sections</a>.</p>
                     </div>
                     <div class="field">
                         <asp:Label runat="server" AssociatedControlID="ddlShift" Text="Shift *" />
-                        <asp:DropDownList ID="ddlShift" runat="server" CssClass="input">
+                        <asp:DropDownList ID="ddlShift" runat="server" CssClass="input" AutoPostBack="true" OnSelectedIndexChanged="ddlShift_Changed">
                             <asp:ListItem Text="Select Shift" Value="" />
                             <asp:ListItem Text="Morning" Value="Morning" />
                             <asp:ListItem Text="Afternoon" Value="Afternoon" />

@@ -29,6 +29,7 @@
         protected global::System.Web.UI.WebControls.DropDownList ddlClass;
         protected global::System.Web.UI.WebControls.DropDownList ddlSection;
         protected global::System.Web.UI.WebControls.DropDownList ddlShift;
+        protected global::System.Web.UI.WebControls.Panel pnlShiftWarn;
 
         protected global::System.Web.UI.WebControls.Panel pnlGuardianField;
         protected global::System.Web.UI.WebControls.DropDownList ddlGuardian;

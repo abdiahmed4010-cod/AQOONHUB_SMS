@@ -133,10 +133,14 @@
                         <asp:Label runat="server" AssociatedControlID="ddlSection" Text="Section *" />
                         <asp:DropDownList ID="ddlSection" runat="server" CssClass="input" />
                         <asp:RequiredFieldValidator runat="server" ControlToValidate="ddlSection" CssClass="field-error" Display="Dynamic" ValidationGroup="Save" ErrorMessage="Please select a section." Text="Please select a section." InitialValue="0" />
+                        <p class="text-[11px] text-gray-500 dark:text-slate-400 mt-1">Sections are filtered by shift. Sections marked <em>“Shift Not Assigned”</em> cannot receive a moved student until configured in <a class="text-brand-600 hover:underline" href="<%= ResolveUrl("~/Modules/Academic/ClassesSections.aspx") %>">Classes &amp; Sections</a>.</p>
+                        <asp:Panel ID="pnlShiftWarn" runat="server" Visible="false" CssClass="mt-2 p-2.5 rounded-lg text-xs" role="alert" aria-live="polite" style="background:#FEF3C7;color:#92400E;border:1px solid #FDE68A;">
+                            This section contains mixed-shift students. Resolve the existing student placements before assigning a section shift. The student's shift will not be changed automatically.
+                        </asp:Panel>
                     </div>
                     <div class="field">
                         <asp:Label runat="server" AssociatedControlID="ddlShift" Text="Shift *" />
-                        <asp:DropDownList ID="ddlShift" runat="server" CssClass="input">
+                        <asp:DropDownList ID="ddlShift" runat="server" CssClass="input" AutoPostBack="true" OnSelectedIndexChanged="ddlShift_Changed">
                             <asp:ListItem Text="Select Shift" Value="" />
                             <asp:ListItem Text="Morning" Value="Morning" />
                             <asp:ListItem Text="Afternoon" Value="Afternoon" />

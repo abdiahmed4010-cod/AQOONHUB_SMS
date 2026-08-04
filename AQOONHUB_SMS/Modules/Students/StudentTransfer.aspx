@@ -117,6 +117,15 @@
                                 <asp:RequiredFieldValidator runat="server" ControlToValidate="ddlReturnClass" CssClass="field-error" Display="Dynamic" ValidationGroup="Return" ErrorMessage="Please select a class." Text="Please select a class." InitialValue="0" />
                             </div>
                             <div class="field">
+                                <asp:Label runat="server" AssociatedControlID="ddlReturnShift" Text="Shift *" />
+                                <asp:DropDownList ID="ddlReturnShift" runat="server" CssClass="input" AutoPostBack="true" OnSelectedIndexChanged="ddlReturnShift_Changed">
+                                    <asp:ListItem Text="Select Shift" Value="" />
+                                    <asp:ListItem Text="Morning" Value="Morning" />
+                                    <asp:ListItem Text="Afternoon" Value="Afternoon" />
+                                </asp:DropDownList>
+                                <asp:RequiredFieldValidator runat="server" ControlToValidate="ddlReturnShift" CssClass="field-error" Display="Dynamic" ValidationGroup="Return" ErrorMessage="Please select a shift." Text="Please select a shift." InitialValue="" />
+                            </div>
+                            <div class="field">
                                 <asp:Label runat="server" AssociatedControlID="ddlReturnSection" Text="Section *" />
                                 <asp:DropDownList ID="ddlReturnSection" runat="server" CssClass="input" />
                                 <asp:RequiredFieldValidator runat="server" ControlToValidate="ddlReturnSection" CssClass="field-error" Display="Dynamic" ValidationGroup="Return" ErrorMessage="Please select a section." Text="Please select a section." InitialValue="0" />

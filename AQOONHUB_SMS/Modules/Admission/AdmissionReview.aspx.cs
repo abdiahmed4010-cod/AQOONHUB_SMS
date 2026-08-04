@@ -160,7 +160,8 @@ namespace AQOONHUB_SMS.Modules.Admission
             lblGender.Text = row["Gender"].ToString();
             lblDob.Text = Convert.ToDateTime(row["DateOfBirth"]).ToString("MMM dd, yyyy");
             lblClass.Text = row["ClassName"].ToString();
-            lblShift.Text = (row.Table.Columns.Contains("Shift") && row["Shift"] != DBNull.Value && !string.IsNullOrEmpty(row["Shift"].ToString())) ? row["Shift"].ToString() : "—";
+            AdmissionShift = (row.Table.Columns.Contains("Shift") && row["Shift"] != DBNull.Value) ? row["Shift"].ToString() : "";
+            lblShift.Text = string.IsNullOrEmpty(AdmissionShift) ? "—" : AdmissionShift;
             lblAppDate.Text = Convert.ToDateTime(row["ApplicationDate"]).ToString("MMM dd, yyyy");
             lblGuardianName.Text = row["GuardianName"].ToString();
             lblGuardianPhone.Text = row["GuardianPhone"].ToString();
@@ -256,17 +257,44 @@ namespace AQOONHUB_SMS.Modules.Admission
             }
         }
 
+        /// <summary>The applicant's fixed shift (from the application), used to filter sections.</summary>
+        private string AdmissionShift
+        {
+            get { return ViewState["AdmShift"] as string ?? ""; }
+            set { ViewState["AdmShift"] = value; }
+        }
+
+        private bool IsAdminLevel() { string r = NormalizeRole(Session["Role"] as string); return r == "superadmin" || r == "admin"; }
+
+        /// <summary>Sections filtered by Class + the admission's Shift + Active. Admins also see
+        /// NULL-shift sections labelled "Shift Not Assigned" (enrollment still blocks them).</summary>
         private void LoadSections(int classId)
         {
             ddlSection.Items.Clear();
             ddlSection.Items.Add(new ListItem("Select Section", "0"));
             if (classId <= 0) return;
 
-            DataTable dt = ExecuteQuery(
-                "SELECT SectionID, SectionName FROM Sections WHERE ClassID = @ClassID ORDER BY SectionName",
-                new[] { new SqlParameter("@ClassID", classId) });
-            foreach (DataRow row in dt.Rows)
-                ddlSection.Items.Add(new ListItem(row["SectionName"].ToString(), row["SectionID"].ToString()));
+            if (AdmissionShift == "Morning" || AdmissionShift == "Afternoon")
+            {
+                DataTable dt = ExecuteQuery(
+                    "SELECT SectionID, SectionName FROM Sections WHERE ClassID=@ClassID AND Status='Active' AND Shift=@Shift ORDER BY SectionName",
+                    new[] { new SqlParameter("@ClassID", classId), new SqlParameter("@Shift", AdmissionShift) });
+                foreach (DataRow row in dt.Rows)
+                    ddlSection.Items.Add(new ListItem(row["SectionName"].ToString(), row["SectionID"].ToString()));
+            }
+
+            if (IsAdminLevel())
+            {
+                DataTable un = ExecuteQuery(
+                    "SELECT SectionID, SectionName FROM Sections WHERE ClassID=@ClassID AND Status='Active' AND Shift IS NULL ORDER BY SectionName",
+                    new[] { new SqlParameter("@ClassID", classId) });
+                foreach (DataRow row in un.Rows)
+                {
+                    var li = new ListItem(row["SectionName"] + " — Shift Not Assigned", row["SectionID"].ToString());
+                    li.Attributes["data-unassigned"] = "1";
+                    ddlSection.Items.Add(li);
+                }
+            }
         }
 
         #region Actions
@@ -468,20 +496,26 @@ namespace AQOONHUB_SMS.Modules.Admission
                             return;
                         }
 
-                        // --- Shift compatibility (Stage 4): reject Morning->Afternoon etc.
-                        //     only when the destination section carries an assigned shift. ---
+                        // --- Shift compatibility (Stage 4): destination section must carry an
+                        //     assigned shift that matches the applicant's shift. An unassigned
+                        //     (NULL) section is never a valid enrollment target. ---
                         string admShift = (app.Table.Columns.Contains("Shift") && app["Shift"] != DBNull.Value)
                             ? app["Shift"].ToString() : null;
-                        if (!string.IsNullOrEmpty(admShift))
                         {
                             object secShiftObj = ExecuteScalar(conn, tx,
                                 "SELECT Shift FROM Sections WHERE SectionID = @s",
                                 new[] { new SqlParameter("@s", sectionId) });
                             string secShift = (secShiftObj == null || secShiftObj == DBNull.Value) ? null : Convert.ToString(secShiftObj);
-                            if (!string.IsNullOrEmpty(secShift) && !string.Equals(secShift, admShift, StringComparison.OrdinalIgnoreCase))
+                            if (string.IsNullOrEmpty(secShift))
                             {
                                 tx.Rollback();
-                                ShowError("Shift mismatch: the selected section is a " + secShift + " section but this applicant's shift is " + admShift + ". Choose a matching section or shift.");
+                                ShowError("The selected section has no assigned shift. Assign the section's shift first (Classes & Sections) before enrolling.");
+                                return;
+                            }
+                            if (!string.IsNullOrEmpty(admShift) && !string.Equals(secShift, admShift, StringComparison.OrdinalIgnoreCase))
+                            {
+                                tx.Rollback();
+                                ShowError("The selected section belongs to the " + secShift + " shift but this applicant's shift is " + admShift + ". Choose a matching section or shift.");
                                 return;
                             }
                         }

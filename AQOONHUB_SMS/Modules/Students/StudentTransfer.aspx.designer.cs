@@ -38,6 +38,7 @@
         protected global::System.Web.UI.WebControls.TextBox txtReturnDate;
         protected global::System.Web.UI.WebControls.DropDownList ddlReturnAcademicYear;
         protected global::System.Web.UI.WebControls.DropDownList ddlReturnClass;
+        protected global::System.Web.UI.WebControls.DropDownList ddlReturnShift;
         protected global::System.Web.UI.WebControls.DropDownList ddlReturnSection;
         protected global::System.Web.UI.WebControls.TextBox txtReturnReason;
         protected global::System.Web.UI.WebControls.TextBox txtReturnNotes;
