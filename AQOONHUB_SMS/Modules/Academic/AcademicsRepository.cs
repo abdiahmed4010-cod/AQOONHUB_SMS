@@ -621,7 +621,12 @@ SELECT st.StudentID, st.StudentCode, st.FullName, c.ClassName AS CurrentClass, s
 FROM Students st
 JOIN Sections sec ON st.SectionID=sec.SectionID
 JOIN Classes c ON sec.ClassID=c.ClassID
-LEFT JOIN StudentPromotions p ON p.StudentID=st.StudentID AND p.ToAcademicYearID=@to
+-- Latest promotion row for the target year only (students may now have several
+-- same-year placement-history rows; this keeps exactly one candidate row each).
+OUTER APPLY (SELECT TOP 1 pp.Status, pp.ActionDate, pp.ToSectionID
+             FROM StudentPromotions pp
+             WHERE pp.StudentID=st.StudentID AND pp.ToAcademicYearID=@to
+             ORDER BY pp.ActionDate DESC, pp.CreatedAt DESC, pp.PromotionID DESC) p
 WHERE st.AcademicYearID=@from
   AND (@cl IS NULL OR c.ClassID=@cl)
   AND (@se IS NULL OR st.SectionID=@se)

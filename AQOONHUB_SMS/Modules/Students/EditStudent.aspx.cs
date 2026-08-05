@@ -699,11 +699,11 @@ namespace AQOONHUB_SMS.Modules.Students
                     }
                     catch (SqlException sx) when (sx.Number == 2601 || sx.Number == 2627)
                     {
-                        // Pre-existing unique index UX_Promotion_Student_ToYear (StudentID, ToAcademicYearID):
-                        // a placement change into the same academic year is already recorded. Surfaced as a
-                        // clear message rather than a raw error — the history transaction itself is unchanged.
+                        // Defensive: no unique/business-key index constrains placement history anymore
+                        // (multiple same-year changes are allowed). This only fires if some other unique
+                        // constraint is ever added; surface it safely rather than as a raw error.
                         try { tx.Rollback(); } catch { }
-                        error = "A placement change into the selected academic year is already recorded for this student. Only one placement change per academic year is supported.";
+                        error = "This placement change appears to duplicate an existing record. Please review and try again.";
                         return false;
                     }
                     catch (Exception)

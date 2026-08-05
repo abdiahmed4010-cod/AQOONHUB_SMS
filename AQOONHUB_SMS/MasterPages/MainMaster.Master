@@ -243,6 +243,9 @@
                         <a class="<%= ChildClass("examinations") %>" href="<%= ResolveUrl("~/Modules/Examinations/Examinations.aspx") %>" <%= ActiveKey=="examinations" ? "aria-current=\"page\"" : "" %>>
                             <i data-lucide="file-edit" class="w-[18px] h-[18px]" aria-hidden="true"></i><span>Examinations</span>
                         </a>
+                        <a class="<%= ChildClass("transcript") %>" href="<%= ResolveUrl("~/Modules/Examinations/Transcripts.aspx") %>" <%= ActiveKey=="transcript" ? "aria-current=\"page\"" : "" %>>
+                            <i data-lucide="file-text" class="w-[18px] h-[18px]" aria-hidden="true"></i><span>Generate Transcript</span>
+                        </a>
                     </div>
                 </div>
                 <% } %>

@@ -11,11 +11,11 @@ namespace AQOONHUB_SMS
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            // Entry point: send authenticated users to the dashboard, others to login.
-            if (Session["UserID"] != null)
-                Response.Redirect("~/Modules/Dashboard/Dashboard.aspx", true);
-            else
-                Response.Redirect("~/Modules/Authentication/Login.aspx", true);
+            // Public home page. The AQOONHUB landing page is shown at the site root to every
+            // visitor — anonymous and authenticated alike. No automatic redirect to Login or
+            // Dashboard happens here; users reach protected areas only via the Sign In links.
+            // (Authenticated users can still open their dashboard from those links; protected
+            //  modules remain secured by the Web.config <location path="Modules"> rule.)
         }
     }
 }

@@ -59,11 +59,11 @@ body {
     padding: 40px 42px;
     color: #EAF1FF;
     overflow: hidden;
-    /* Layered: navy overlay -> campus photo -> navy fallback gradient.
-       If the photo is absent the fallback gradient keeps the panel on-brand. */
+    /* Layered: navy overlay -> AQOONHUB dashboard-office photo -> navy fallback gradient.
+       The dark-blue overlay keeps the logo, heading, features and copyright readable. */
     background-image:
-        linear-gradient(175deg, rgba(15, 45, 107, .72) 0%, rgba(11, 33, 74, .80) 55%, rgba(6, 22, 52, .90) 100%),
-        url("../images/campus.jpg"),
+        linear-gradient(175deg, rgba(15, 45, 107, .74) 0%, rgba(11, 33, 74, .82) 55%, rgba(6, 22, 52, .90) 100%),
+        url("../images/about-dashboard.png"),
         linear-gradient(160deg, #0F2D6B 0%, #0B2350 55%, #081B3F 100%);
     background-position: center, center, center;
     background-size: cover, cover, cover;

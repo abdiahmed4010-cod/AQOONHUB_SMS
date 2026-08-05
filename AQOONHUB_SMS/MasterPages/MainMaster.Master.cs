@@ -214,6 +214,7 @@ namespace AQOONHUB_SMS.MasterPages
                 new[] {"~/modules/parents/","guardians"},
                 new[] {"~/modules/admission/","admissions"},
                 new[] {"~/modules/staff/","staff"},
+                new[] {"~/modules/examinations/transcripts","transcript"},
                 new[] {"~/modules/examinations/","examinations"},
                 new[] {"~/modules/finance/pendingfinancesetup","finance-setup"},
                 new[] {"~/modules/finance/","finance"},
@@ -244,7 +245,7 @@ namespace AQOONHUB_SMS.MasterPages
             switch (key)
             {
                 case "students": case "guardians": case "admissions": return "student";
-                case "staff": case "academics": case "classes": case "attendance": case "myattendance": case "examinations": return "academic";
+                case "staff": case "academics": case "classes": case "attendance": case "myattendance": case "examinations": case "transcript": return "academic";
                 case "finance": case "finance-setup": case "payroll": return "finance";
                 case "reports": return "reports";
                 case "comm-overview": case "comm-announcements": case "comm-messages": case "comm-sms": case "comm-logs": return "comm";

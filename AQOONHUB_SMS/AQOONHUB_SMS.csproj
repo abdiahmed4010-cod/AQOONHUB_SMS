@@ -108,12 +108,14 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="About.aspx" />
+    <Content Include="Assets\images\about-dashboard.png" />
     <Content Include="Assets\images\campus.png" />
     <Content Include="Assets\js\modules\dashboard\dashboard.js" />
     <Content Include="Assets\js\modules\attendance\attendance.js" />
     <Content Include="Assets\js\modules\authentication\login-page.js" />
     <Content Include="Assets\js\modules\authentication\change-password.js" />
     <Content Include="Assets\js\layout\sidebar-navigation.js" />
+    <Content Include="Assets\js\landing.js" />
     <Content Include="Assets\js\core\app.js" />
     <Content Include="Assets\js\core\dropdown.js" />
     <Content Include="Assets\js\core\layout.js" />
@@ -208,6 +210,7 @@
     <Content Include="Modules\Examinations\Results.aspx" />
     <Content Include="Modules\Examinations\ReportCard.aspx" />
     <Content Include="Modules\Examinations\ReportCards.aspx" />
+    <Content Include="Modules\Examinations\Transcripts.aspx" />
     <Content Include="Modules\Attendance\Attendance.aspx" />
     <Content Include="Modules\Attendance\MarkAttendance.aspx" />
     <Content Include="Modules\Attendance\AttendanceByDate.aspx" />
@@ -240,6 +243,7 @@
     <Content Include="Modules\Reports\ReportAuditLog.aspx" />
     <Content Include="Assets\css\reports-stage5.css" />
     <Content Include="Assets\css\login-page.css" />
+    <Content Include="Assets\css\landing.css" />
     <Content Include="Assets\css\sidebar-navigation.css" />
     <Content Include="Database\Scripts\ReportsStage5.sql" />
     <Content Include="Modules\Academic\Academics.aspx" />
@@ -776,6 +780,14 @@
     <Compile Include="Modules\Payroll\PayrollRepository.cs" />
     <Compile Include="Modules\Academic\AcademicsRepository.cs" />
     <Compile Include="Modules\Examinations\ExaminationsRepository.cs" />
+    <Compile Include="Modules\Examinations\TranscriptRepository.cs" />
+    <Compile Include="Modules\Examinations\Transcripts.aspx.cs">
+      <DependentUpon>Transcripts.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Examinations\Transcripts.aspx.designer.cs">
+      <DependentUpon>Transcripts.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Modules\Examinations\Examinations.aspx.cs">
       <DependentUpon>Examinations.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
